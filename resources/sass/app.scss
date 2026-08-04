@@ -1,0 +1,14 @@
+// RohidaFarm Premium Ghee E-commerce SCSS
+@import "bootstrap/scss/bootstrap";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+@import "swiper/css/bundle";
+@import "aos/dist/aos.css";
+
+// Modular Theme Components
+@import "theme/variables";
+@import "theme/base";
+@import "theme/components";
+@import "theme/sliders";
+@import "theme/media-gallery";
+@import "icon-picker";
+@import "header";

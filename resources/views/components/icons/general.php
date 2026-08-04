@@ -1,0 +1,21 @@
+<?php
+return [
+    'bi-tags' => 'Tags',
+    'bi-tag' => 'Tag',
+    'bi-bookmark' => 'Bookmark',
+    'bi-bookmark-star' => 'Bookmark Star',
+    'bi-award' => 'Award / Trophy',
+    'bi-award-fill' => 'Award Solid',
+    'bi-shield-check' => 'Purity Shield',
+    'bi-patch-check' => 'Verified Badge',
+    'bi-patch-check-fill' => 'Verified Badge Solid',
+    'bi-gem' => 'Gem / Premium',
+    'bi-stars' => 'Organic Stars',
+    'bi-star' => 'Star Outline',
+    'bi-star-fill' => 'Star Solid',
+    'bi-check-all' => 'Verified Checks',
+    'bi-check-circle' => 'Check Circle',
+    'bi-hand-thumbs-up' => 'Thumbs Up / Approved',
+    'bi-heart' => 'Heart Outline',
+    'bi-heart-fill' => 'Heart Solid',
+];

@@ -1,0 +1,169 @@
+// ─── Desktop Add to Cart / Buy Now — less rounded ──
+// Applied to product page buttons only (scoped inside .main-detail-card)
+.main-detail-card {
+    .btn-premium,
+    .btn-premium-outline {
+        border-radius: 10px !important;
+    }
+}
+
+// ---------- Mobile Sticky CTA Bar ----------
+.mobile-sticky-cta {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1020;
+    background: #fff;
+    border-top: 1px solid #e8e4dd;
+    padding: 10px 14px;
+    box-shadow: 0 -6px 24px rgba(0,0,0,0.12);
+    gap: 10px;
+}
+
+body.hide-mobile-cta .mobile-sticky-cta {
+    display: none !important;
+}
+
+// Premium CTA Button Base
+.mobile-cta-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    flex: 1;
+    height: 50px;
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.88rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+
+    &:active { transform: scale(0.97); }
+}
+
+// Add to Cart — outlined style
+.mobile-cta-cart {
+    background: #ffffff;
+    color: #1a6b36;
+    border: 2px solid #1a6b36;
+
+    .mobile-cta-icon { color: #1a6b36; }
+
+    &:hover {
+        background: #f0faf4;
+        box-shadow: 0 4px 14px rgba(26,107,54,0.15);
+    }
+}
+
+// Buy Now — solid green with shimmer streamer
+.mobile-cta-buy {
+    background: linear-gradient(135deg, #1a6b36 0%, #248443 60%, #2da653 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 18px rgba(36,132,67,0.35);
+
+    .mobile-cta-icon { color: #ffffff; }
+    .mobile-cta-label { color: #ffffff; }
+
+    &:hover {
+        box-shadow: 0 6px 22px rgba(36,132,67,0.48);
+        transform: translateY(-1px);
+    }
+}
+
+// Sold Out — premium disabled styling
+.mobile-cta-sold-out {
+    background-color: #95a5a6 !important;
+    color: #ffffff !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+    box-shadow: none !important;
+    border: none !important;
+
+    &:hover {
+        box-shadow: none !important;
+        transform: none !important;
+    }
+}
+
+// Shimmer streak on Buy Now
+.mobile-cta-shimmer {
+    position: absolute;
+    top: 0;
+    left: -60%;
+    width: 45%;
+    height: 100%;
+    background: linear-gradient(
+        105deg,
+        transparent 30%,
+        rgba(255,255,255,0.30) 50%,
+        transparent 70%
+    );
+    animation: ctaShimmer 2.2s ease-in-out infinite;
+    pointer-events: none;
+}
+@keyframes ctaShimmer {
+    0%   { left: -60%; }
+    100% { left: 120%; }
+}
+
+// Icon wrapper
+.mobile-cta-icon {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+@media (max-width: 767.98px) {
+    .mobile-sticky-cta { display: flex !important; }
+    .desktop-cart-controls { display: none !important; }
+    // Pad content so sticky bar doesn't overlap
+    body { padding-bottom: 80px; }
+
+    // Darker mobile gallery thumbnails border
+    .mobile-thumbs-container .thumb-img-wrapper {
+        border-color: #c5b99a !important;
+        background: #faf7f0 !important;
+    }
+    .mobile-thumbs-container .thumb-img-wrapper.active {
+        border-color: #1a6b36 !important;
+        box-shadow: 0 0 0 2px rgba(26,107,54,0.22) !important;
+    }
+}
+
+// ---------- Widened Detail Section ----------
+.product-detail-container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 30px;
+}
+
+@media (max-width: 767.98px) {
+    .product-detail-container {
+        padding: 0 12px !important;
+    }
+
+    // Remove boxed borders/shadows on mobile for full width look
+    .main-detail-card {
+        padding: 12px 6px !important;
+        border: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        margin-bottom: 15px !important;
+        background-color: transparent !important;
+    }
+}
+
+// ---------- Tab list sliding scroll ----------
+.nav-tabs {
+    .nav-link {
+        white-space: nowrap;
+    }
+}

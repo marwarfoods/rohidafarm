@@ -1,0 +1,25 @@
+.header-main-container {
+    transition: var(--transition-smooth);
+    z-index: 1024;
+}
+
+.mobile-menu-tabs {
+    margin-left: -24px;
+    margin-right: -24px;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+.mobile-menu-tabs .nav-link.active {
+    background-color: #ffffff !important;
+    color: var(--primary-green) !important;
+    border-bottom: 3px solid var(--primary-green) !important;
+}
+.mobile-menu-tabs .nav-link {
+    border-bottom: 3px solid transparent !important;
+}
+/* Accordion chevron transitions */
+[data-bs-toggle="collapse"] i {
+    transition: transform 0.2s ease-in-out;
+}
+[data-bs-toggle="collapse"]:not(.collapsed) i {
+    transform: rotate(180deg);
+}

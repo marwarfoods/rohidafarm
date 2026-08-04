@@ -1,0 +1,86 @@
+/* Admin Settings Page Styles */
+
+/* Tab Styles */
+.nav-pills .nav-link {
+    color: #495057;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.nav-pills .nav-link:hover {
+    background-color: rgba(36, 132, 67, 0.05);
+    color: var(--primary-green);
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+    background-color: var(--primary-green);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(36, 132, 67, 0.2);
+}
+
+/* Tab Content Transitions */
+.tab-content > .tab-pane {
+    display: none;
+}
+.tab-content > .active {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Right Sidebar Sticky Cards */
+.dynamic-sidebar-card {
+    display: none; /* JS will toggle this */
+}
+.dynamic-sidebar-card.active {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* SEO Preview (WordPress Style) */
+.seo-preview-card {
+    background: #fff;
+    border: 1px solid #dfe1e5;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    font-family: Arial, sans-serif; /* Google uses standard sans-serif */
+}
+
+.seo-preview-url {
+    color: #202124;
+    font-size: 14px;
+    line-height: 1.3;
+    margin-bottom: 2px;
+}
+
+.seo-preview-title {
+    color: #1a0dab;
+    font-size: 20px;
+    line-height: 1.3;
+    margin-bottom: 4px;
+    cursor: pointer;
+    font-weight: 400;
+}
+.seo-preview-title:hover {
+    text-decoration: underline;
+}
+
+.seo-preview-desc {
+    color: #4d5156;
+    font-size: 14px;
+    line-height: 1.58;
+}
+
+.empty-seo-placeholder {
+    color: #70757a;
+    font-style: italic;
+}

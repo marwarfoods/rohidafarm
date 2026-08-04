@@ -1,0 +1,43 @@
+// ---------- Gallery Thumbnails ----------
+.product-gallery-sticky {
+    .thumb-img-wrapper {
+        border: 2px solid #e8e4dd !important;
+        transition: all 0.2s ease;
+        opacity: 0.65;
+
+        &:hover, &.active {
+            opacity: 1;
+            border-color: var(--primary-green) !important;
+            box-shadow: 0 4px 12px rgba(36, 132, 67, 0.1);
+        }
+    }
+}
+
+// ---------- Lightbox Swiper Modal ----------
+#imageLightboxModal .modal-content {
+    background: rgba(0,0,0,0.92) !important;
+}
+#lightboxSwiper {
+    .swiper-slide {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .swiper-button-next,
+    .swiper-button-prev {
+        color: #fff;
+        background: rgba(255,255,255,0.12);
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        --swiper-navigation-size: 18px;
+
+        &:hover { background: rgba(255,255,255,0.25); }
+    }
+    .swiper-pagination-bullet-active { background: #fff !important; }
+}
+
+// ---------- Swiper Dot Active ----------
+.swiper-pagination-bullet-active {
+    background: var(--primary-green) !important;
+}

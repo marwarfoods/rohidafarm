@@ -1,0 +1,498 @@
+/* ── About Us Page Custom SCSS ── */
+
+.about-page {
+    background-color: #FAF8F5;
+    color: #2D2825;
+
+    /* Common Card Styling */
+    .about-card {
+        background: #FFFFFF;
+        border: 1px solid #ECE7DD;
+        border-radius: 20px;
+        padding: 2rem;
+        height: 100%;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+
+        &:hover {
+            transform: translateY(-6px);
+            border-color: #8B5A2B;
+            box-shadow: 0 16px 36px rgba(139, 90, 43, 0.08);
+        }
+    }
+
+    /* Icon Box */
+    .icon-box-circle {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background-color: #F6EFE5;
+        color: #8B5A2B;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1.25rem;
+        transition: all 0.3s ease;
+    }
+
+    .about-card:hover .icon-box-circle {
+        background-color: #8B5A2B;
+        color: #FFFFFF;
+        transform: scale(1.08);
+    }
+}
+
+/* 1. Hero Section (2-Column Layout) */
+.about-hero-section {
+    background: linear-gradient(135deg, #FAF5EA 0%, #F5EFE6 100%);
+    padding: 4rem 0;
+    border-bottom: 1px solid #EBE4D8;
+    position: relative;
+    overflow: hidden;
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.4rem 1.2rem;
+        background-color: #EFE4D6;
+        color: #7A4B22;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        border-radius: 50px;
+        text-transform: uppercase;
+        margin-bottom: 1.25rem;
+        border: 1px solid #E2D3BF;
+    }
+
+    .hero-title {
+        font-family: var(--font-heading);
+        color: #362518;
+        font-size: 2.5rem;
+        font-weight: 800;
+        line-height: 1.22;
+        margin-bottom: 1.25rem;
+
+        .highlight-text {
+            color: #8B5A2B;
+            position: relative;
+            display: inline-block;
+            &::after {
+                content: "";
+                position: absolute;
+                bottom: 4px;
+                left: 0;
+                width: 100%;
+                height: 8px;
+                background-color: rgba(212, 160, 23, 0.25);
+                z-index: -1;
+                border-radius: 4px;
+            }
+        }
+
+        @media (min-width: 992px) {
+            font-size: 3.25rem;
+        }
+    }
+
+    .hero-subtitle {
+        font-size: 1.1rem;
+        color: #6C5B4C;
+        line-height: 1.8;
+        margin-bottom: 1rem;
+    }
+
+    .hero-feature-tags {
+        .feature-tag {
+            background-color: #FFFFFF;
+            border: 1px solid #E5D8C5;
+            color: #4A3E37;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+    }
+
+    .btn-hero-primary {
+        background-color: #8B5A2B;
+        color: #FFFFFF;
+        border: 1px solid #8B5A2B;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        &:hover {
+            background-color: #724720;
+            color: #FFFFFF;
+            box-shadow: 0 8px 20px rgba(139, 90, 43, 0.25);
+            transform: translateY(-2px);
+        }
+    }
+
+    .btn-hero-outline {
+        background-color: transparent;
+        color: #5C3A1A;
+        border: 1.5px solid #8B5A2B;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        &:hover {
+            background-color: #8B5A2B;
+            color: #FFFFFF;
+            transform: translateY(-2px);
+        }
+    }
+
+    /* Right Column Visual */
+    .hero-visual-container {
+        padding: 10px;
+
+        .hero-main-img-card {
+            border-color: #E5D5C3 !important;
+            border-radius: 28px !important;
+
+            img {
+                transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+            &:hover img {
+                transform: scale(1.03);
+            }
+        }
+
+        .hero-floating-badge {
+            position: absolute;
+            bottom: -20px;
+            left: -15px;
+            z-index: 10;
+            border: 1px solid #E5D5C3;
+            border-radius: 20px !important;
+            box-shadow: 0 12px 32px rgba(122, 75, 34, 0.12) !important;
+            max-width: 290px;
+
+            @media (max-width: 576px) {
+                position: relative;
+                bottom: 0;
+                left: 0;
+                margin-top: 15px;
+                max-width: 100%;
+            }
+        }
+    }
+}
+
+/* 2. Intro Statement Banner */
+.about-intro-section {
+    padding: 3.5rem 0;
+
+    .intro-box {
+        background: #FFFFFF;
+        border: 1px dashed #D6C8B5;
+        border-radius: 24px;
+        padding: 2.5rem 2rem;
+        box-shadow: 0 10px 30px rgba(122, 75, 34, 0.04);
+
+        @media (min-width: 768px) {
+            padding: 3.5rem 3rem;
+        }
+
+        .intro-text {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #4A3E37;
+
+            @media (min-width: 992px) {
+                font-size: 1.3rem;
+            }
+        }
+    }
+}
+
+/* 3. Story Section */
+.about-story-section {
+    padding: 4.5rem 0;
+    background-color: #FFFFFF;
+    border-top: 1px solid #ECE7DD;
+    border-bottom: 1px solid #ECE7DD;
+
+    .story-image-wrapper {
+        position: relative;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 16px 40px rgba(43, 30, 20, 0.09);
+        border: 1px solid #EAE3D2;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            min-height: 420px;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        &:hover img {
+            transform: scale(1.03);
+        }
+
+        .story-image-overlay-badge {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(8px);
+            padding: 1.25rem 1.5rem;
+            border-radius: 16px;
+            border: 1px solid rgba(232, 220, 196, 0.8);
+        }
+    }
+
+    .story-triad-pills {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-top: 1.5rem;
+
+        .triad-pill {
+            background-color: #F6EFE5;
+            color: #7A4B22;
+            padding: 0.5rem 1.25rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid #E5D5C3;
+        }
+    }
+}
+
+/* 4. What Makes Us Different Section */
+.about-difference-section {
+    padding: 5rem 0;
+
+    .section-title {
+        font-family: var(--font-heading);
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: #362518;
+        margin-bottom: 0.75rem;
+
+        @media (min-width: 992px) {
+            font-size: 2.75rem;
+        }
+    }
+
+    .section-subtitle {
+        color: #6C5B4C;
+        font-size: 1.1rem;
+        max-width: 650px;
+        margin: 0 auto 3rem;
+    }
+}
+
+/* 5. Pillars / Promise Section */
+.about-pillars-section {
+    padding: 4.5rem 0;
+    background-color: #F5EFE6;
+    border-top: 1px solid #ECE7DD;
+    border-bottom: 1px solid #ECE7DD;
+
+    .pillar-card {
+        background: #FFFFFF;
+        border-radius: 20px;
+        padding: 2rem;
+        border: 1px solid #E8DCC4;
+        height: 100%;
+        display: flex;
+        gap: 1.25rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+        &:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(122, 75, 34, 0.07);
+        }
+
+        .pillar-icon {
+            flex-shrink: 0;
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background-color: #F6EFE5;
+            color: #1B5E20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+        }
+
+        .pillar-content {
+            h5 {
+                font-family: var(--font-heading);
+                font-size: 1.15rem;
+                font-weight: 700;
+                color: #2D2825;
+                margin-bottom: 0.4rem;
+            }
+
+            p {
+                color: #6C5B4C;
+                font-size: 0.95rem;
+                line-height: 1.6;
+                margin: 0;
+            }
+        }
+    }
+}
+
+/* 6. Why Families Choose Us Grid */
+.about-why-section {
+    padding: 5rem 0;
+    background: linear-gradient(135deg, #1B5E20 0%, #114215 100%);
+    color: #FFFFFF;
+
+    .why-header {
+        h2 {
+            font-family: var(--font-heading);
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+
+            @media (min-width: 992px) {
+                font-size: 2.75rem;
+            }
+        }
+    }
+
+    .why-item-card {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 16px;
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        height: 100%;
+        transition: all 0.3s ease;
+
+        i {
+            color: #79D987;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        span {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #FFFFFF;
+            letter-spacing: 0.2px;
+        }
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.16);
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+    }
+}
+
+/* 7. Looking Ahead & Founder Section */
+.about-founder-section {
+    padding: 5rem 0;
+    background-color: #FAF8F5;
+
+    .ahead-box {
+        h3 {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            font-weight: 700;
+            color: #362518;
+            margin-bottom: 1.25rem;
+        }
+
+        .highlight-quote {
+            background-color: #FFFFFF;
+            border-left: 4px solid #8B5A2B;
+            border-radius: 0 16px 16px 0;
+            padding: 1.5rem 1.75rem;
+            margin-top: 2rem;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
+
+            p {
+                font-family: var(--font-heading);
+                font-size: 1.15rem;
+                font-weight: 700;
+                color: #7A4B22;
+                line-height: 1.6;
+                margin: 0;
+            }
+        }
+    }
+
+    .founder-card {
+        background: #FFFFFF;
+        border: 1px solid #E8DCC4;
+        border-radius: 24px;
+        padding: 2.5rem 2rem;
+        position: relative;
+        box-shadow: 0 14px 36px rgba(122, 75, 34, 0.06);
+
+        @media (min-width: 768px) {
+            padding: 3rem 2.5rem;
+        }
+
+        .quote-icon {
+            position: absolute;
+            top: -22px;
+            left: 36px;
+            width: 46px;
+            height: 46px;
+            background-color: #8B5A2B;
+            color: #FFFFFF;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: 0 6px 16px rgba(139, 90, 43, 0.25);
+        }
+
+        h4 {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #362518;
+            margin-bottom: 1.25rem;
+        }
+
+        p {
+            color: #5C4E43;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            font-style: italic;
+        }
+
+        .founder-signature {
+            margin-top: 1.75rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid #F0E8DC;
+
+            .name {
+                font-family: var(--font-heading);
+                font-weight: 700;
+                font-size: 1.15rem;
+                color: #362518;
+            }
+
+            .title {
+                font-size: 0.85rem;
+                color: #8B5A2B;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+        }
+    }
+}

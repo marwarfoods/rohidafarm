@@ -1,0 +1,166 @@
+// ═══════════════════════════════════════════════════════
+// Admin Stat Cards & Info Cards
+// ═══════════════════════════════════════════════════════
+
+// ── Stat Card ──────────────────────────────────────────
+.admin-stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  padding: 1.35rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.07);
+  }
+
+  // Decorative corner gradient
+  &::after {
+    content: '';
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    opacity: 0.06;
+    background: var(--stat-color, var(--admin-accent));
+  }
+
+  .stat-info {
+    flex: 1;
+
+    .stat-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .stat-value {
+      font-family: var(--font-body);
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+
+    .stat-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+
+      &.up   { color: #22c55e; }
+      &.down { color: #ef4444; }
+    }
+  }
+
+  .stat-icon-wrap {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+    background: var(--stat-icon-bg, rgba(36,132,67,0.1));
+    color: var(--stat-color, var(--admin-accent));
+  }
+
+  // Color variants
+  &.stat-success {
+    --stat-color: #16a34a;
+    --stat-icon-bg: rgba(22,163,74,0.1);
+  }
+  &.stat-primary {
+    --stat-color: #2563eb;
+    --stat-icon-bg: rgba(37,99,235,0.1);
+  }
+  &.stat-warning {
+    --stat-color: #d97706;
+    --stat-icon-bg: rgba(217,119,6,0.1);
+  }
+  &.stat-danger {
+    --stat-color: #dc2626;
+    --stat-icon-bg: rgba(220,38,38,0.1);
+  }
+  &.stat-info {
+    --stat-color: #0891b2;
+    --stat-icon-bg: rgba(8,145,178,0.1);
+  }
+  &.stat-purple {
+    --stat-color: #7c3aed;
+    --stat-icon-bg: rgba(124,58,237,0.1);
+  }
+}
+
+// ── Generic Admin Card ─────────────────────────────────
+.admin-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+
+  .admin-card-header {
+    padding: 1.1rem 1.5rem;
+    border-bottom: 1px solid var(--card-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fafaf8;
+
+    .admin-card-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0;
+
+      i { color: var(--admin-accent); }
+    }
+
+    .admin-card-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+
+  .admin-card-body {
+    padding: 1.5rem;
+  }
+
+  .admin-card-footer {
+    padding: 0.85rem 1.5rem;
+    border-top: 1px solid var(--card-border);
+    background: #fafaf8;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+// ── Page Content Area ──────────────────────────────────
+.admin-content {
+  flex: 1;
+  padding: var(--content-padding);
+  overflow-x: hidden;
+}

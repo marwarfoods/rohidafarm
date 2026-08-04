@@ -1,0 +1,23 @@
+<?php
+return [
+    'bi-egg-fried' => 'Fried Egg',
+    'bi-cup-hot' => 'Hot Cup / Tea / Beverage',
+    'bi-cup' => 'Cup Outline',
+    'bi-bucket' => 'Bucket / Milking',
+    'bi-bucket-fill' => 'Milk Bucket Solid',
+    'bi-circle-half' => 'Wooden Bilona churner',
+    'bi-bezier2' => 'Bilona spindle wave / Churn',
+    'bi-fire' => 'Fire / Slow cooked Ghee',
+    'bi-mortar-pestle' => 'Traditional mortar / Ayurveda',
+    'bi-thermometer-half' => 'Clarified Temperature',
+    'bi-suit-spade' => 'Churning Wooden Paddle',
+    'bi-suit-spade-fill' => 'Stirring Wooden Paddle Solid',
+    'bi-egg' => 'Egg / Dairy item',
+    'bi-droplet-half' => 'Liquid Ghee drop',
+    'bi-droplet-fill' => 'Golden Ghee pour',
+    'bi-funnel' => 'Filtering Cold Pressed Oil',
+    'bi-oil-barrel' => 'Cold Pressed Oil storage',
+    'bi-water' => 'Pure liquid Ghee/Oil fat',
+    'bi-patch-check' => '100% Pure Ghee certificate',
+    'bi-heart' => 'Cholesterol Friendly Ghee',
+];

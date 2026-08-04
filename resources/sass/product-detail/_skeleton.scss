@@ -1,0 +1,25 @@
+// ---------- Skeleton Loader (Full-Page) ----------
+.skeleton-overlay {
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    z-index: 9999 !important;
+
+    .skeleton-shimmer {
+        background: linear-gradient(110deg, #eceff1 25%, #f5f7f8 37%, #eceff1 50%);
+        background-size: 200% 100%;
+        animation: shimmer 1.3s infinite linear;
+        border-radius: 8px;
+    }
+}
+@keyframes shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+// Skeleton layout blocks
+.skeleton-block {
+    background: linear-gradient(110deg, #eceff1 25%, #f5f7f8 37%, #eceff1 50%);
+    background-size: 200% 100%;
+    animation: shimmer 1.3s infinite linear;
+    border-radius: 8px;
+}

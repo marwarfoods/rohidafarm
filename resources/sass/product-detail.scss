@@ -1,0 +1,175 @@
+// =============================================
+// Product Detail Page — Split Component Imports
+// resources/sass/product-detail.scss
+// =============================================
+
+@import 'product-detail/skeleton';
+@import 'product-detail/variants';
+@import 'product-detail/gallery';
+@import 'product-detail/layout';
+
+// ── Short Description – 4-line clamp with Read More ──
+.short-desc-clamp {
+    display: -webkit-box !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 4 !important;
+    overflow: hidden !important;
+    transition: none !important;
+}
+.short-desc-clamp.expanded {
+    display: block !important;
+    -webkit-line-clamp: unset !important;
+    overflow: visible !important;
+}
+
+// ── Tab Navigation & CKEditor Table Custom Styling ──
+#detailTabs .nav-link {
+    color: #2B2B2B !important;
+    border-bottom: 2px solid transparent !important;
+    transition: color 0.15s ease, border-color 0.15s ease;
+    padding-bottom: 0.75rem !important;
+}
+#detailTabs .nav-link:hover {
+    color: #248443 !important;
+}
+#detailTabs .nav-link.active {
+    color: #248443 !important;
+    border-bottom: 2px solid #248443 !important;
+}
+
+#detailTabsContent table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 1rem 0 !important;
+    font-size: 0.85rem !important;
+    border: 1px solid #ECE7DD !important;
+}
+#detailTabsContent table th {
+    background-color: #fcfbfa !important;
+    color: #1a4d2e !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    padding: 0.75rem 1rem !important;
+    border-bottom: 2px solid #ECE7DD !important;
+    border-right: 1px solid #ECE7DD !important;
+    text-align: left !important;
+}
+#detailTabsContent table th:last-child {
+    border-right: none !important;
+}
+#detailTabsContent table td {
+    padding: 0.75rem 1rem !important;
+    border-bottom: 1px solid #ECE7DD !important;
+    border-right: 1px solid #ECE7DD !important;
+    color: #333333 !important;
+}
+#detailTabsContent table td:last-child {
+    border-right: none !important;
+}
+#detailTabsContent table tr:last-child td {
+    border-bottom: none !important;
+}
+#detailTabsContent table tr:hover {
+    background-color: #FAF9F6 !important;
+}
+#detailTabsContent table tr:nth-child(even) {
+    background-color: #fbfbf9 !important;
+}
+
+// ── Vertical Thumbnail Column (Desktop) ──────────
+
+// Scroll arrow buttons
+.thumb-scroll-btn {
+    flex-shrink: 0 !important;
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 50% !important;
+    border: 1px solid #dee2e6 !important;
+    background: #f8f9fa !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    padding: 0 !important;
+    color: #248443 !important;
+    margin: 4px 0 !important;
+    z-index: 2 !important;
+}
+.thumb-scroll-btn:hover {
+    background-color: #248443 !important;
+    border-color: #248443 !important;
+    color: #ffffff !important;
+}
+.thumb-scroll-btn i {
+    color: inherit !important;
+    font-size: 0.75rem !important;
+}
+
+// Scrollable container — height is set dynamically by JS
+.thumb-slider-col {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    width: 100% !important;
+    overflow-y: scroll !important;
+    overflow-x: hidden !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    scroll-behavior: smooth !important;
+    // Height injected by JS: (thumbWidth * 5) + (6 * 4)
+}
+.thumb-slider-col::-webkit-scrollbar {
+    display: none !important;
+}
+
+// Individual thumbnail — perfectly square equal size
+.thumb-img-wrapper {
+    width: 100% !important;
+    flex-shrink: 0 !important;
+    aspect-ratio: 1 / 1 !important;
+    overflow: hidden !important;
+    border: 1.5px solid #ECE7DD !important;
+    border-radius: 8px !important;
+    background: #fff !important;
+    cursor: pointer !important;
+    transition: border-color 0.18s, box-shadow 0.18s !important;
+    display: block !important;
+    position: relative !important;
+}
+.thumb-img-wrapper.active {
+    border-color: #248443 !important;
+    box-shadow: 0 0 0 2px rgba(36, 132, 67, 0.18) !important;
+}
+.thumb-img-wrapper img {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+
+// Mobile Horizontal Thumbnails
+@media (max-width: 767.98px) {
+    .mobile-thumbs-container {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        gap: 6px !important;
+        width: 100% !important;
+        overflow-x: auto !important;
+        scrollbar-width: none !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    .mobile-thumbs-container::-webkit-scrollbar {
+        display: none !important;
+    }
+    .mobile-thumbs-container .thumb-img-wrapper {
+        flex: 0 0 calc((100% - 24px) / 5) !important;
+        width: calc((100% - 24px) / 5) !important;
+        aspect-ratio: 1/1 !important;
+        margin: 0 !important;
+    }
+}
+

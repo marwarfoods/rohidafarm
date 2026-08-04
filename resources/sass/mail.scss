@@ -1,0 +1,125 @@
+/* Reset & Base Styles */
+body, p, h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+    padding: 0;
+}
+body {
+    font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: #f4f5f7;
+    color: #333333;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Layout */
+.email-wrapper {
+    width: 100%;
+    background-color: #f4f5f7;
+    padding: 20px 0;
+}
+.email-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+/* Header */
+.email-header {
+    background-color: #1a4f3b; /* RohidaFarm Dark Green */
+    padding: 20px;
+    text-align: center;
+}
+.email-header img {
+    height: 40px;
+    max-width: 100%;
+}
+
+/* Body */
+.email-body {
+    padding: 30px;
+}
+.email-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a4f3b;
+    margin-bottom: 20px;
+}
+.email-text {
+    font-size: 15px;
+    color: #444444;
+    margin-bottom: 20px;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    background-color: #f7a01d; /* Orange/Yellow highlight */
+    color: #ffffff !important;
+    text-decoration: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    margin: 10px 0;
+}
+
+/* Tables (for order details) */
+.order-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.order-table th {
+    background-color: #f8f9fa;
+    text-align: left;
+    padding: 10px;
+    font-size: 14px;
+    color: #666;
+    border-bottom: 2px solid #eeeeee;
+}
+.order-table td {
+    padding: 12px 10px;
+    font-size: 14px;
+    border-bottom: 1px solid #eeeeee;
+}
+
+/* Order Summary (Totals) */
+.totals-table {
+    width: 100%;
+    max-width: 300px;
+    margin-left: auto;
+    margin-bottom: 20px;
+}
+.totals-table td {
+    padding: 5px 10px;
+    font-size: 14px;
+    text-align: right;
+}
+.total-row {
+    font-weight: 700;
+    font-size: 16px;
+    color: #1a4f3b;
+}
+
+/* Footer */
+.email-footer {
+    background-color: #fafafa;
+    padding: 20px;
+    text-align: center;
+    font-size: 13px;
+    color: #888888;
+    border-top: 1px solid #eeeeee;
+}
+
+/* Utilities */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-success { color: #198754; }
+.text-danger { color: #dc3545; }
+.mt-3 { margin-top: 15px; }
+.mb-3 { margin-bottom: 15px; }
+.p-3 { padding: 15px; }
+.bg-light { background-color: #f8f9fa; border-radius: 6px; }

@@ -1,0 +1,304 @@
+// ═══════════════════════════════════════════════════════
+// Admin Sidebar — Collapsible, Dark, Premium
+// ═══════════════════════════════════════════════════════
+
+.admin-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background: var(--page-bg);
+}
+
+// ── Sidebar Shell ──────────────────────────────────────
+.admin-sidebar {
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1040;
+  transition: width var(--transition-base), transform var(--transition-base);
+  overflow: hidden;
+  box-shadow: 4px 0 24px rgba(0,0,0,0.18);
+
+  // Collapsed state (desktop)
+  &.sidebar-collapsed {
+    width: var(--sidebar-collapsed-w);
+
+    .sidebar-logo-text,
+    .sidebar-label,
+    .sidebar-section-title,
+    .sidebar-badge {
+      opacity: 0;
+      pointer-events: none;
+      width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .sidebar-nav-link {
+      justify-content: center;
+      padding: 0.72rem 0;
+
+      .sidebar-icon {
+        margin-right: 0;
+      }
+    }
+
+    .sidebar-logo {
+      justify-content: center;
+      padding: 1.2rem 0;
+    }
+
+    .sidebar-footer {
+      padding: 0.75rem 0;
+      .btn { font-size: 0; padding: 0.5rem; }
+      .btn i { font-size: 1rem; margin: 0; }
+    }
+  }
+
+  // Mobile hidden
+  @media (max-width: 991px) {
+    transform: translateX(-100%);
+    &.sidebar-open {
+      transform: translateX(0);
+    }
+  }
+}
+
+// ── Logo Area ──────────────────────────────────────────
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.2rem 1.25rem;
+  border-bottom: 1px solid var(--sidebar-border);
+  flex-shrink: 0;
+  text-decoration: none;
+  transition: padding var(--transition-base);
+
+  .sidebar-logo-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--admin-accent), #1a8c4a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.1rem;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(36,132,67,0.35);
+  }
+
+  .sidebar-logo-text {
+    transition: opacity var(--transition-base), width var(--transition-base);
+    white-space: nowrap;
+    overflow: hidden;
+
+    strong {
+      display: block;
+      color: #fff;
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      line-height: 1.1;
+    }
+
+    small {
+      display: block;
+      color: rgba(255,255,255,0.4);
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+    }
+  }
+}
+
+// ── Nav Scroll Area ────────────────────────────────────
+.sidebar-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.75rem 0;
+
+  &::-webkit-scrollbar { width: 3px; }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+  }
+}
+
+// ── Section Titles ─────────────────────────────────────
+.sidebar-section-title {
+  color: rgba(255,255,255,0.28);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 1rem 1.25rem 0.35rem;
+  white-space: nowrap;
+  transition: opacity var(--transition-base);
+}
+
+// ── Nav Links ──────────────────────────────────────────
+.sidebar-nav {
+  list-style: none;
+  padding: 0 0.6rem;
+  margin: 0;
+}
+
+.sidebar-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.5rem;
+  color: var(--sidebar-link-color);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: var(--font-body);
+  transition: all var(--transition-fast);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  position: relative;
+
+  .sidebar-icon {
+    font-size: 1.05rem;
+    flex-shrink: 0;
+    width: 20px;
+    text-align: center;
+    margin-right: 0.1rem;
+    transition: margin var(--transition-base);
+  }
+
+  .sidebar-badge {
+    margin-left: auto;
+    font-size: 0.62rem;
+    background: rgba(36,132,67,0.25);
+    color: #5cce82;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: opacity var(--transition-base);
+  }
+
+  &:hover {
+    color: var(--sidebar-link-hover);
+    background: rgba(255,255,255,0.07);
+  }
+
+  &.active {
+    color: var(--sidebar-link-active);
+    background: var(--sidebar-link-active-bg);
+    font-weight: 600;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 20%;
+      bottom: 20%;
+      width: 3px;
+      background: var(--admin-accent);
+      border-radius: 0 2px 2px 0;
+    }
+  }
+}
+
+// ── Sidebar Footer ─────────────────────────────────────
+.sidebar-footer {
+  padding: 0.75rem 0.6rem;
+  border-top: 1px solid var(--sidebar-border);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  .btn {
+    border-radius: 0.5rem !important;
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
+    padding: 0.45rem 0.75rem !important;
+    width: 100%;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    transition: all var(--transition-fast);
+
+    i { flex-shrink: 0; }
+  }
+}
+
+// ── Sidebar Toggle Button ──────────────────────────────
+.sidebar-toggle-btn {
+  position: fixed;
+  top: calc(var(--topbar-height) / 2 - 16px);
+  left: calc(var(--sidebar-width) - 16px);
+  z-index: 1050;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--admin-accent);
+  color: #fff;
+  border: 2px solid var(--page-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: left var(--transition-base), background var(--transition-fast), transform var(--transition-base);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+
+  &:hover { background: var(--admin-accent-hover); }
+
+  .admin-sidebar.sidebar-collapsed ~ & {
+    left: calc(var(--sidebar-collapsed-w) - 16px);
+  }
+
+  @media (max-width: 991px) {
+    display: none;
+  }
+}
+
+// ── Mobile Overlay ─────────────────────────────────────
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1039;
+  backdrop-filter: blur(2px);
+
+  @media (max-width: 991px) {
+    &.active { display: block; }
+  }
+}
+
+// ── Main Content Area ──────────────────────────────────
+.admin-main {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left var(--transition-base);
+
+  &.sidebar-collapsed {
+    margin-left: var(--sidebar-collapsed-w);
+  }
+
+  @media (max-width: 991px) {
+    margin-left: 0 !important;
+  }
+}

@@ -1,0 +1,8 @@
+.gallery-picker-item:hover {
+    transform: scale(1.04);
+    background-color: #f8f9fa;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+.cursor-pointer {
+    cursor: pointer;
+}

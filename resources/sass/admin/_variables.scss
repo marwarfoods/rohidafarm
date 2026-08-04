@@ -1,0 +1,57 @@
+// ═══════════════════════════════════════════════════════
+// Admin Design Tokens & CSS Custom Properties
+// ═══════════════════════════════════════════════════════
+
+:root {
+  // Brand Colors
+  --admin-primary:        #1a4d2e;
+  --admin-primary-hover:  #16402a;
+  --admin-accent:         #248443;
+  --admin-accent-hover:   #1e6b35;
+  --admin-gold:           #C89B3C;
+  --admin-danger:         #e53935;
+  --admin-warning:        #fb8c00;
+  --admin-info:           #039be5;
+
+  // Sidebar
+  --sidebar-width:        260px;
+  --sidebar-collapsed-w:  72px;
+  --sidebar-bg:           #0f2d1c;
+  --sidebar-border:       rgba(255,255,255,0.06);
+  --sidebar-link-color:   rgba(255,255,255,0.65);
+  --sidebar-link-hover:   rgba(255,255,255,0.92);
+  --sidebar-link-active-bg: rgba(36,132,67,0.22);
+  --sidebar-link-active:  #5cce82;
+
+  // Topbar
+  --topbar-height:        64px;
+  --topbar-bg:            #ffffff;
+  --topbar-border:        #ECE7DD;
+  --topbar-shadow:        0 1px 4px rgba(0,0,0,0.06);
+
+  // Page
+  --page-bg:              #f4f5f7;
+  --card-bg:              #ffffff;
+  --card-border:          #ECE7DD;
+  --card-radius:          0.875rem;
+  --card-shadow:          0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.04);
+
+  // Typography
+  --font-heading:         'Cormorant Garamond', serif;
+  --font-body:            'DM Sans', sans-serif;
+  --text-primary:         #1c1f24;
+  --text-secondary:       #6b7280;
+  --text-muted:           #9ca3af;
+
+  // Spacing
+  --content-padding:      1.75rem;
+  --gap-base:             1rem;
+
+  // Transitions
+  --transition-fast:      0.15s ease;
+  --transition-base:      0.25s ease;
+  --transition-slow:      0.4s ease;
+}
+
+// Dark sidebar breakpoint
+$sidebar-bp: 992px;

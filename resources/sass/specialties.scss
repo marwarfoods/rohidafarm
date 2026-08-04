@@ -1,0 +1,18 @@
+/* Minimalistic feature cards styling */
+.feature-card-minimal {
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.feature-card-minimal:hover {
+    transform: translateY(-10px);
+}
+
+.feature-card-minimal .icon-wrapper {
+    transition: all 0.4s ease;
+}
+
+.feature-card-minimal:hover .icon-wrapper {
+    background-color: var(--primary-green) !important;
+    color: #fff !important;
+    transform: scale(1.1);
+}

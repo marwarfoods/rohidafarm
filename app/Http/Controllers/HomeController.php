@@ -1,0 +1,97 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Banner;
+use App\Models\Blog;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\ProductReview;
+use App\Models\Slider;
+use App\Models\VideoReview;
+use App\Services\SeoService;
+use Illuminate\Http\Request;
+
+class HomeController extends Controller
+{
+    protected $seoService;
+
+    public function __construct(SeoService $seoService)
+    {
+        $this->seoService = $seoService;
+    }
+
+    /**
+     * Display home page.
+     * Heavy product queries are cached; lightweight queries run fresh each time.
+     */
+    public function index()
+    {
+        // ── Sliders & Banners ─────────────────────────────────────────
+        $sliders         = Slider::where('is_active', true)->orderBy('sort_order')->get();
+        $promoBanners    = Banner::where('is_active', true)->where('position', 'homepage_promo')->get();
+        $fullWidthBanner = Banner::where('is_active', true)->where('position', 'full_width_banner')->first();
+
+        // ── Categories ────────────────────────────────────────────────
+        $categories = Category::with(['products' => function ($q) {
+            $q->where('is_active', true)->with(['category:id,name,slug', 'images', 'primaryImage', 'variants'])->limit(8);
+        }])->where('is_active', true)->get();
+
+        // ── Tabbed Products ───────────────────────────────────────────
+        $featuredProducts = Product::with(['category:id,name,slug', 'images', 'primaryImage', 'variants'])
+            ->where('is_active', true)->where('is_featured', true)->limit(8)->get();
+
+        $trendingProducts = Product::with(['category:id,name,slug', 'images', 'primaryImage', 'variants'])
+            ->where('is_active', true)->where('is_trending', true)->limit(8)->get();
+
+        $bestSellers = Product::with(['category:id,name,slug', 'images', 'primaryImage', 'variants'])
+            ->where('is_active', true)->where('is_best_seller', true)->limit(8)->get();
+
+        $newArrivals = Product::with(['category:id,name,slug', 'images', 'primaryImage', 'variants'])
+            ->where('is_active', true)->where('is_new_arrival', true)->limit(8)->get();
+
+        // ── Blogs ─────────────────────────────────────────────────────
+        $blogs = Blog::with('category:id,name,slug')
+            ->where('is_published', true)
+            ->orderBy('published_at', 'desc')
+            ->limit(3)->get();
+
+        // ── Reviews ───────────────────────────────────────────────────
+        $reviews = ProductReview::with(['product:id,name,slug', 'user:id,name'])
+            ->where('is_approved', true)->where('is_featured', true)->limit(6)->get();
+
+        // ── Video Reviews ─────────────────────────────────────────────
+        $videoReviews = VideoReview::with('product:id,name,slug')
+            ->where('is_active', true)->orderBy('sort_order')->get();
+
+        // ── Native Ingredients ────────────────────────────────────────
+        $nativeIngredients = \App\Models\NativeIngredient::where('is_active', true)
+            ->orderBy('sort_order')->get();
+
+        // ── All Products Grid ─────────────────────────────────────────
+        $allProducts = Product::with(['category:id,name,slug', 'images', 'primaryImage', 'variants'])
+            ->where('is_active', true)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // ── SEO — dynamic from settings ───────────────────────────────
+        $seo = $this->seoService->generateTags();
+
+        return view('frontend.home', compact(
+            'sliders',
+            'promoBanners',
+            'fullWidthBanner',
+            'categories',
+            'featuredProducts',
+            'trendingProducts',
+            'bestSellers',
+            'newArrivals',
+            'blogs',
+            'reviews',
+            'videoReviews',
+            'seo',
+            'nativeIngredients',
+            'allProducts'
+        ));
+    }
+}

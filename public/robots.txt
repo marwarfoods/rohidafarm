@@ -1,0 +1,24 @@
+User-agent: *
+Allow: /
+Allow: /shop
+Allow: /shop/*
+Allow: /blogs
+Allow: /blogs/*
+
+# Disallow Private & Admin Areas
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /login
+Disallow: /register
+Disallow: /password/reset
+Disallow: /cart
+Disallow: /checkout
+Disallow: /customer/dashboard
+Disallow: /customer/profile
+Disallow: /customer/orders
+
+# Disallow Search Results Page
+Disallow: /shop?*search=*
+
+# Sitemap
+Sitemap: https://rohidafarm.com/sitemap.xml

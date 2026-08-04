@@ -1,0 +1,357 @@
+// Hero Swiper Customizations
+.hero-slider {
+    width: 100%;
+    height: auto !important;
+    border-radius: 0 !important;
+    border: none !important;
+    
+    .swiper-slide {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: auto;
+    }
+
+    // Typewriter effects
+    .text-typewriter {
+        border-right: 2px solid var(--primary-green);
+        padding-right: 4px;
+        animation: typewriterCursor 0.75s step-end infinite;
+    }
+}
+
+// Slide up items
+.animate-item {
+    opacity: 0;
+    transform: translateY(25px);
+}
+
+.animate-delay-1 { animation-delay: 0.15s; }
+.animate-delay-2 { animation-delay: 0.35s; }
+.animate-delay-3 { animation-delay: 0.55s; }
+.animate-delay-4 { animation-delay: 0.75s; }
+
+// Keyframe Animations
+@keyframes slideUpFadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes zoomInFade {
+    from {
+        opacity: 0;
+        transform: scale(0.85);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes floatImage {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-12px);
+    }
+}
+
+@keyframes typewriterCursor {
+    from, to { border-color: transparent }
+    50% { border-color: var(--primary-green); }
+}
+
+@media (max-width: 991px) {
+    .hero-slider-section {
+        padding: 0 !important;
+        margin: 0 !important;
+        background-color: var(--cream-bg);
+    }
+    .hero-slider {
+        border-radius: 0 !important;
+        overflow: hidden;
+        height: auto !important;
+        border: none !important;
+    }
+}
+
+// Mobile product slider styles
+.products-slider {
+    padding-bottom: 35px !important;
+    overflow: hidden !important; // strictly clip slides to wrapper bounds
+    
+    .swiper-pagination-bullet-active {
+        background: #70885c !important;
+        width: 18px;
+        border-radius: 4px;
+        transition: width 0.3s ease;
+    }
+    
+    .swiper-pagination {
+        bottom: 0px !important;
+    }
+
+    // Custom Styled Scrollbar
+    .swiper-scrollbar {
+        background: #f0ede6 !important;
+        height: 4px !important;
+        border-radius: 2px !important;
+        bottom: 10px !important;
+        
+        .swiper-scrollbar-drag {
+            background: #248443 !important;
+            height: 4px !important;
+            border-radius: 2px !important;
+        }
+    }
+}
+
+#productTabs {
+    &::-webkit-scrollbar {
+        display: none !important;
+    }
+}
+
+// Skeleton Loader shimmer animation styles
+@keyframes skeletonShimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.skeleton-card {
+    border: 1px solid #ECE7DD !important;
+    background: #ffffff !important;
+    .skeleton-img, .skeleton-text, .skeleton-button {
+        background: linear-gradient(90deg, #f3f3f3 25%, #e6e6e6 50%, #f3f3f3 75%);
+        background-size: 200% 100%;
+        animation: skeletonShimmer 1.5s infinite linear;
+    }
+}
+
+// Video Reviews slider adjustments
+.video-reviews-slider {
+    padding-bottom: 40px !important;
+    
+    .swiper-pagination-bullet-active {
+        background: #70885c !important;
+        width: 18px;
+        border-radius: 4px;
+        transition: width 0.3s ease;
+    }
+}
+
+.video-card-wrapper {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08) !important;
+    }
+}
+
+// Video Review Lightbox Overlay styles
+.video-lightbox-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease;
+    overscroll-behavior: contain;
+    touch-action: none; /* Prevents mobile browser from scrolling background on swipe */
+    
+    
+    .lightbox-backdrop {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.65); // darker overlay
+        backdrop-filter: blur(5px);
+    }
+    
+    .lightbox-container {
+        position: relative;
+        z-index: 10;
+        width: 90%;
+        max-width: 480px;
+        background: #111;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        display: flex;
+        flex-direction: column;
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+        
+        &.fading {
+            opacity: 0.3;
+            transform: scale(0.96);
+        }
+    }
+
+    .lightbox-close {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        z-index: 30;
+        background: rgba(0, 0, 0, 0.75) !important; // highlighted dark background
+        color: #fff;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s;
+        &:hover {
+            background: rgba(0, 0, 0, 0.9) !important;
+        }
+    }
+
+    .lightbox-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 100;
+        background: rgba(255, 255, 255, 0.25) !important;
+        color: #fff !important;
+        border: none;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.2s;
+        &.arrow-left {
+            left: 30px;
+        }
+        &.arrow-right {
+            right: 30px;
+        }
+        &:hover {
+            background: rgba(255, 255, 255, 0.45) !important;
+        }
+    }
+
+    .lightbox-content {
+        position: relative;
+        background: #111;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .lightbox-video-wrapper {
+        height: 58vh;
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+    }
+
+    .lightbox-info {
+        background: #181818;
+        padding: 20px;
+        border-top: 1px solid rgba(255,255,255,0.08);
+        position: relative;
+        z-index: 12;
+        width: 100%;
+    }
+
+    // Reels style navigation buttons on mobile
+    .lightbox-mobile-nav {
+        position: absolute;
+        right: 15px;
+        bottom: 80px;
+        z-index: 20;
+        display: flex;
+        flex-direction: column;
+        
+        .mobile-nav-btn {
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+    }
+}
+
+// Hide arrows on desktop when screen is too narrow
+@media (max-width: 768px) {
+    .video-lightbox-overlay {
+        .lightbox-arrow {
+            display: none !important;
+        }
+        .lightbox-container {
+            max-width: calc(100% - 16px);
+            height: calc(100vh - 30px);
+            border-radius: 16px;
+            margin: 15px 8px;
+        }
+        .lightbox-video-wrapper {
+            flex-grow: 1;
+            height: calc(100% - 80px); /* Adjust for info area */
+            video {
+                object-fit: cover; // full screen reels mode on mobile
+            }
+        }
+    }
+}
+
+// ── Products Slider Wrapper Navigation Styling (Desktop Only Floating Arrows) ──
+.products-slider-wrapper {
+    position: relative;
+    
+    .swiper-button-prev,
+    .swiper-button-next {
+        color: #248443 !important;
+        background: #ffffff !important;
+        width: 42px !important;
+        height: 42px !important;
+        border-radius: 50% !important;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08) !important;
+        border: 1px solid #ECE7DD !important;
+        transition: all 0.25s ease !important;
+        
+        &::after {
+            font-size: 1rem !important;
+            font-weight: 900 !important;
+        }
+        
+        &:hover {
+            background: #248443 !important;
+            color: #ffffff !important;
+            border-color: #248443 !important;
+            box-shadow: 0 6px 14px rgba(36, 132, 67, 0.2) !important;
+        }
+        
+        &.swiper-button-disabled {
+            opacity: 0 !important; // hide disabled arrows cleanly
+            pointer-events: none;
+        }
+    }
+    
+    .swiper-button-prev {
+        left: -20px !important;
+    }
+    
+    .swiper-button-next {
+        right: -20px !important;
+    }
+}
+

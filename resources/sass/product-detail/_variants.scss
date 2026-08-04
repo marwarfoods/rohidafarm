@@ -1,0 +1,42 @@
+// ---------- Variant Cards ----------
+.variant-card {
+    border: 2px solid #e8e4dd !important;
+    background-color: #fdfcfa;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 12px !important;
+
+    &:hover {
+        border-color: var(--primary-green) !important;
+        box-shadow: 0 8px 20px rgba(36, 132, 67, 0.1);
+    }
+
+    &.active {
+        border-color: var(--primary-green) !important;
+        background-color: rgba(36, 132, 67, 0.05) !important;
+        box-shadow: 0 8px 24px rgba(36, 132, 67, 0.12) !important;
+
+        .fw-bold, span { color: var(--primary-green) !important; }
+    }
+}
+
+// ---------- Variant Label Spacing ----------
+.variant-label {
+    margin-bottom: 14px !important;
+    padding-bottom: 4px;
+}
+
+// ---------- Skeleton Text Loading ----------
+@keyframes shimmerText {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+.skeleton-loading-text {
+    color: transparent !important;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmerText 1.2s infinite;
+    border-radius: 4px;
+    display: inline-block;
+    width: 90px;
+    height: 24px;
+}
