@@ -48,7 +48,7 @@ class ProductController extends Controller
             $filters['subcategory'] = $request->input('subcategory');
         }
 
-        $products = $this->productRepo->filterAndPaginate($filters, 6);
+        $products = $this->productRepo->filterAndPaginate($filters, 10);
         $categories = $this->categoryRepo->getWithSubcategories();
 
         $seo = $this->seoService->generateTags([

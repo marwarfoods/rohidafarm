@@ -82,6 +82,47 @@ class AppServiceProvider extends ServiceProvider
             view()->composer('*', function ($view) {
                 $view->with('seo', app(\App\Services\SeoService::class)->generateTags());
             });
+
+            // Share only currently valid, active coupons with the store coupons popup,
+            // each resolved to the product/category page it should deep-link to.
+            view()->composer('frontend.partials.coupons-offcanvas', function ($view) {
+                $now = now();
+
+                $coupons = \App\Models\Coupon::where('is_active', true)
+                    ->where(function ($q) use ($now) {
+                        $q->whereNull('active_from')->orWhere('active_from', '<=', $now);
+                    })
+                    ->where(function ($q) use ($now) {
+                        $q->whereNull('active_until')->orWhere('active_until', '>=', $now);
+                    })
+                    ->where(function ($q) {
+                        $q->whereNull('usage_limit')->orWhereColumn('usage_count', '<', 'usage_limit');
+                    })
+                    ->orderBy('created_at', 'desc')
+                    ->get()
+                    ->map(function ($coupon) {
+                        $link = route('shop.index');
+
+                        if ($coupon->target_type === 'products' && !empty($coupon->target_ids)) {
+                            $product = \App\Models\Product::whereIn('id', $coupon->target_ids)
+                                ->where('is_active', true)->first();
+                            if ($product) {
+                                $link = route('shop.show', $product->slug);
+                            }
+                        } elseif ($coupon->target_type === 'categories' && !empty($coupon->target_ids)) {
+                            $category = \App\Models\Category::whereIn('id', $coupon->target_ids)
+                                ->where('is_active', true)->first();
+                            if ($category) {
+                                $link = route('shop.category', $category->slug);
+                            }
+                        }
+
+                        $coupon->target_link = $link;
+                        return $coupon;
+                    });
+
+                $view->with('coupons', $coupons);
+            });
         } catch (\Exception $e) {
             // Silently catch exceptions if database is not migrated yet
         }

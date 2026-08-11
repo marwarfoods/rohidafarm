@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\CouponController as AdminCouponController;
 use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\StockController;
 use App\Http\Controllers\Admin\RoleController as AdminRoleController;
+use App\Http\Controllers\Admin\CertificationController as AdminCertificationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -308,4 +309,20 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/roles-permissions/assign', [AdminRoleController::class, 'assignRole'])->name('roles.assign');
         Route::delete('/roles-permissions/user/{userId}/remove/{roleId}', [AdminRoleController::class, 'removeUserRole'])->name('roles.remove-user-role');
     });
+
+    // Certifications & Trust Marks
+    Route::get('/certifications', [AdminCertificationController::class, 'index'])->name('certifications.index');
+    Route::get('/certifications/create', [AdminCertificationController::class, 'create'])->name('certifications.create');
+    Route::post('/certifications/store', [AdminCertificationController::class, 'store'])->name('certifications.store');
+    Route::get('/certifications/{id}/edit', [AdminCertificationController::class, 'edit'])->name('certifications.edit');
+    Route::post('/certifications/{id}/update', [AdminCertificationController::class, 'update'])->name('certifications.update');
+    Route::delete('/certifications/{id}/delete', [AdminCertificationController::class, 'destroy'])->name('certifications.destroy');
+
+    // Instagram Feed Gallery
+    Route::get('/instagram-feed', [\App\Http\Controllers\Admin\InstagramFeedController::class, 'index'])->name('instagram-feed.index');
+    Route::get('/instagram-feed/create', [\App\Http\Controllers\Admin\InstagramFeedController::class, 'create'])->name('instagram-feed.create');
+    Route::post('/instagram-feed/store', [\App\Http\Controllers\Admin\InstagramFeedController::class, 'store'])->name('instagram-feed.store');
+    Route::get('/instagram-feed/{id}/edit', [\App\Http\Controllers\Admin\InstagramFeedController::class, 'edit'])->name('instagram-feed.edit');
+    Route::post('/instagram-feed/{id}/update', [\App\Http\Controllers\Admin\InstagramFeedController::class, 'update'])->name('instagram-feed.update');
+    Route::delete('/instagram-feed/{id}/delete', [\App\Http\Controllers\Admin\InstagramFeedController::class, 'destroy'])->name('instagram-feed.destroy');
 });

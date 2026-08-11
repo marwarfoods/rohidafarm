@@ -29,7 +29,7 @@
                     <span class="fw-bold text-dark" title="{{ $prod->name }}">{{ \Illuminate\Support\Str::words($prod->name, 4, '...') }}</span>
                 </div>
             </td>
-            <td class="px-4 py-3">{{ $prod->category->name }} @if($prod->subCategory) / {{ $prod->subCategory->name }} @endif</td>
+            <td class="px-4 py-3">{{ $prod->category?->name ?? 'Uncategorized' }} @if($prod->subCategory) / {{ $prod->subCategory?->name }} @endif</td>
             <td class="fw-semibold px-4 py-3">{{ $prod->sku }}</td>
             <td class="px-4 py-3">
                 <span class="text-decoration-line-through text-muted small">₹{{ number_format($prod->mrp, 0) }}</span>

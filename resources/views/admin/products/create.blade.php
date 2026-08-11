@@ -171,6 +171,36 @@
                 </div>
             </div>
 
+            {{-- ── PRODUCT STORY / INFOGRAPHIC BANNERS ── --}}
+            <div class="card border-0 shadow-sm rounded-4 bg-white mb-4">
+                <div class="card-header bg-white rounded-top-4 px-4 py-3 border-bottom">
+                    <h6 class="fw-bold text-dark m-0"><i class="bi bi-file-image text-success me-2"></i>Product Story &amp; Infographic Banners</h6>
+                    <p class="text-muted m-0 mt-1" style="font-size:0.78rem;">
+                        Upload vertical promotional banners to display below description section on product page.
+                    </p>
+                </div>
+                <div class="card-body p-4">
+                    <label class="form-label text-dark fw-semibold" style="font-size:0.85rem;">Selected Story Banners:</label>
+                    <div class="d-flex flex-wrap gap-3 p-3 border rounded-4 bg-light mb-3" id="infographicGrid">
+                        <span class="text-muted small py-2" id="emptyInfographicsMsg">No story banners selected yet.</span>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Option A: Pick from Media Library</label>
+                            <div class="input-group">
+                                <input type="text" name="infographic_urls" id="infographicMediaInput" class="form-control media-picker-input"
+                                       placeholder="Choose from media library..." value="{{ old('infographic_urls') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Option B: Upload Files Directly (Multiple)</label>
+                            <input type="file" name="infographic_images[]" class="form-control border p-2" accept="image/*" multiple onchange="previewInfographicFiles(this)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {{-- ── SEO CONFIGURATIONS CARD ── --}}
             <div class="card border-0 shadow-sm rounded-4 bg-white mb-4">
                 <div class="card-header bg-white rounded-top-4 px-4 py-3 border-bottom">
@@ -387,6 +417,34 @@
                 googleDescPreview.textContent = this.value.trim() || 'No SEO description set. Edit the fields above to configure your search result snippet.';
             });
         }
+        if (typeof window.initMediaPicker === 'function') {
+            window.initMediaPicker('#infographicMediaInput', '#infographicPreview', 'image');
+        }
     });
+
+    function previewInfographicFiles(input) {
+        const container = document.getElementById('infographicGrid');
+        const emptyMsg = document.getElementById('emptyInfographicsMsg');
+        if (emptyMsg) emptyMsg.remove();
+        if (input.files) {
+            Array.from(input.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    container.insertAdjacentHTML('beforeend', `
+                        <div class="position-relative infographic-card-item">
+                            <img src="${e.target.result}" class="rounded-3 border" style="height: 120px; width: 90px; object-fit: cover; border: 2px solid #5C3D2E;">
+                            <button type="button" class="btn btn-danger btn-sm rounded-circle position-absolute top-0 end-0 m-1 p-0 d-flex align-items-center justify-content-center"
+                                    style="width: 22px; height: 22px; font-size: 12px; line-height: 1;"
+                                    onclick="this.closest('.infographic-card-item').remove()"
+                                    title="Remove image">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </div>
+                    `);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    }
 </script>
 @endpush

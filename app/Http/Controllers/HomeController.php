@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Banner;
 use App\Models\Blog;
 use App\Models\Category;
+use App\Models\Certification;
+use App\Models\InstagramFeed;
 use App\Models\Product;
 use App\Models\ProductReview;
 use App\Models\Slider;
@@ -74,6 +76,18 @@ class HomeController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // ── Certifications & Trust Marks ──────────────────────────────
+        $certifications = Certification::where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
+
+        // ── Instagram Feed (Marquee) ──────────────────────────────────
+        $instagramPosts = InstagramFeed::where('is_active', true)
+            ->orderBy('sort_order')->orderBy('created_at', 'desc')
+            ->get();
+        $instaRow1 = $instagramPosts->where('row', 1)->values();
+        $instaRow2 = $instagramPosts->where('row', 2)->values();
+
         // ── SEO — dynamic from settings ───────────────────────────────
         $seo = $this->seoService->generateTags();
 
@@ -91,7 +105,10 @@ class HomeController extends Controller
             'videoReviews',
             'seo',
             'nativeIngredients',
-            'allProducts'
+            'allProducts',
+            'certifications',
+            'instaRow1',
+            'instaRow2'
         ));
     }
 }

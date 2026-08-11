@@ -47,13 +47,13 @@
             <!-- ── Desktop View Layout (Sleek Centered Logo with 4 Menu Links Left & 4 Menu Links Right) ── -->
             <div class="d-none d-lg-flex align-items-center justify-content-between w-100">
                 
-                <!-- Left Menu Items (4 Links: Home, Shop, Our Story, Why Tharparkar) -->
+                <!-- Left Menu Items (3 Links: Home, Shop, Our Story) -->
                 <div class="d-flex align-items-center flex-grow-1" style="flex-basis: 0;">
                     <ul class="navbar-nav me-auto fw-semibold gap-3.5" style="font-size: 1.05rem; font-family: var(--font-heading); letter-spacing: 0.3px;">
                         <li class="nav-item">
                             <a class="nav-link text-dark hover-gold fw-semibold py-1" href="{{ route('home') }}">Home</a>
                         </li>
-                        
+
                         <!-- Shop Dropdown / Mega Menu -->
                         <li class="nav-item dropdown dropdown-hover position-static">
                             <a class="nav-link text-dark hover-gold dropdown-toggle fw-semibold py-1" href="{{ route('shop.index') }}" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -64,12 +64,12 @@
                                     @php
                                         $megaMenuProducts = \App\Models\Product::with('images')->where('is_active', true)->take(15)->get();
                                     @endphp
-                                    
+
                                     <div class="swiper mega-menu-slider overflow-hidden py-3">
                                         <div class="swiper-wrapper">
                                             @foreach($megaMenuProducts as $product)
-                                                @php 
-                                                    $img = $product->primaryImage ? asset($product->primaryImage->image_path) : asset('/assets/images/products/placeholder.jpg'); 
+                                                @php
+                                                    $img = $product->primaryImage ? asset($product->primaryImage->image_path) : asset('/assets/images/products/placeholder.jpg');
                                                 @endphp
                                                 <div class="swiper-slide text-center">
                                                     <a href="{{ route('shop.show', $product->slug) }}" class="d-block text-decoration-none">
@@ -82,7 +82,7 @@
                                             @endforeach
                                         </div>
                                     </div>
-                                    
+
                                     <!-- Slider Navigation -->
                                     <div class="swiper-button-next mega-menu-next text-success shadow-sm rounded-circle bg-white" style="width: 35px; height: 35px; top: 50%; right: 5px;"></div>
                                     <div class="swiper-button-prev mega-menu-prev text-success shadow-sm rounded-circle bg-white" style="width: 35px; height: 35px; top: 50%; left: 5px;"></div>
@@ -92,9 +92,6 @@
 
                         <li class="nav-item">
                             <a class="nav-link text-dark hover-gold fw-semibold py-1" href="{{ route('about') }}">Our Story</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark hover-gold fw-semibold py-1" href="{{ url('/#why-tharparkar') }}">Why Tharparkar</a>
                         </li>
                     </ul>
                 </div>
@@ -111,23 +108,8 @@
                     </a>
                 </div>
 
-                <!-- Right Menu Items (4 Links: Bilona Process, Lab Reports, Blogs, Contact) & Utility Icons -->
+                <!-- Right Side: Utility Icons -->
                 <div class="d-flex align-items-center justify-content-end flex-grow-1" style="flex-basis: 0;">
-                    <ul class="navbar-nav ms-auto fw-semibold gap-3.5 me-4" style="font-size: 1.05rem; font-family: var(--font-heading); letter-spacing: 0.3px;">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark hover-gold fw-semibold py-1" href="{{ url('/#bilona-process') }}">Bilona Process</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark hover-gold fw-semibold py-1" href="#" data-bs-toggle="modal" data-bs-target="#labReportsModal">Lab Reports</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark hover-gold fw-semibold py-1" href="{{ route('blogs.index') }}">Blogs</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark hover-gold fw-semibold py-1" href="{{ route('contact') }}">Contact</a>
-                        </li>
-                    </ul>
-
                     <!-- Utility Icons (Search, Account, Cart) -->
                     <div class="d-flex align-items-center gap-3 text-dark fs-5">
                         <!-- Search Trigger -->
@@ -276,11 +258,6 @@
                         <li><a href="{{ route('home') }}" class="text-dark d-block py-1">Home</a></li>
                         <li><a href="{{ route('shop.index') }}" class="text-dark d-block py-1">Shop Catalog</a></li>
                         <li><a href="{{ route('about') }}" class="text-dark d-block py-1">Our Story</a></li>
-                        <li><a href="{{ url('/#why-tharparkar') }}" class="text-dark d-block py-1">Why Tharparkar</a></li>
-                        <li><a href="{{ url('/#bilona-process') }}" class="text-dark d-block py-1">Bilona Process</a></li>
-                        <li><a href="#" data-bs-toggle="modal" data-bs-target="#labReportsModal" class="text-dark d-block py-1"><i class="bi bi-file-earmark-check text-warning me-2"></i>Lab Reports</a></li>
-                        <li><a href="{{ route('blogs.index') }}" class="text-dark d-block py-1">Healthy Living Blogs</a></li>
-                        <li><a href="{{ route('contact') }}" class="text-dark d-block py-1">Contact Us</a></li>
                         <li><a href="{{ route('track-order') }}" class="text-dark d-block py-1"><i class="bi bi-geo-alt text-success me-2"></i>Track Order</a></li>
                     </ul>
                 </div>

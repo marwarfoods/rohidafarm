@@ -9,57 +9,54 @@
         @include('frontend.home.featured')
     </div>
 
-    {{-- -- 3. Trust Bar (6 Core Pillars) -- --}}
-    <div class="lazy-section">
-        @include('frontend.home.trust-bar')
-    </div>
-
-    {{-- -- 4. Our Roots & Heritage (Rohida Farm Story) -- --}}
+    {{-- -- 3. Our Roots & Heritage (Rohida Farm Story) -- --}}
     <div class="lazy-section">
         @include('frontend.home.story')
     </div>
 
-    {{-- -- 5. The Traditional Journey Of Our Ghee (Step-by-Step Bilona Timeline) -- --}}
+    {{-- Decorative divider between Our Roots & Heritage and Vedic Craftsmanship --}}
+    <div class="w-100" style="line-height: 0;" aria-hidden="true">
+        <svg viewBox="0 0 100 5" preserveAspectRatio="none" width="100%" height="5" style="display: block;">
+            <line x1="0" y1="2.5" x2="100" y2="2.5" stroke="#C49A45" stroke-width="4" />
+        </svg>
+    </div>
+
+    {{-- -- 4. The Traditional Journey Of Our Ghee (Vedic Bilona Process) -- --}}
     <div class="lazy-section">
         @include('frontend.home.bilona-process')
     </div>
 
-    {{-- -- 6. Why Rohida Farm & Why Tharparkar Cows -- --}}
-    <div class="lazy-section">
-        @include('frontend.home.why-tharparkar')
-    </div>
-
-    {{-- -- 7. Promo Banners -- --}}
+    {{-- -- 5. Promo Banners -- --}}
     <div class="lazy-section">
         @include('frontend.home.banners')
     </div>
 
-    {{-- -- 8. All Products Grid -- --}}
+    {{-- -- 6. All Products Grid -- --}}
     <div class="lazy-section">
         @include('frontend.home.all-products-grid')
     </div>
 
-    {{-- -- 9. Native Ingredients -- --}}
+    {{-- -- 7. Native Ingredients -- --}}
     <div class="lazy-section">
         @include('frontend.home.native-ingredients')
     </div>
 
-    {{-- -- 10. Certifications & Quality Standards -- --}}
+    {{-- -- 8. Certifications & Quality Standards -- --}}
     <div class="lazy-section">
         @include('frontend.home.certifications')
     </div>
 
-    {{-- -- 11. Customer Love & Video Reviews -- --}}
+    {{-- -- 9. Customer Love & Video Reviews -- --}}
     <div class="lazy-section">
         @include('frontend.home.videos')
     </div>
 
-    {{-- -- 12. Latest Blogs -- --}}
+    {{-- -- 10. Latest Blogs -- --}}
     <div class="lazy-section">
         @include('frontend.home.blogs')
     </div>
 
-    {{-- -- 13. Instagram Feed Gallery (Bottom Section Before Footer) -- --}}
+    {{-- -- 11. Instagram Feed Gallery (Bottom Section Before Footer) -- --}}
     <div class="lazy-section">
         @include('frontend.home.instagram-feed')
     </div>

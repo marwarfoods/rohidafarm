@@ -44,17 +44,23 @@
             </div>
 
 
-            <!-- ── Quick Links Column ── -->
+            <!-- ── Quick Links Column (Accordion on mobile, static on desktop) ── -->
             <div class="col-6 col-md-3 col-lg-2">
-                <h6 class="text-uppercase fw-bold font-heading mb-4" style="letter-spacing:1.5px;font-size:0.75rem;color:var(--gold-accent);">Quick Links</h6>
-                <ul class="list-unstyled d-flex flex-column gap-3" style="font-size:0.88rem;">
-                    <li><a href="{{ route('about') }}" class="footer-link">Our Story</a></li>
-                    <li><a href="{{ url('/#bilona-process') }}" class="footer-link">Bilona Process</a></li>
-                    <li><a href="{{ url('/#why-tharparkar') }}" class="footer-link">Why Tharparkar</a></li>
-                    <li><a href="#" data-bs-toggle="modal" data-bs-target="#labReportsModal" class="footer-link">Lab Reports</a></li>
-                    <li><a href="{{ route('blogs.index') }}" class="footer-link">Healthy Blogs</a></li>
-                    <li><a href="{{ route('contact') }}" class="footer-link">Contact Us</a></li>
-                </ul>
+                <button class="footer-accordion-toggle d-flex d-md-none justify-content-between align-items-center w-100 border-0 bg-transparent p-0 mb-4"
+                        type="button" data-bs-toggle="collapse" data-bs-target="#footerQuickLinks" aria-expanded="false" aria-controls="footerQuickLinks">
+                    <h6 class="text-uppercase fw-bold font-heading m-0" style="letter-spacing:1.5px;font-size:0.75rem;color:var(--gold-accent);">Quick Links</h6>
+                    <i class="bi bi-chevron-down footer-accordion-icon" style="font-size:0.8rem;color:var(--gold-accent);transition:transform .3s ease;"></i>
+                </button>
+                <h6 class="d-none d-md-block text-uppercase fw-bold font-heading mb-4" style="letter-spacing:1.5px;font-size:0.75rem;color:var(--gold-accent);">Quick Links</h6>
+                <div class="collapse d-md-block" id="footerQuickLinks">
+                    <ul class="list-unstyled d-flex flex-column gap-3" style="font-size:0.88rem;">
+                        <li><a href="{{ route('about') }}" class="footer-link">Our Story</a></li>
+                        <li><a href="{{ url('/#bilona-process') }}" class="footer-link">Bilona Process</a></li>
+                        <li><a href="#" data-bs-toggle="modal" data-bs-target="#labReportsModal" class="footer-link">Lab Reports</a></li>
+                        <li><a href="{{ route('blogs.index') }}" class="footer-link">Healthy Blogs</a></li>
+                        <li><a href="{{ route('contact') }}" class="footer-link">Contact Us</a></li>
+                    </ul>
+                </div>
             </div>
 
             <!-- ── Policy Pages Column (Dynamic — only Active ones) ── -->
@@ -72,16 +78,23 @@
             @endphp
             @if($footerPolicyPages->isNotEmpty())
             <div class="col-6 col-md-3 col-lg-2">
-                <h6 class="text-uppercase fw-bold font-heading mb-4" style="letter-spacing:1.5px;font-size:0.75rem;color:#a8d5a2;">Policies</h6>
-                <ul class="list-unstyled d-flex flex-column gap-3" style="font-size:0.88rem;">
-                    @foreach($footerPolicyPages as $policyPage)
-                        <li>
-                            <a href="{{ url('/' . $policyPage->slug) }}" class="footer-link">
-                                {{ $policyPage->title }}
-                            </a>
-                        </li>
-                    @endforeach
-                </ul>
+                <button class="footer-accordion-toggle d-flex d-md-none justify-content-between align-items-center w-100 border-0 bg-transparent p-0 mb-4"
+                        type="button" data-bs-toggle="collapse" data-bs-target="#footerPolicies" aria-expanded="false" aria-controls="footerPolicies">
+                    <h6 class="text-uppercase fw-bold font-heading m-0" style="letter-spacing:1.5px;font-size:0.75rem;color:#a8d5a2;">Policies</h6>
+                    <i class="bi bi-chevron-down footer-accordion-icon" style="font-size:0.8rem;color:#a8d5a2;transition:transform .3s ease;"></i>
+                </button>
+                <h6 class="d-none d-md-block text-uppercase fw-bold font-heading mb-4" style="letter-spacing:1.5px;font-size:0.75rem;color:#a8d5a2;">Policies</h6>
+                <div class="collapse d-md-block" id="footerPolicies">
+                    <ul class="list-unstyled d-flex flex-column gap-3" style="font-size:0.88rem;">
+                        @foreach($footerPolicyPages as $policyPage)
+                            <li>
+                                <a href="{{ url('/' . $policyPage->slug) }}" class="footer-link">
+                                    {{ $policyPage->title }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
             </div>
             @endif
 
@@ -129,7 +142,7 @@
                     <div class="d-flex align-items-center gap-1" style="font-size:0.75rem;color:rgba(255,255,255,0.65);">
                         <i class="bi bi-shield-check text-success"></i> FSSAI Certified
                     </div>
-                    <div class="d-flex align-items-center gap-1" style="font-size:0.75rem;color:rgba(255,255,255,0.65);">
+                    <div class="d-none d-md-flex align-items-center gap-1" style="font-size:0.75rem;color:rgba(255,255,255,0.65);">
                         <i class="bi bi-truck text-success"></i> Free Shipping ₹499+
                     </div>
                     <div class="d-flex align-items-center gap-1" style="font-size:0.75rem;color:rgba(255,255,255,0.65);">
@@ -139,7 +152,7 @@
             </div>
         </div>
 
-        <hr class="my-5" style="border-color:rgba(255,255,255,0.12);">
+        <hr class="my-3 my-md-5" style="border-color:rgba(255,255,255,0.12);">
 
         <!-- Bottom Copyright Row -->
         <div class="row align-items-center gy-2">

@@ -138,6 +138,20 @@
                 </a>
             </li>
             @endif
+            <li>
+                <a href="{{ route('admin.certifications.index') }}"
+                   class="sidebar-nav-link {{ Route::is('admin.certifications.*') ? 'active' : '' }}">
+                    <i class="bi bi-patch-check sidebar-icon"></i>
+                    <span class="sidebar-label">Certifications</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.instagram-feed.index') }}"
+                   class="sidebar-nav-link {{ Route::is('admin.instagram-feed.*') ? 'active' : '' }}">
+                    <i class="bi bi-instagram sidebar-icon"></i>
+                    <span class="sidebar-label">Instagram Feed</span>
+                </a>
+            </li>
         </ul>
         @endif
 

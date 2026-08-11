@@ -131,15 +131,7 @@
         <!-- ── RIGHT: Product Details ── -->
         <div class="col-md-6 col-12 d-flex flex-column justify-content-between">
             <div>
-                <!-- Badges -->
-                <div class="d-flex gap-2 align-items-center mb-3">
-                    <span class="badge text-white py-2 px-3 rounded-pill text-uppercase" style="background-color:var(--primary-green);font-size:0.65rem;letter-spacing:0.5px;">{{ $product->category->name }}</span>
-                    @if($product->is_bilona)
-                        <span class="badge py-2 px-3 rounded-pill text-dark text-uppercase fw-semibold" style="background-color:#ffe082;font-size:0.65rem;letter-spacing:0.5px;">Bilona churned</span>
-                    @endif
-                </div>
-
-                <h1 class="display-6 font-heading fw-semibold text-dark mb-2" style="font-weight: 500 !important; font-size: 1.85rem;">{{ $product->name }}</h1>
+                <h1 class="font-heading text-dark mb-2 fs-3 fs-md-2" style="font-weight: 500 !important;">{{ $product->name }}</h1>
 
                 <!-- Review Stars -->
                 <div class="d-flex align-items-center mb-3 fs-6">
@@ -199,7 +191,6 @@
                         $defaultVariant = $product->variants->firstWhere('stock', '>', 0) ?? $product->variants->first();
                     @endphp
                     <div class="mb-4">
-                        <h6 class="fw-bold text-dark text-uppercase font-heading variant-label" style="font-size:0.85rem;letter-spacing:0.5px;">Select Weight Variant:</h6>
                         <div class="d-flex flex-nowrap overflow-x-auto gap-2 pb-2" style="-webkit-overflow-scrolling:touch;scrollbar-width:none;">
                             @foreach($product->variants as $variant)
                                 @php
@@ -209,12 +200,6 @@
                                         $vol = floatval(preg_replace('/[^0-9.]/', '', $variant->name));
                                         if (str_contains($variant->name, 'ml')) $vol = $vol / 1000.0;
                                         if ($vol > 0) { $unitPriceText = "₹" . number_format($variant->sale_price / $vol, 0) . "/L"; }
-                                    }
-                                    $variantIcon = "bi-cup-hot-fill";
-                                    if (str_contains($variant->name, '5L') || str_contains($variant->name, 'Dolchi') || str_contains($variant->name, '15L')) {
-                                        $variantIcon = "bi-box-seam-fill";
-                                    } elseif (str_contains($variant->name, '1L') || str_contains($variant->name, '2L')) {
-                                        $variantIcon = "bi-droplet-fill";
                                     }
                                     $isVarDefault = ($defaultVariant->id === $variant->id);
                                 @endphp
@@ -235,16 +220,15 @@
                                      data-best-price="₹{{ number_format($variantBestPrice, 0) }}"
                                      data-best-coupon="{{ isset($bestCoupon) && $bestCoupon ? $bestCoupon->code : '' }}"
                                      data-stock="{{ $variant->stock }}"
-                                     style="cursor:pointer;min-width:110px;width:110px;height:95px;flex-shrink:0;">
+                                     style="cursor:pointer;min-width:110px;width:auto;padding:8px 14px;min-height:82px;flex-shrink:0;">
                                     @if($varDiscount > 0)
                                         <span class="position-absolute badge bg-danger text-white px-1 rounded-1" style="font-size:0.55rem;top:4px;right:4px;color:#fff !important;">{{ $varDiscount }}% off</span>
                                     @endif
                                     @if($variant->stock <= 0)
-                                        <span class="position-absolute badge bg-secondary px-1 rounded-1 w-100" style="font-size:0.55rem;top:25px;left:0;right:0;text-transform:uppercase;color:#fff !important;">Out of Stock</span>
+                                        <span class="position-absolute badge bg-secondary px-1 rounded-1 w-100" style="font-size:0.55rem;top:20px;left:0;right:0;text-transform:uppercase;color:#fff !important;">Out of Stock</span>
                                     @endif
-                                    <div class="d-flex align-items-center justify-content-center gap-1 mt-1 text-muted">
-                                        <i class="bi {{ $variantIcon }}" style="font-size:0.85rem;"></i>
-                                        <span class="fw-bold font-heading" style="font-size:0.8rem;">{{ $variant->weight }}</span>
+                                    <div class="d-flex align-items-center justify-content-center mt-1">
+                                        <span class="fw-bold font-heading" style="font-size:0.85rem;">{{ $variant->weight }}</span>
                                     </div>
                                     <div class="mt-auto">
                                         <div class="d-flex flex-column align-items-center">
@@ -360,43 +344,35 @@
                 </button>
             </div>
 
-            <!-- Product Short Description with Read More -->
-            <div class="mt-3 pb-1">
+            <!-- Product Short Description (Hidden on Mobile) -->
+            <div class="mt-3 pb-1 d-none d-md-block">
                 <div id="shortDescText" class="text-muted fs-6 mb-0 short-desc-clamp" style="line-height:1.7;">{!! $product->short_description !!}</div>
                 <button type="button" id="shortDescToggle" class="btn btn-link text-success p-0 mt-1 fw-semibold" style="font-size:0.82rem;text-decoration:none;">
                     <i class="bi bi-chevron-down me-1" id="shortDescIcon"></i><span id="shortDescLabel">Read More</span>
                 </button>
             </div>
 
-            <!-- Trust Badges -->
-            <div class="row g-2 py-3 mt-1 border-top text-center text-md-start" style="border-color:#f6f3eb !important;">
-                <div class="col-6 col-sm-3">
-                    <div class="d-flex flex-column align-items-center align-items-md-start">
-                        <span class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded-circle mb-2" style="width:40px;height:40px;"><i class="bi bi-truck fs-5"></i></span>
-                        <h6 class="fw-bold text-dark mb-0" style="font-size:0.75rem;">Free Shipping</h6>
-                        <span class="text-muted" style="font-size:0.65rem;">Above ₹499</span>
-                    </div>
+            <!-- Trust Badges (Single Row on Mobile) -->
+            <div class="d-flex flex-nowrap justify-content-around align-items-center py-3 mt-2 border-top text-center overflow-x-auto" style="border-color:#f6f3eb !important; gap: 8px; scrollbar-width: none;">
+                <div class="d-flex flex-column align-items-center flex-shrink-0" style="min-width: 75px;">
+                    <span class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded-circle mb-1" style="width:34px;height:34px;"><i class="bi bi-truck fs-6"></i></span>
+                    <h6 class="fw-bold text-dark mb-0" style="font-size:0.68rem;">Free Shipping</h6>
+                    <span class="text-muted" style="font-size:0.6rem;">Above ₹499</span>
                 </div>
-                <div class="col-6 col-sm-3">
-                    <div class="d-flex flex-column align-items-center align-items-md-start">
-                        <span class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded-circle mb-2" style="width:40px;height:40px;"><i class="bi bi-headset fs-5"></i></span>
-                        <h6 class="fw-bold text-dark mb-0" style="font-size:0.75rem;">360° Help</h6>
-                        <span class="text-muted" style="font-size:0.65rem;">Instant Support</span>
-                    </div>
+                <div class="d-flex flex-column align-items-center flex-shrink-0" style="min-width: 75px;">
+                    <span class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded-circle mb-1" style="width:34px;height:34px;"><i class="bi bi-headset fs-6"></i></span>
+                    <h6 class="fw-bold text-dark mb-0" style="font-size:0.68rem;">360° Help</h6>
+                    <span class="text-muted" style="font-size:0.6rem;">Instant Support</span>
                 </div>
-                <div class="col-6 col-sm-3">
-                    <div class="d-flex flex-column align-items-center align-items-md-start">
-                        <span class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded-circle mb-2" style="width:40px;height:40px;"><i class="bi bi-arrow-left-right fs-5"></i></span>
-                        <h6 class="fw-bold text-dark mb-0" style="font-size:0.75rem;">30 Day Return</h6>
-                        <span class="text-muted" style="font-size:0.65rem;">Hassle-Free</span>
-                    </div>
+                <div class="d-flex flex-column align-items-center flex-shrink-0" style="min-width: 75px;">
+                    <span class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded-circle mb-1" style="width:34px;height:34px;"><i class="bi bi-arrow-left-right fs-6"></i></span>
+                    <h6 class="fw-bold text-dark mb-0" style="font-size:0.68rem;">30 Day Return</h6>
+                    <span class="text-muted" style="font-size:0.6rem;">Hassle-Free</span>
                 </div>
-                <div class="col-6 col-sm-3">
-                    <div class="d-flex flex-column align-items-center align-items-md-start">
-                        <span class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded-circle mb-2" style="width:40px;height:40px;"><i class="bi bi-shield-check fs-5"></i></span>
-                        <h6 class="fw-bold text-dark mb-0" style="font-size:0.75rem;">70+ Checks</h6>
-                        <span class="text-muted" style="font-size:0.65rem;">Certified Pure</span>
-                    </div>
+                <div class="d-flex flex-column align-items-center flex-shrink-0" style="min-width: 75px;">
+                    <span class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded-circle mb-1" style="width:34px;height:34px;"><i class="bi bi-shield-check fs-6"></i></span>
+                    <h6 class="fw-bold text-dark mb-0" style="font-size:0.68rem;">70+ Checks</h6>
+                    <span class="text-muted" style="font-size:0.6rem;">Certified Pure</span>
                 </div>
             </div>
         </div>

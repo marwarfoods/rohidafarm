@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-    {{-- Breadcrumb Navigation --}}
-    @include('frontend.shop.partials.breadcrumb')
+    {{-- Breadcrumb Navigation (hidden on product page — PC & mobile) --}}
+    {{-- @include('frontend.shop.partials.breadcrumb') --}}
 
     {{-- Main Product Detail Container --}}
     <section class="py-4 py-lg-5" style="background-color: var(--cream-bg);">
@@ -12,6 +12,9 @@
 
             {{-- Detail Specification Tabs (Description, Benefits, Ingredients) --}}
             @include('frontend.shop.partials.tabs')
+
+            {{-- Product Story / Infographic Banners (Stacked Banners) --}}
+            @include('frontend.shop.partials.infographics')
 
             {{-- Ratings & Reviews (Flipkart Style review sliders) --}}
             @include('frontend.shop.partials.reviews')

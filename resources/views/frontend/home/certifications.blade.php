@@ -1,62 +1,141 @@
-<!-- ── Certifications & Quality Accreditation Section ── -->
-<section class="py-5 bg-white border-top border-bottom" id="certifications" style="border-color: var(--border-color) !important;">
-    <div class="container py-md-3">
-        <div class="text-center mb-5" data-aos="fade-up">
-            <span class="text-uppercase fw-bold font-heading text-success mb-1 d-block" style="font-size: 0.8rem; letter-spacing: 2px; color: var(--primary-brown) !important;">
+<!-- ── Certifications & Trust Marks (Kasutam Pill Design + Certificate Modal) ── -->
+<section class="py-4 py-md-5 certifications-kasutam-section" id="certifications">
+    <div class="container">
+
+        {{-- Section Header --}}
+        <div class="text-center mb-4" data-aos="fade-up">
+            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill font-heading fw-bold text-uppercase mb-3"
+                 style="font-size: 0.78rem; letter-spacing: 2px; color: #5C3D2E; background: rgba(196, 154, 69, 0.15); border: 1px solid rgba(196, 154, 69, 0.35);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" stroke="#C49A45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
                 100% Quality Guarantee
-            </span>
-            <h2 class="display-6 font-heading fw-bold text-dark m-0">Accreditations & Certifications</h2>
-            <p class="text-muted mx-auto mt-2" style="max-width: 600px; font-size: 0.95rem;">
+            </div>
+            <h2 class="font-heading fw-bold cert-heading-title mb-2">Certifications & Trust Marks</h2>
+            <p class="text-muted mx-auto" style="max-width: 560px; font-size: 0.92rem;">
                 Our products strictly adhere to government quality standards, safety protocols, and organic food certifications.
             </p>
         </div>
 
-        <div class="row g-4 justify-content-center align-items-stretch">
-            
-            <!-- Cert 1: FSSAI -->
-            <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="100">
-                <div class="p-4 rounded-4 text-center h-100 border shadow-sm transition-hover" style="background-color: var(--cream-bg); border-color: var(--border-color) !important;">
-                    <div class="rounded-circle mx-auto mb-3 bg-white p-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 76px; height: 76px; color: var(--dark-green);">
-                        <i class="bi bi-shield-lock-fill fs-1"></i>
-                    </div>
-                    <h5 class="fw-bold font-heading text-dark fs-6 mb-1">FSSAI Certified</h5>
-                    <small class="text-muted d-block" style="font-size: 0.78rem;">Food Safety Lic: 10020022011985</small>
-                </div>
-            </div>
+        {{-- Certification Pills Row --}}
+        <div class="cert-pills-row" data-aos="fade-up" data-aos-delay="100">
 
-            <!-- Cert 2: AGMARK -->
-            <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="150">
-                <div class="p-4 rounded-4 text-center h-100 border shadow-sm transition-hover" style="background-color: var(--cream-bg); border-color: var(--border-color) !important;">
-                    <div class="rounded-circle mx-auto mb-3 bg-white p-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 76px; height: 76px; color: var(--gold-accent);">
-                        <i class="bi bi-award-fill fs-1"></i>
-                    </div>
-                    <h5 class="fw-bold font-heading text-dark fs-6 mb-1">AGMARK Special Grade</h5>
-                    <small class="text-muted d-block" style="font-size: 0.78rem;">Premium Quality Standard Seal</small>
-                </div>
-            </div>
+            @if(isset($certifications) && $certifications->isNotEmpty())
+                @foreach($certifications as $cert)
+                    <button type="button"
+                            class="cert-pill-item"
+                            data-cert-id="{{ $cert->id }}"
+                            data-cert-name="{{ $cert->name }}"
+                            data-cert-number="{{ $cert->certificate_number }}"
+                            data-cert-images="{{ json_encode($cert->certificate_images ?? []) }}"
+                            onclick="openCertModal(this)">
+                        <div class="cert-pill-logo">
+                            @if($cert->logo_path)
+                                <img src="{{ asset($cert->logo_path) }}" alt="{{ $cert->name }} logo" loading="lazy">
+                            @else
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#C49A45" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            @endif
+                        </div>
+                        <span class="cert-pill-text">{{ $cert->name }}</span>
+                    </button>
+                @endforeach
 
-            <!-- Cert 3: ISO Certified -->
-            <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="200">
-                <div class="p-4 rounded-4 text-center h-100 border shadow-sm transition-hover" style="background-color: var(--cream-bg); border-color: var(--border-color) !important;">
-                    <div class="rounded-circle mx-auto mb-3 bg-white p-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 76px; height: 76px; color: var(--primary-brown);">
-                        <i class="bi bi-check-circle-fill fs-1"></i>
+            @else
+                {{-- Static fallback pills if no DB entries yet --}}
+                @foreach([
+                    ['name' => 'ISO 9001:2015', 'icon' => 'bi-award-fill'],
+                    ['name' => 'FSSAI', 'icon' => 'bi-shield-check'],
+                    ['name' => 'AGMARK', 'icon' => 'bi-patch-check-fill'],
+                    ['name' => 'NABL Lab Tested', 'icon' => 'bi-file-earmark-medical-fill'],
+                ] as $pill)
+                    <div class="cert-pill-item">
+                        <div class="cert-pill-logo">
+                            <i class="bi {{ $pill['icon'] }}" style="color: #C49A45; font-size: 1.1rem;"></i>
+                        </div>
+                        <span class="cert-pill-text">{{ $pill['name'] }}</span>
                     </div>
-                    <h5 class="fw-bold font-heading text-dark fs-6 mb-1">ISO 22000:2018</h5>
-                    <small class="text-muted d-block" style="font-size: 0.78rem;">Food Safety Management System</small>
-                </div>
-            </div>
-
-            <!-- Cert 4: Lab Tested -->
-            <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="250">
-                <div class="p-4 rounded-4 text-center h-100 border shadow-sm transition-hover" style="background-color: var(--cream-bg); border-color: var(--border-color) !important;" role="button" data-bs-toggle="modal" data-bs-target="#labReportsModal">
-                    <div class="rounded-circle mx-auto mb-3 bg-white p-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 76px; height: 76px; color: var(--dark-green);">
-                        <i class="bi bi-file-earmark-medical-fill fs-1"></i>
-                    </div>
-                    <h5 class="fw-bold font-heading text-dark fs-6 mb-1 hover-gold">NABL Lab Tested <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 0.7rem;"></i></h5>
-                    <small class="text-muted d-block" style="font-size: 0.78rem;">Click to view batch report</small>
-                </div>
-            </div>
+                @endforeach
+            @endif
 
         </div>
+
     </div>
 </section>
+
+{{-- ── Certificate Document Modal ── --}}
+<div class="modal fade" id="certDocModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered cert-modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title mb-0" id="certModalTitle">Certificate</h5>
+                    <span class="counter-badge" id="certModalCounter"></span>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="cert-doc-card">
+                    <img id="certModalImg" src="" alt="Certificate" class="img-fluid">
+                </div>
+                {{-- Prev / Next for multi-page certs --}}
+                <div class="d-flex align-items-center justify-content-center gap-3 mt-3" id="certNavRow">
+                    <button class="nav-arrow-btn" onclick="certNavPrev()" id="certPrevBtn">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <span class="fw-bold font-heading" style="color: #5C3D2E; font-size: 0.9rem;" id="certPageInfo">1 / 1</span>
+                    <button class="nav-arrow-btn" onclick="certNavNext()" id="certNextBtn">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" id="certOpenFullBtn" target="_blank"
+                   class="btn rounded-pill px-4 font-heading fw-bold"
+                   style="background: #5C3D2E; color: #fff; font-size: 0.88rem; border: 2px solid #5C3D2E;">
+                    <i class="bi bi-box-arrow-up-right me-1"></i> Open Full Certificate
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let _certImages = [];
+    let _certPage = 0;
+
+    function openCertModal(btn) {
+        const images = JSON.parse(btn.dataset.certImages || '[]');
+        if (!images.length) return;
+
+        _certImages = images;
+        _certPage = 0;
+
+        document.getElementById('certModalTitle').textContent = btn.dataset.certName;
+        document.getElementById('certModalCounter').textContent = btn.dataset.certNumber ? '🪪 ' + btn.dataset.certNumber : '';
+
+        renderCertPage();
+        new bootstrap.Modal(document.getElementById('certDocModal')).show();
+    }
+
+    function renderCertPage() {
+        const img = document.getElementById('certModalImg');
+        const pageInfo = document.getElementById('certPageInfo');
+        const navRow = document.getElementById('certNavRow');
+        const openBtn = document.getElementById('certOpenFullBtn');
+        const url = '/' + _certImages[_certPage];
+
+        img.src = url;
+        img.alt = 'Certificate page ' + (_certPage + 1);
+        pageInfo.textContent = (_certPage + 1) + ' / ' + _certImages.length;
+        openBtn.href = url;
+        navRow.style.display = _certImages.length > 1 ? 'flex' : 'none';
+
+        document.getElementById('certPrevBtn').disabled = _certPage === 0;
+        document.getElementById('certNextBtn').disabled = _certPage === _certImages.length - 1;
+    }
+
+    function certNavPrev() { if (_certPage > 0) { _certPage--; renderCertPage(); } }
+    function certNavNext() { if (_certPage < _certImages.length - 1) { _certPage++; renderCertPage(); } }
+</script>

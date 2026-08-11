@@ -1,5 +1,6 @@
 <!-- Latest Blogs Section -->
-<section class="py-5 bg-light position-relative overflow-hidden" style="border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+<section class="py-5 position-relative overflow-hidden"
+    style="background: url('{{ asset('images/vectors/bg9.png') }}') center center / cover no-repeat; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
     <!-- Section Skeleton Overlay -->
     <div class="section-skeleton-overlay position-absolute top-0 start-0 w-100 h-100 bg-white" style="z-index: 10; pointer-events: none; padding: 80px 48px;">
         <div class="container">
@@ -21,7 +22,10 @@
         </div>
     </div>
 
-    <div class="container">
+    <div class="position-absolute top-0 start-0 w-100 h-100"
+         style="background: rgba(255, 255, 255, 0.55); z-index: 0; pointer-events: none;"></div>
+
+    <div class="container position-relative" style="z-index: 1;">
         <div class="row align-items-end mb-5">
             <div class="col-md-8 text-center text-md-start" data-aos="fade-right">
                 <span class="text-uppercase fw-bold text-success" style="font-size: 0.75rem; letter-spacing: 2px;">Healthy Living</span>

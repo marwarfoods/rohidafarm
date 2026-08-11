@@ -87,7 +87,31 @@ class ProductController extends Controller
             $imagePath = $request->input('image');
         }
 
-        $product = Product::create($request->except('image', 'gallery', 'variants', 'slug') + [
+        $infographics = [];
+        if ($request->hasFile('infographic_images')) {
+            foreach ($request->file('infographic_images') as $file) {
+                $fileName = time() . '_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/products/infographics'), $fileName);
+                $infographics[] = '/uploads/products/infographics/' . $fileName;
+            }
+        }
+        if ($request->filled('infographic_urls')) {
+            $raw = $request->input('infographic_urls');
+            $decoded = json_decode($raw, true);
+            if (is_array($decoded)) {
+                foreach ($decoded as $item) {
+                    $path = is_array($item) ? ($item['full_url'] ?? $item['file_path'] ?? reset($item)) : (string)$item;
+                    if ($path) $infographics[] = $path;
+                }
+            } else {
+                $lines = array_filter(array_map('trim', explode("\n", $raw)));
+                foreach ($lines as $line) {
+                    if ($line) $infographics[] = $line;
+                }
+            }
+        }
+
+        $product = Product::create($request->except('image', 'gallery', 'variants', 'slug', 'infographic_images', 'infographic_urls') + [
             'slug' => $slug,
             'is_bilona' => $request->has('is_bilona'),
             'is_organic' => $request->has('is_organic'),
@@ -97,6 +121,7 @@ class ProductController extends Controller
             'is_new_arrival' => $request->has('is_new_arrival'),
             'free_shipping_threshold' => $request->input('free_shipping_threshold'),
             'display_coupons' => $request->input('display_coupons'),
+            'infographic_images' => array_values(array_unique($infographics)),
         ]);
 
         // Create main image mapping
@@ -205,6 +230,46 @@ class ProductController extends Controller
             'free_shipping_threshold' => $request->input('free_shipping_threshold'),
             'display_coupons' => $request->input('display_coupons'),
         ]);
+
+        // Infographic / Product Story Images
+        $infographics = [];
+        if ($request->has('infographic_form_submitted')) {
+            $existing = $request->input('existing_infographics', []);
+            if (is_array($existing)) {
+                foreach ($existing as $eImg) {
+                    if (!empty($eImg)) $infographics[] = $eImg;
+                }
+            }
+        } else {
+            $infographics = $product->infographic_images ?? [];
+            if (!is_array($infographics)) {
+                $infographics = is_string($infographics) ? (json_decode($infographics, true) ?? []) : [];
+            }
+        }
+
+        if ($request->hasFile('infographic_images')) {
+            foreach ($request->file('infographic_images') as $file) {
+                $fileName = time() . '_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/products/infographics'), $fileName);
+                $infographics[] = '/uploads/products/infographics/' . $fileName;
+            }
+        }
+        if ($request->filled('infographic_urls')) {
+            $raw = $request->input('infographic_urls');
+            $decoded = json_decode($raw, true);
+            if (is_array($decoded)) {
+                foreach ($decoded as $item) {
+                    $path = is_array($item) ? ($item['full_url'] ?? $item['file_path'] ?? reset($item)) : (string)$item;
+                    if ($path) $infographics[] = $path;
+                }
+            } else {
+                $lines = array_filter(array_map('trim', explode("\n", $raw)));
+                foreach ($lines as $line) {
+                    if ($line) $infographics[] = $line;
+                }
+            }
+        }
+        $product->update(['infographic_images' => array_values(array_unique($infographics))]);
 
         // Handle image upload simulation or existing gallery path selection
         if ($request->hasFile('image')) {

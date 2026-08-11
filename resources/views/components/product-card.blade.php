@@ -50,6 +50,8 @@
             @endif
         </a>
 
+        
+
         <!-- Wishlist & Quick Actions Float (Visible on hover) -->
         <div class="product-actions position-absolute bottom-3 start-0 end-0 p-3 d-flex justify-content-center gap-2 z-3" style="transform: translateY(110%); transition: var(--transition-smooth);">
             <button class="btn bg-white text-dark rounded-circle border p-2 shadow-sm hover-gold btn-wishlist-toggle" data-id="{{ $product->id }}" aria-label="Add {{ $product->name }} to wishlist">

@@ -1,0 +1,479 @@
+// ── Kasutam & Vedic Theme Sections SCSS ── //
+
+// 1. Hero Banner Section
+.hero-banner-section {
+    background-color: #FAF7EE;
+    position: relative;
+
+    .hero-banner-card {
+        background: #FFFFFF;
+        border: 2px solid #5C3D2E;
+        border-radius: 2.2rem;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(92, 61, 46, 0.08);
+        position: relative;
+        transition: box-shadow 0.3s ease;
+
+        &:hover {
+            box-shadow: 0 14px 36px rgba(92, 61, 46, 0.12);
+        }
+    }
+
+    .hero-banner-img {
+        width: 100%;
+        height: auto;
+        max-height: 540px;
+        object-fit: cover;
+        display: block;
+    }
+
+    @media (max-width: 767.98px) {
+        .hero-banner-card {
+            border-radius: 1.5rem;
+            border-width: 2px;
+        }
+        .hero-banner-img {
+            max-height: 480px;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+        }
+    }
+}
+
+.hero-slider {
+    .swiper-pagination {
+        bottom: 16px !important;
+    }
+    .swiper-pagination-bullet {
+        background: #5C3D2E;
+        opacity: 0.35;
+        width: 8px;
+        height: 8px;
+        margin: 0 4px !important;
+        transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+    .swiper-pagination-bullet-active {
+        opacity: 1;
+        width: 26px;
+        border-radius: 10px;
+        background: #5C3D2E;
+    }
+}
+
+
+// 2. Vedic Bilona Process Section
+.bilona-kasutam-section {
+    background-color: #FAF7EE;
+    position: relative;
+
+    .bilona-left-panel {
+        height: 100%;
+        min-height: 560px;
+        position: relative;
+
+        @media (min-width: 992px) {
+            position: sticky;
+            top: 100px;
+            height: calc(100% - 20px);
+        }
+    }
+
+    .bilona-full-img-card {
+        width: 100%;
+        height: 100%;
+        min-height: 560px;
+        background: #FFFFFF;
+        border: 2px solid #5C3D2E;
+        border-radius: 2rem;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(92, 61, 46, 0.08);
+        position: relative;
+
+        img {
+            width: 100%;
+            height: 100%;
+            min-height: 560px;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+    }
+
+    .kasutam-timeline-wrapper {
+        position: relative;
+    }
+
+    .kasutam-dashed-line {
+        position: absolute;
+        left: 26px;
+        top: 30px;
+        bottom: 30px;
+        width: 0;
+        border-left: 3px dashed #B8976C;
+        z-index: 0;
+    }
+
+    .kasutam-step-item {
+        position: relative;
+        z-index: 1;
+        margin-bottom: 0.85rem;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    .kasutam-num-badge {
+        width: 54px;
+        height: 54px;
+        min-width: 54px;
+        border-radius: 50%;
+        background: #5C3D2E;
+        color: #FFFFFF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-heading);
+        font-weight: 800;
+        font-size: 1.45rem;
+        border: 4px solid #FAF7EE;
+        box-shadow: 0 4px 12px rgba(92, 61, 46, 0.18);
+        z-index: 2;
+    }
+
+    .kasutam-card {
+        background: #FFFFFF;
+        border: 2px solid #5C3D2E;
+        border-radius: 2rem;
+        padding: 1.25rem 1.75rem;
+        box-shadow: 0 4px 16px rgba(92, 61, 46, 0.04);
+        flex-grow: 1;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 1.5rem;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+        &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 26px rgba(92, 61, 46, 0.1);
+        }
+    }
+
+    .kasutam-scalloped-frame {
+        width: 96px;
+        height: 96px;
+        min-width: 96px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .kasutam-scalloped-svg {
+        position: absolute;
+        inset: -6px;
+        width: calc(100% + 12px);
+        height: calc(100% + 12px);
+        z-index: 2;
+        pointer-events: none;
+    }
+    .kasutam-step-img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .kasutam-card-title {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        color: #5C3D2E;
+        font-size: 1.35rem;
+        margin-bottom: 0.35rem;
+    }
+    .kasutam-card-desc {
+        color: #6E5B4F;
+        font-size: 0.95rem;
+        line-height: 1.55;
+        margin: 0;
+    }
+
+    @media (max-width: 575.98px) {
+        .bilona-full-img-card, .bilona-full-img-card img {
+            min-height: 380px;
+        }
+        .kasutam-dashed-line {
+            left: 20px;
+        }
+        .kasutam-num-badge {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            font-size: 1.15rem;
+        }
+        .kasutam-card {
+            flex-direction: column;
+            text-align: center;
+            padding: 1.25rem;
+            border-radius: 1.5rem;
+        }
+        .kasutam-scalloped-frame {
+            width: 84px;
+            height: 84px;
+            min-width: 84px;
+        }
+    }
+}
+
+
+// 3. Our Roots & Heritage Story Section
+.story-kasutam-section {
+    background-color: #FAF7EE;
+    position: relative;
+    
+    .story-img-card {
+        position: relative;
+        border: 2px solid #5C3D2E;
+        border-radius: 2.2rem;
+        overflow: hidden;
+        box-shadow: 0 14px 36px rgba(92, 61, 46, 0.1);
+        aspect-ratio: 4 / 3;
+        background: #FFFFFF;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        &:hover img {
+            transform: scale(1.04);
+        }
+    }
+
+    .story-badge-floating {
+        border: 2px solid #5C3D2E !important;
+        border-radius: 1.5rem !important;
+        box-shadow: 0 8px 24px rgba(92, 61, 46, 0.12) !important;
+    }
+
+    .story-feature-card {
+        background: #FFFFFF;
+        border: 2px solid #5C3D2E;
+        border-radius: 1.25rem;
+        padding: 1rem 1.15rem;
+        box-shadow: 0 4px 14px rgba(92, 61, 46, 0.04);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+        &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(92, 61, 46, 0.09);
+        }
+    }
+
+    .btn-story-primary {
+        background-color: #5C3D2E !important;
+        border: 2px solid #5C3D2E !important;
+        color: #FFFFFF !important;
+        transition: background-color 0.25s ease, transform 0.25s ease;
+
+        &:hover {
+            background-color: #4A2E1B !important;
+            border-color: #4A2E1B !important;
+            transform: translateY(-2px);
+        }
+    }
+
+    .btn-story-outline {
+        background-color: transparent !important;
+        border: 2px solid #5C3D2E !important;
+        color: #5C3D2E !important;
+        transition: background-color 0.25s ease, color 0.25s ease, transform 0.25s ease;
+
+        &:hover {
+            background-color: #5C3D2E !important;
+            color: #FFFFFF !important;
+            transform: translateY(-2px);
+        }
+    }
+}
+
+
+// 4. Certifications & Trust Marks Section
+.certifications-kasutam-section {
+    background-color: #FAF7EE;
+    position: relative;
+
+    .cert-heading-title {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        color: #2D4A27; // Deep Kasutam green tone
+        font-size: 2.2rem;
+        letter-spacing: -0.5px;
+
+        @media (max-width: 767.98px) {
+            font-size: 1.75rem;
+        }
+    }
+
+    .cert-pills-row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 1.25rem;
+
+        @media (max-width: 767.98px) {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            justify-content: flex-start;
+            padding-bottom: 0.75rem;
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: x mandatory;
+            
+            &::-webkit-scrollbar {
+                display: none;
+            }
+        }
+    }
+
+    .cert-pill-item {
+        background: #FFFDF5;
+        border: 1.5px solid rgba(196, 154, 69, 0.4);
+        border-radius: 50rem;
+        padding: 0.6rem 1.6rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+        box-shadow: 0 3px 12px rgba(92, 61, 46, 0.04);
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        white-space: nowrap;
+
+        @media (max-width: 767.98px) {
+            scroll-snap-align: start;
+            flex-shrink: 0;
+            padding: 0.5rem 1.2rem;
+        }
+
+        &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(92, 61, 46, 0.1);
+            border-color: #5C3D2E;
+        }
+    }
+
+    .cert-pill-logo {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        border-radius: 50%;
+        background: #FFFFFF;
+        border: 1px solid rgba(196, 154, 69, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        padding: 3px;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+    }
+
+    .cert-pill-text {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        color: #3E2723;
+        font-size: 0.95rem;
+        letter-spacing: 0.5px;
+    }
+}
+
+
+// 5. Certification Modal Popup Styling
+.cert-modal-dialog {
+    max-width: 580px;
+
+    .modal-content {
+        background: #FAF7EE;
+        border: 2px solid #5C3D2E;
+        border-radius: 2rem;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(62, 39, 35, 0.25);
+    }
+
+    .modal-header {
+        background: #FFFFFF;
+        border-bottom: 1px solid rgba(92, 61, 46, 0.15);
+        padding: 1.1rem 1.5rem;
+
+        .modal-title {
+            font-family: var(--font-heading);
+            font-weight: 800;
+            color: #5C3D2E;
+            font-size: 1.25rem;
+        }
+        
+        .counter-badge {
+            font-size: 0.85rem;
+            color: #705849;
+            font-weight: 600;
+        }
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        position: relative;
+        text-center: center;
+    }
+
+    .cert-doc-card {
+        background: #FFFFFF;
+        border: 1px solid rgba(92, 61, 46, 0.2);
+        border-radius: 1.25rem;
+        padding: 1rem;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+
+        img {
+            max-width: 100%;
+            height: auto;
+            max-height: 480px;
+            object-fit: contain;
+            border-radius: 0.75rem;
+            display: block;
+            margin: 0 auto;
+        }
+    }
+
+    .nav-arrow-btn {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #FFFFFF;
+        border: 2px solid #5C3D2E;
+        color: #5C3D2E;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+            background: #5C3D2E;
+            color: #FFFFFF;
+        }
+    }
+
+    .modal-footer {
+        background: #FFFFFF;
+        border-top: 1px solid rgba(92, 61, 46, 0.15);
+        padding: 1rem 1.5rem;
+        justify-content: center;
+    }
+}

@@ -1,6 +1,9 @@
 <!-- Featured Videos Section -->
-<section class="py-5 bg-white border-bottom">
-    <div class="container overflow-hidden">
+<section class="py-5 position-relative overflow-hidden"
+    style="background: url('{{ asset('images/vectors/bg7.png') }}') center center / cover no-repeat;">
+    <div class="position-absolute top-0 start-0 w-100 h-100"
+         style="background: rgba(255, 255, 255, 0.55); z-index: 0; pointer-events: none;"></div>
+    <div class="container overflow-hidden position-relative" style="z-index: 1;">
         <div class="d-flex justify-content-between align-items-end mb-4" data-aos="fade-up">
             <div>
                 <span class="text-uppercase fw-bold text-success" style="font-size: 0.75rem; letter-spacing: 2px;">Customer Love</span>

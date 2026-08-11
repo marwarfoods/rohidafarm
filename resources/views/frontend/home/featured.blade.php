@@ -1,5 +1,11 @@
-<section class="py-md-5 py-3 bg-light">
-    <div class="container-fluid px-md-4 px-2" style="max-width: 100%;">
+<section class="py-md-5 py-3 position-relative overflow-hidden" id="featured-products"
+    style="background: url('{{ asset('images/vectors/bg5.png') }}') center center / cover no-repeat;">
+
+    {{-- Soft warm overlay for crisp UI contrast --}}
+    <div class="position-absolute top-0 start-0 w-100 h-100"
+         style="background: rgba(250, 247, 238, 0.35); z-index: 0; pointer-events: none;"></div>
+
+    <div class="container-fluid px-md-4 px-2 position-relative" style="max-width: 100%; z-index: 1;">
         <div class="text-center mb-md-5 mb-2" data-aos="fade-up">
             <h2 class="display-5 font-heading fw-bold mt-1 mb-1">Featured Products</h2>
             <span class="text-uppercase fw-bold text-success" style="font-size: 0.75rem; letter-spacing: 2px;">Shop By Categories</span>
