@@ -40,7 +40,8 @@
         width: 76px;
         height: 76px;
         border-radius: 50%;
-        background-color: #F6EFE5;
+        background-color: #FFFFFF;
+        border: 1px solid #ECE7DD;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -56,7 +57,7 @@
     }
 
     .about-card:hover .icon-box-circle {
-        background-color: #EFE0C8;
+        background-color: #FFFFFF;
         transform: scale(1.06);
     }
 
@@ -237,8 +238,8 @@
         row-gap: 0.75rem !important;
 
         .trust-icon {
-            width: 92px;
-            height: 92px;
+            width: 110px;
+            height: 110px;
             margin: 0 auto 0.6rem;
             border-radius: 50%;
             background-color: #FFFFFF;
@@ -247,20 +248,21 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 6px 18px rgba(122, 75, 34, 0.06);
+            overflow: hidden;
 
             img {
-                width: 54px;
-                height: 54px;
+                width: 100%;
+                height: 100%;
                 object-fit: contain;
+                padding: 8px;
             }
 
             @media (max-width: 576px) {
-                width: 68px;
-                height: 68px;
+                width: 82px;
+                height: 82px;
 
                 img {
-                    width: 38px;
-                    height: 38px;
+                    padding: 6px;
                 }
             }
         }
@@ -324,15 +326,15 @@
     .story-visual {
         border-radius: 24px;
         overflow: hidden;
-        background: #F6EFE5;
-        padding: 1.5rem;
+        background: #FFFFFF;
+        padding: 0.5rem;
         display: flex;
         align-items: center;
         justify-content: center;
 
         img {
             width: 100%;
-            max-height: 380px;
+            max-height: 480px;
             object-fit: contain;
             transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -441,15 +443,15 @@
     .sustainability-visual {
         border-radius: 24px;
         overflow: hidden;
-        background: #F0EAD9;
-        padding: 1.5rem;
+        background: #FFFFFF;
+        padding: 0;
         display: flex;
         align-items: center;
         justify-content: center;
 
         img {
             width: 100%;
-            max-height: 340px;
+            height: auto;
             object-fit: contain;
         }
     }

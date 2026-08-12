@@ -8,7 +8,8 @@
     @include('frontend.pages.about.difference')
     @include('frontend.pages.about.pillars')
     @include('frontend.pages.about.why-us')
-    @include('frontend.pages.about.video')
+    {{-- Video section hidden for now --}}
+    {{-- @include('frontend.pages.about.video') --}}
     @include('frontend.pages.about.founder')
 </div>
 @endsection

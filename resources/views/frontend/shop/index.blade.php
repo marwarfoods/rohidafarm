@@ -5,19 +5,6 @@
     @vite(['resources/sass/shop.scss'])
 @endpush
 
-<!-- Page Header -->
-<section class="py-4 bg-light border-bottom">
-    <div class="container-shop">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-1" style="font-size: 0.85rem; font-family: 'DM Sans', sans-serif;">
-                <li class="breadcrumb-item"><a href="{{ route('home') }}" class="text-success text-decoration-none">Home</a></li>
-                <li class="breadcrumb-item active text-dark" aria-current="page">Shop Catalog</li>
-            </ol>
-        </nav>
-        <h1 class="display-6 font-heading fw-bold m-0">Our Organic Farm Products</h1>
-    </div>
-</section>
-
 <!-- Shop Body Section -->
 <section class="py-4" style="background-color: var(--cream-bg);">
     <div class="container-shop">

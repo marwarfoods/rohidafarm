@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
     productSliders.forEach(slider => {
         const wrapper = slider.closest('.products-slider-wrapper');
         const slidesCount = slider.querySelectorAll('.swiper-slide').length;
-        new Swiper(slider, {
+        const productSwiper = new Swiper(slider, {
             loop: slidesCount > 4,
             autoplay: {
                 delay: 3000,
@@ -131,6 +131,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     spaceBetween: 24,
                 }
             }
+        });
+
+        // While the variant dropdown inside a slide is open/focused, fully lock
+        // the slider (stop autoplay + block touch/drag swipe) so selecting a
+        // weight can never get interrupted by the slide moving underneath the
+        // cursor. It only unlocks once the dropdown loses focus.
+        slider.addEventListener('focusin', function (e) {
+            if (!e.target.matches('.variant-selector')) return;
+            productSwiper.autoplay.stop();
+            productSwiper.allowTouchMove = false;
+        });
+        slider.addEventListener('focusout', function (e) {
+            if (!e.target.matches('.variant-selector')) return;
+            productSwiper.allowTouchMove = true;
+            productSwiper.autoplay.start();
         });
     });
 

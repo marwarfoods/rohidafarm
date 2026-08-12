@@ -354,57 +354,65 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Dynamic Variant Selector Price and Hidden Inputs Update with Shimmer Loader
-    document.querySelectorAll('.variant-selector').forEach(select => {
-        select.addEventListener('change', function () {
-            const productId = this.getAttribute('data-product-id');
-            const card = document.getElementById(`prod-card-${productId}`);
-            if (!card) return;
+    // Delegated on document (not bound per-select) because Swiper's loop mode
+    // clones slides — including their <select> and the duplicated
+    // "prod-card-{id}" wrapper — after this script runs. A direct listener
+    // attached only to the selects that existed at load time would silently
+    // miss those clones, which is why the price update used to work
+    // intermittently depending on which physical slide (original vs. clone)
+    // the user landed on.
+    document.addEventListener('change', function (e) {
+        const select = e.target.closest('.variant-selector');
+        if (!select) return;
 
-            const selectedOption = this.options[this.selectedIndex];
-            const price = parseFloat(selectedOption.getAttribute('data-price'));
-            const mrp = parseFloat(selectedOption.getAttribute('data-mrp'));
-            const variantId = selectedOption.value;
+        const productId = select.getAttribute('data-product-id');
+        const card = select.closest('.product-card') || document.getElementById(`prod-card-${productId}`);
+        if (!card) return;
 
-            const formattedPrice = `₹${price.toLocaleString('en-IN', {maximumFractionDigits: 0})}`;
-            const formattedMrp = `₹${mrp.toLocaleString('en-IN', {maximumFractionDigits: 0})}`;
-            const bestPrice = `Best Price ₹${Math.round(price * 0.85).toLocaleString('en-IN')} with PURE15`;
+        const selectedOption = select.options[select.selectedIndex];
+        const price = parseFloat(selectedOption.getAttribute('data-price'));
+        const mrp = parseFloat(selectedOption.getAttribute('data-mrp'));
+        const variantId = selectedOption.value;
 
-            RohidaDebug.log('🏷️', 'Variant Change', `Product #${productId} variant changed -> Selected Variant #${variantId}, Price: ${formattedPrice}`);
+        const formattedPrice = `₹${price.toLocaleString('en-IN', {maximumFractionDigits: 0})}`;
+        const formattedMrp = `₹${mrp.toLocaleString('en-IN', {maximumFractionDigits: 0})}`;
+        const bestPrice = `Best Price ₹${Math.round(price * 0.85).toLocaleString('en-IN')} with PURE15`;
 
-            const salePriceEl = card.querySelector('.card-sale-price');
-            const mrpPriceEl = card.querySelector('.card-mrp-price');
-            const bestPriceEl = card.querySelector('.card-best-price');
-            const priceContainer = card.querySelector('.price-container');
+        RohidaDebug.log('🏷️', 'Variant Change', `Product #${productId} variant changed -> Selected Variant #${variantId}, Price: ${formattedPrice}`);
 
-            if (priceContainer) {
-                priceContainer.classList.add('price-loading-shimmer');
-                setTimeout(() => {
-                    if (salePriceEl) salePriceEl.textContent = formattedPrice;
-                    if (mrpPriceEl) mrpPriceEl.textContent = formattedMrp;
-                    if (bestPriceEl) bestPriceEl.innerHTML = `<i class="bi bi-tag-fill me-1"></i>${bestPrice}`;
-                    priceContainer.classList.remove('price-loading-shimmer');
-                }, 250);
-            } else {
+        const salePriceEl = card.querySelector('.card-sale-price');
+        const mrpPriceEl = card.querySelector('.card-mrp-price');
+        const bestPriceEl = card.querySelector('.card-best-price');
+        const priceContainer = card.querySelector('.price-container');
+
+        if (priceContainer) {
+            priceContainer.classList.add('price-loading-shimmer');
+            setTimeout(() => {
                 if (salePriceEl) salePriceEl.textContent = formattedPrice;
                 if (mrpPriceEl) mrpPriceEl.textContent = formattedMrp;
                 if (bestPriceEl) bestPriceEl.innerHTML = `<i class="bi bi-tag-fill me-1"></i>${bestPrice}`;
-            }
+                priceContainer.classList.remove('price-loading-shimmer');
+            }, 250);
+        } else {
+            if (salePriceEl) salePriceEl.textContent = formattedPrice;
+            if (mrpPriceEl) mrpPriceEl.textContent = formattedMrp;
+            if (bestPriceEl) bestPriceEl.innerHTML = `<i class="bi bi-tag-fill me-1"></i>${bestPrice}`;
+        }
 
-            const variantInput = card.querySelector('.card-variant-id');
-            if (variantInput) variantInput.value = variantId;
+        const variantInput = card.querySelector('.card-variant-id');
+        if (variantInput) variantInput.value = variantId;
 
-            const stock = parseInt(selectedOption.getAttribute('data-stock') || '0');
-            const cartForm = card.querySelector('.add-to-cart-form');
-            const soldOutBtn = card.querySelector('.card-sold-out-btn');
+        const stock = parseInt(selectedOption.getAttribute('data-stock') || '0');
+        const cartForm = card.querySelector('.add-to-cart-form');
+        const soldOutBtn = card.querySelector('.card-sold-out-btn');
 
-            if (stock > 0) {
-                if (cartForm) cartForm.classList.remove('d-none');
-                if (soldOutBtn) soldOutBtn.classList.add('d-none');
-            } else {
-                if (cartForm) cartForm.classList.add('d-none');
-                if (soldOutBtn) soldOutBtn.classList.remove('d-none');
-            }
-        });
+        if (stock > 0) {
+            if (cartForm) cartForm.classList.remove('d-none');
+            if (soldOutBtn) soldOutBtn.classList.add('d-none');
+        } else {
+            if (cartForm) cartForm.classList.add('d-none');
+            if (soldOutBtn) soldOutBtn.classList.remove('d-none');
+        }
     });
 
     // Auto-open drawers after page reload if flag is present

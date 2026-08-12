@@ -195,12 +195,6 @@
                             @foreach($product->variants as $variant)
                                 @php
                                     $varDiscount = $variant->mrp > $variant->sale_price ? round((($variant->mrp - $variant->sale_price) / $variant->mrp) * 100) : 0;
-                                    $unitPriceText = "";
-                                    if (str_contains($variant->name, 'L') || str_contains($variant->name, 'ml')) {
-                                        $vol = floatval(preg_replace('/[^0-9.]/', '', $variant->name));
-                                        if (str_contains($variant->name, 'ml')) $vol = $vol / 1000.0;
-                                        if ($vol > 0) { $unitPriceText = "₹" . number_format($variant->sale_price / $vol, 0) . "/L"; }
-                                    }
                                     $isVarDefault = ($defaultVariant->id === $variant->id);
                                 @endphp
                                 <div class="variant-card border p-2 rounded-3 text-center position-relative cursor-pointer d-flex flex-column justify-content-between {{ $isVarDefault ? 'active border-success bg-success-subtle' : '' }} {{ $variant->stock <= 0 ? 'opacity-50' : '' }}"
@@ -237,9 +231,6 @@
                                                 <span class="text-muted text-decoration-line-through" style="font-size:0.7rem;">₹{{ number_format($variant->mrp, 0) }}</span>
                                             @endif
                                         </div>
-                                        @if($unitPriceText)
-                                            <div class="text-muted" style="font-size:0.65rem;line-height:1;">{{ $unitPriceText }}</div>
-                                        @endif
                                     </div>
                                 </div>
                             @endforeach

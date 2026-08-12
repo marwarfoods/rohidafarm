@@ -3,13 +3,13 @@
     <div class="container">
         <div class="row g-5 align-items-center">
 
-            <div class="col-lg-6" data-aos="fade-right">
+            <div class="col-lg-7" data-aos="fade-right">
                 <div class="sustainability-visual">
-                    <img src="{{ asset('images/svgs/Rohida Farm Web Vector 08.svg') }}" alt="Sustainability at Rohida Farm" loading="lazy">
+                    <img src="{{ asset('images/svgs/Rohida Farm Web Vector 13.svg') }}" alt="Sustainability at Rohida Farm" loading="lazy">
                 </div>
             </div>
 
-            <div class="col-lg-6" data-aos="fade-left">
+            <div class="col-lg-5" data-aos="fade-left">
                 <span class="text-uppercase fw-bold mb-2 d-block sustainability-eyebrow">Rooted In Care</span>
                 <h2 class="story-heading">Sustainability</h2>
                 <p class="story-text mb-0">
