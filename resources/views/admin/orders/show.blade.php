@@ -37,18 +37,68 @@
             </div>
         @endif
 
+        <!-- Order Summary (table) -->
+        <div class="card border-0 rounded-4 shadow-sm p-4 bg-white mb-4">
+            <h4 class="font-heading fw-bold text-dark border-bottom pb-2 mb-3">Order Summary</h4>
+            <div class="table-responsive">
+                <table class="table table-borderless align-middle m-0" style="font-size: 0.88rem;">
+                    <tbody>
+                        <tr>
+                            <td class="text-muted" style="width: 220px;">Order Number</td>
+                            <td class="fw-bold text-dark">#{{ $order->order_number }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Order Date</td>
+                            <td class="text-dark">{{ $order->created_at->format('d M Y, h:i A') }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Order Status</td>
+                            <td><span class="badge {{ $order->status_badge_class }}">{{ ucfirst(str_replace('_', ' ', $order->status)) }}</span></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Payment Method</td>
+                            <td class="text-uppercase text-dark">{{ $order->payment_method ?: '—' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Payment Status</td>
+                            <td>
+                                <span class="badge {{ $order->payment_status === 'paid' ? 'bg-success text-white' : ($order->payment_status === 'failed' ? 'bg-danger text-white' : 'bg-warning text-dark') }}">
+                                    {{ ucfirst($order->payment_status ?: 'pending') }}
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <div class="card border-0 rounded-4 shadow-sm p-4 bg-white mb-4">
             <h4 class="font-heading fw-bold text-dark border-bottom pb-2 mb-3">Order Items</h4>
-            
-            @foreach($order->items as $item)
-                <div class="d-flex align-items-center justify-content-between py-3 border-bottom">
-                    <div>
-                        <h6 class="fw-bold text-dark m-0" style="font-size: 0.95rem;">{{ $item->product_name }}</h6>
-                        <span class="text-muted" style="font-size: 0.75rem;">Variant: {{ $item->variant_name ?: 'Default' }} | Quantity: {{ $item->quantity }} @ ₹{{ number_format($item->price, 2) }}</span>
-                    </div>
-                    <strong class="text-dark" style="font-size: 1rem;">₹{{ number_format($item->total, 2) }}</strong>
-                </div>
-            @endforeach
+
+            <div class="table-responsive">
+                <table class="table align-middle" style="font-size: 0.88rem;">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Product</th>
+                            <th>Variant</th>
+                            <th class="text-center">Qty</th>
+                            <th class="text-end">Price</th>
+                            <th class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($order->items as $item)
+                            <tr>
+                                <td class="fw-bold text-dark">{{ $item->product_name }}</td>
+                                <td class="text-muted">{{ $item->variant_name ?: 'Default' }}</td>
+                                <td class="text-center text-muted">{{ $item->quantity }}</td>
+                                <td class="text-end text-muted">₹{{ number_format($item->price, 2) }}</td>
+                                <td class="text-end fw-bold text-dark">₹{{ number_format($item->total, 2) }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Calculations -->
             <div class="pt-3">
@@ -76,6 +126,41 @@
                 </div>
             </div>
         </div>
+
+        {{-- Payment Details (from payments transactions table, if any) --}}
+        @if($order->payments && $order->payments->count())
+        <div class="card border-0 rounded-4 shadow-sm p-4 bg-white mb-4">
+            <h4 class="font-heading fw-bold text-dark border-bottom pb-2 mb-3">Payment Details</h4>
+            <div class="table-responsive">
+                <table class="table align-middle" style="font-size: 0.88rem;">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Method</th>
+                            <th>Transaction ID</th>
+                            <th class="text-end">Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($order->payments as $payment)
+                            <tr>
+                                <td class="text-uppercase text-dark">{{ $payment->payment_method }}</td>
+                                <td class="text-muted">{{ $payment->transaction_id ?: '—' }}</td>
+                                <td class="text-end fw-bold text-dark">₹{{ number_format($payment->amount, 2) }}</td>
+                                <td>
+                                    <span class="badge {{ $payment->status === 'success' || $payment->status === 'paid' ? 'bg-success text-white' : ($payment->status === 'failed' ? 'bg-danger text-white' : 'bg-warning text-dark') }}">
+                                        {{ ucfirst($payment->status) }}
+                                    </span>
+                                </td>
+                                <td class="text-muted">{{ $payment->created_at->format('d M Y, h:i A') }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endif
 
         <!-- Tracking Timeline status logs -->
         <div class="card border-0 rounded-4 shadow-sm p-4 bg-white">
@@ -180,24 +265,33 @@
         <!-- Shipping and Customer Details -->
         <div class="card border-0 rounded-4 shadow-sm p-4 bg-white">
             <h4 class="font-heading fw-bold text-dark border-bottom pb-2 mb-3">Customer Details</h4>
-            
-            <div class="mb-3" style="font-size: 0.85rem;">
-                <strong class="d-block text-dark">Name:</strong>
-                <span class="text-muted">
-                    @if($order->user)
-                        {{ $order->user->name }} ({{ $order->user->email }})
-                    @else
-                        Guest Customer
-                    @endif
-                </span>
-            </div>
-            
-            <div class="mb-3" style="font-size: 0.85rem;">
-                <strong class="d-block text-dark">Shipping Address:</strong>
-                <span class="text-muted d-block">{{ $order->shipping_name }}</span>
-                <span class="text-muted d-block">{{ $order->shipping_address_line1 }} @if($order->shipping_address_line2), {{ $order->shipping_address_line2 }} @endif</span>
-                <span class="text-muted d-block">{{ $order->shipping_city }}, {{ $order->shipping_state }} - {{ $order->shipping_postal_code }}</span>
-                <span class="text-muted d-block">Phone: {{ $order->shipping_phone }}</span>
+
+            <div class="table-responsive">
+                <table class="table table-borderless align-middle m-0" style="font-size: 0.85rem;">
+                    <tbody>
+                        <tr>
+                            <td class="text-muted" style="width: 110px;">Name</td>
+                            <td class="fw-bold text-dark">{{ $order->user->name ?? $order->shipping_name ?? 'Guest Customer' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Email</td>
+                            <td class="text-dark">{{ $order->user->email ?? '—' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Phone</td>
+                            <td class="text-dark">{{ $order->shipping_phone ?: '—' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted align-top">Shipping Address</td>
+                            <td class="text-dark">
+                                {{ $order->shipping_name }}<br>
+                                {{ $order->shipping_address_line1 }}{{ $order->shipping_address_line2 ? ', ' . $order->shipping_address_line2 : '' }}<br>
+                                {{ $order->shipping_city }}, {{ $order->shipping_state }} - {{ $order->shipping_postal_code }}<br>
+                                {{ $order->shipping_country }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

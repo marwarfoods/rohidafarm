@@ -38,11 +38,27 @@
                     </div>
                 </div>
 
+                <!-- Category Image (Media Gallery Picker) -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Category Image</label>
+                    <div class="row g-2">
+                        <div class="col-8">
+                            <input type="text" name="image" id="categoryImageInput" class="form-control bg-light border p-2 media-picker-input"
+                                   placeholder="Choose from media gallery...">
+                        </div>
+                        <div class="col-4">
+                            <div id="categoryImagePreview" class="border rounded-3 p-1 bg-light text-center d-flex align-items-center justify-content-center" style="height: 42px;">
+                                <span class="text-muted" style="font-size: 0.68rem;">No image</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="mb-3">
                     <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Description</label>
                     <textarea name="description" class="form-control bg-light border p-2" rows="3" placeholder="Brief details..."></textarea>
                 </div>
-                
+
                 <button type="submit" class="btn btn-premium w-100 py-2 rounded-3 text-uppercase font-heading" style="font-size: 0.8rem;">Save Category</button>
             </form>
         </div>
@@ -60,7 +76,11 @@
                             <div class="accordion-button collapsed d-flex align-items-center justify-content-between p-3 bg-white border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCat{{ $cat->id }}" aria-expanded="false" aria-controls="collapseCat{{ $cat->id }}">
                                 <!-- Left: Icon, Name & Product Count -->
                                 <div class="d-flex align-items-center gap-2 flex-grow-1 text-start">
-                                    <i class="bi {{ $cat->icon ?? 'bi-tags' }} text-success fs-4 me-2"></i>
+                                    @if($cat->image)
+                                        <img src="{{ asset($cat->image) }}" alt="{{ $cat->name }}" class="rounded-3 border me-2" style="width: 38px; height: 38px; object-fit: cover; flex-shrink: 0;">
+                                    @else
+                                        <i class="bi {{ $cat->icon ?? 'bi-tags' }} text-success fs-4 me-2"></i>
+                                    @endif
                                     <div>
                                         <span class="fw-bold text-dark fs-5 d-block font-heading" style="line-height: 1.2;">{{ $cat->name }}</span>
                                         <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill mt-1" style="font-size: 0.72rem; font-weight: 600;">
@@ -76,6 +96,7 @@
                                             data-name="{{ $cat->name }}" 
                                             data-description="{{ $cat->description }}" 
                                             data-icon="{{ $cat->icon ?? 'bi-tags' }}"
+                                            data-image="{{ $cat->image }}"
                                             title="Edit Category">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
@@ -175,6 +196,22 @@
                         </div>
                     </div>
 
+                    <!-- Category Image (Media Gallery Picker) -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Category Image</label>
+                        <div class="row g-2">
+                            <div class="col-8">
+                                <input type="text" name="image" id="editCatImageInput" class="form-control bg-light border p-2 media-picker-input"
+                                       placeholder="Choose from media gallery...">
+                            </div>
+                            <div class="col-4">
+                                <div id="editCatImagePreview" class="border rounded-3 p-1 bg-light text-center d-flex align-items-center justify-content-center" style="height: 42px;">
+                                    <span class="text-muted" style="font-size: 0.68rem;">No image</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="mb-3">
                         <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Description</label>
                         <textarea name="description" id="editCatDescription" class="form-control bg-light border p-2" rows="3"></textarea>
@@ -249,6 +286,12 @@ document.addEventListener('DOMContentLoaded', function() {
         window.initIconPicker('#editCatIconInput', '#editSelectedIconDisplay');
     }
 
+    // Initialize Media Gallery Pickers for Category Images
+    if (window.initMediaPicker) {
+        window.initMediaPicker('#categoryImageInput', '#categoryImagePreview', 'image');
+        window.initMediaPicker('#editCatImageInput', '#editCatImagePreview', 'image');
+    }
+
     // ── Create category logic ──
     const parentSelect = document.getElementById('parentCategorySelect');
     const iconWrapper = document.getElementById('iconSelectorWrapper');
@@ -270,6 +313,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const editCatDescription = document.getElementById('editCatDescription');
     const editCatIconInput = document.getElementById('editCatIconInput');
     const editSelectedIconDisplay = document.getElementById('editSelectedIconDisplay');
+    const editCatImageInput = document.getElementById('editCatImageInput');
+    const editCatImagePreview = document.getElementById('editCatImagePreview');
     const editCatModal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
 
     editCatButtons.forEach(btn => {
@@ -278,13 +323,22 @@ document.addEventListener('DOMContentLoaded', function() {
             const name = this.getAttribute('data-name');
             const desc = this.getAttribute('data-description');
             const icon = this.getAttribute('data-icon') || 'bi-tags';
+            const image = this.getAttribute('data-image') || '';
 
             editCatForm.action = `/admin/categories/${id}/update`;
             editCatName.value = name;
             editCatDescription.value = desc || '';
             editCatIconInput.value = icon;
-            
+
             editSelectedIconDisplay.innerHTML = `<i class="bi ${icon} text-success me-2 fs-5"></i> Selected Preview`;
+
+            editCatImageInput.value = image;
+            if (image) {
+                const previewSrc = image.startsWith('http') ? image : (window.location.origin + '/' + image.replace(/^\//, ''));
+                editCatImagePreview.innerHTML = `<img src="${previewSrc}" class="rounded-3 img-fluid border" style="max-height: 40px; object-fit: cover;">`;
+            } else {
+                editCatImagePreview.innerHTML = `<span class="text-muted" style="font-size: 0.68rem;">No image</span>`;
+            }
 
             editCatModal.show();
         });

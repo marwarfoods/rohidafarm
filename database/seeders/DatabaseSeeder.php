@@ -573,7 +573,7 @@ class DatabaseSeeder extends Seeder
             'blog_category_id' => $blogCategory->id,
             'title' => 'Why Traditional Bilona Churned Ghee is Worth It',
             'slug' => 'why-traditional-bilona-churned-ghee-is-worth-it',
-            'author_name' => 'Dr. Sharma (Ayurvedic Expert)',
+            'author_name' => '',
             'excerpt' => 'Unlike industrial cream-processed ghee, Bilona Cow Ghee involves curd churning, preserving vital butyrate and gut enzymes.',
             'content' => '<p>In traditional households, Ghee was never just an ingredient or a cooking fat. It was treated as a "Rasayana"—a rejuvenator that builds cellular vitality. The magic lies in the traditional Bilona churning process. Modern factory-made ghee is prepared by boiling raw milk cream under high mechanical heat, which rips away delicate micro-nutrients. Bilona Ghee, on the other hand, starts by culturing pure cow milk into whole curd. This curd is then churned slowly using a wooden staff to yield butter, which is gently clarified to produce the rich, granular golden ghee.</p><p>This curd culturing introduces gut-friendly enzymes and generates butyric acid, a short-chain fatty acid that repairs the stomach lining and acts as an anti-inflammatory shield. Thus, investing in pure A2 Vedic Bilona Ghee is not just paying for a fat, it is securing traditional wellness for your family.</p>',
             'featured_image' => '/assets/images/blogs/blog-bilona-ghee.jpg',

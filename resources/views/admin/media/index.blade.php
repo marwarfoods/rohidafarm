@@ -18,7 +18,7 @@
             <i class="bi bi-upload me-2"></i>Upload File
         </button>
     </div>
-    <input type="file" id="galleryPageFileInput" class="d-none">
+    <input type="file" id="galleryPageFileInput" class="d-none" multiple>
 </div>
 
 <!-- Storage Usage Info Bar -->
@@ -37,9 +37,10 @@
     </div>
 </div>
 
-<!-- Upload Progress Alert -->
-<div class="progress mb-4 d-none" id="galleryPageProgressContainer" style="height: 10px;">
-    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" id="galleryPageProgressBar" role="progressbar" style="width: 0%;"></div>
+<!-- Upload Progress: real per-file progress list -->
+<div class="card border-0 rounded-4 shadow-sm p-3 mb-4 d-none" id="galleryPageProgressContainer">
+    <h6 class="fw-bold text-dark mb-3" style="font-size: 0.9rem;"><i class="bi bi-cloud-arrow-up-fill text-success me-2"></i>Uploading Files</h6>
+    <div id="galleryPageProgressList" class="d-flex flex-column gap-2"></div>
 </div>
 
 <div class="media-layout-wrapper">
@@ -89,6 +90,12 @@
                     <span class="folder-badge">{{ $counts['videos'] }}</span>
                 </a>
             </li>
+            <li class="folder-item">
+                <a href="{{ route('admin.media.index', ['folder' => 'built-in']) }}" class="folder-link {{ $folder === 'built-in' ? 'active' : '' }}" title="Built-in app images shipped with the site — read only">
+                    <span><i class="bi bi-box-seam"></i>Built-in Images</span>
+                    <span class="folder-badge">{{ $counts['built-in'] }}</span>
+                </a>
+            </li>
             <li class="folder-item mt-4">
                 <a href="{{ route('admin.media.index', ['folder' => 'trash']) }}" class="folder-link {{ $folder === 'trash' ? 'active' : '' }}">
                     <span><i class="bi bi-trash-fill text-muted"></i>Trash</span>
@@ -108,7 +115,7 @@
         <div class="d-flex align-items-center gap-2 mb-3 text-muted" style="font-size: 0.85rem;">
             <span>Media Library</span>
             <i class="bi bi-chevron-right" style="font-size: 0.75rem;"></i>
-            <span class="text-dark fw-bold text-capitalize">{{ str_replace('-', ' ', $folder) }}</span>
+            <span class="text-dark fw-bold text-capitalize">{{ $folder === 'built-in' ? 'Built-in Images' : str_replace('-', ' ', $folder) }}</span>
         </div>
 
         <!-- Search and Toggles Toolbar -->
@@ -137,11 +144,20 @@
         <div id="mediaGridContainer" class="media-items-grid">
             <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3">
                 @forelse($mediaItems as $media)
+                    @php $isBuiltin = $media->is_builtin ?? false; @endphp
                     <div class="col">
                         <div class="card media-card position-relative" id="mediaGridCard_{{ $media->id }}">
-                             <!-- Select Checkbox overlay -->
+                             <!-- Select Checkbox overlay (built-in images cannot be selected for bulk delete) -->
+                             @unless($isBuiltin)
                              <input type="checkbox" class="form-check-input media-select-checkbox" data-id="{{ $media->id }}" style="position: absolute !important; top: 10px !important; left: 10px !important; z-index: 25 !important; width: 18px !important; height: 18px !important; opacity: 1 !important; cursor: pointer !important; border: 2px solid #248443 !important; background-color: #ffffff;">
-                            
+                             @endunless
+
+                            @if($isBuiltin)
+                                <span class="badge bg-dark position-absolute" style="top: 10px; right: 10px; z-index: 25; font-size: 0.65rem;" title="Bundled app image — cannot be deleted">
+                                    <i class="bi bi-box-seam me-1"></i>Built-in
+                                </span>
+                            @endif
+
                             <div class="thumbnail-wrapper">
                                 @if($media->file_type === 'video')
                                     <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-dark text-white">
@@ -151,18 +167,23 @@
                                 @else
                                     <img src="{{ asset($media->file_path) }}" class="w-100 h-100 object-fit-cover">
                                 @endif
-                                
+
                                 <!-- Hover Actions overlay -->
                                 <div class="card-hover-overlay d-flex flex-column align-items-center justify-content-center gap-2" style="background: rgba(43,43,43,0.7) !important;">
                                     <a href="{{ asset($media->file_path) }}" target="_blank" class="btn-preview px-3 py-1 bg-white text-dark rounded fw-bold text-decoration-none" style="font-size: 0.75rem;"><i class="bi bi-eye"></i> Preview</a>
-                                    @if($media->file_type === 'image')
+                                    @if($media->file_type === 'image' && !$isBuiltin)
                                         <button type="button" class="btn-compress-single btn btn-warning px-3 py-1 rounded fw-bold text-dark border-0" data-id="{{ $media->id }}" style="font-size: 0.75rem;" onclick="compressSingleMedia(this, {{ $media->id }})">
                                             <i class="bi bi-file-zip-fill"></i> Compress
                                         </button>
                                     @endif
+                                    @if($isBuiltin)
+                                        <button type="button" class="btn-preview px-3 py-1 bg-white text-dark rounded fw-bold border-0" style="font-size: 0.75rem;" onclick="navigator.clipboard.writeText('{{ $media->full_url }}'); this.innerHTML='<i class=\'bi bi-check-lg\'></i> Copied!';">
+                                            <i class="bi bi-clipboard"></i> Copy Link
+                                        </button>
+                                    @endif
                                 </div>
                             </div>
-                            
+
                             <div class="card-details">
                                 <h6 class="card-name" title="{{ $media->filename }}">{{ $media->filename }}</h6>
                                 <div class="card-size" id="mediaCardSize_{{ $media->id }}">{{ number_format($media->file_size / 1024, 1) }} KB</div>
@@ -197,9 +218,12 @@
                     </thead>
                     <tbody>
                         @forelse($mediaItems as $media)
+                            @php $isBuiltin = $media->is_builtin ?? false; @endphp
                             <tr id="mediaListRow_{{ $media->id }}">
                                 <td>
-                                    <input type="checkbox" class="form-check-input media-select-checkbox" data-id="{{ $media->id }}">
+                                    @unless($isBuiltin)
+                                        <input type="checkbox" class="form-check-input media-select-checkbox" data-id="{{ $media->id }}">
+                                    @endunless
                                 </td>
                                 <td>
                                     <div class="rounded overflow-hidden" style="width: 50px; height: 50px;">
@@ -214,6 +238,9 @@
                                 </td>
                                 <td class="fw-bold text-dark text-truncate" style="max-width: 250px;">
                                     {{ $media->filename }}
+                                    @if($isBuiltin)
+                                        <span class="badge bg-dark-subtle text-dark ms-1" style="font-size: 0.65rem;">Built-in</span>
+                                    @endif
                                 </td>
                                 <td class="text-muted">
                                     {{ number_format($media->file_size / 1024, 1) }} KB
@@ -225,13 +252,19 @@
                                     {{ $media->created_at->format('d M Y') }}
                                 </td>
                                 <td class="text-center">
-                                    <form action="{{ route('admin.media.delete', $media->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this media?');" class="m-0">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger border-0">
-                                            <i class="bi bi-trash-fill"></i>
+                                    @if($isBuiltin)
+                                        <button type="button" class="btn btn-sm btn-outline-secondary border-0" title="Copy link" onclick="navigator.clipboard.writeText('{{ $media->full_url }}'); this.innerHTML='<i class=\'bi bi-check-lg\'></i>';">
+                                            <i class="bi bi-clipboard"></i>
                                         </button>
-                                    </form>
+                                    @else
+                                        <form action="{{ route('admin.media.delete', $media->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this media?');" class="m-0">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger border-0">
+                                                <i class="bi bi-trash-fill"></i>
+                                            </button>
+                                        </form>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
@@ -267,213 +300,114 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Grid View / List View Toggling
-        const btnGridView = document.getElementById('btnGridView');
-        const btnListView = document.getElementById('btnListView');
-        const mediaGrid = document.getElementById('mediaGridContainer');
-        const mediaList = document.getElementById('mediaListContainer');
+        // NOTE: Grid/List toggle, checkbox selection, bulk delete and bulk compress
+        // are all handled once, globally, by resources/js/media-gallery.js
+        // (loaded via app.js on every admin page). Do NOT duplicate those handlers
+        // here — having them in both places caused every bulk action to fire twice
+        // (second request always failed since the items were already gone),
+        // which is why "Failed to delete" used to show even though it had worked.
 
-        if (btnGridView && btnListView && mediaGrid && mediaList) {
-            btnGridView.addEventListener('click', function() {
-                btnGridView.classList.add('active');
-                btnListView.classList.remove('active');
-                mediaGrid.classList.remove('d-none');
-                mediaList.classList.add('d-none');
-                localStorage.setItem('media_layout_view', 'grid');
-            });
-
-            btnListView.addEventListener('click', function() {
-                btnListView.classList.add('active');
-                btnGridView.classList.remove('active');
-                mediaList.classList.remove('d-none');
-                mediaGrid.classList.add('d-none');
-                localStorage.setItem('media_layout_view', 'list');
-            });
-
-            // Restore preference
-            const savedView = localStorage.getItem('media_layout_view');
-            if (savedView === 'list') {
-                btnListView.click();
-            }
-        }
-
-        // Selection & Bulk Action Bar logic
-        const selectCheckboxes = document.querySelectorAll('.media-select-checkbox');
-        const masterSelect = document.getElementById('masterSelectCheckbox');
-        const bulkActionsBar = document.getElementById('mediaBulkActionsBar');
-        const selectedCountBadge = document.getElementById('selectedCountBadge');
-        const btnBulkCompress = document.getElementById('btnBulkCompress');
-        const btnBulkDelete = document.getElementById('btnBulkDelete');
-        const btnCancelSelection = document.getElementById('btnCancelSelection');
-
-        function updateBulkActionsState() {
-            const selected = Array.from(selectCheckboxes).filter(cb => cb.checked);
-            const count = selected.length;
-            
-            if (count > 0) {
-                bulkActionsBar.classList.add('active');
-                selectedCountBadge.textContent = `${count} items selected`;
-            } else {
-                bulkActionsBar.classList.remove('active');
-            }
-        }
-
-        selectCheckboxes.forEach(cb => {
-            cb.addEventListener('change', function() {
-                const card = document.getElementById(`mediaGridCard_${this.dataset.id}`);
-                const row = document.getElementById(`mediaListRow_${this.dataset.id}`);
-                
-                if (this.checked) {
-                    if (card) card.classList.add('selected');
-                    if (row) row.classList.add('table-primary');
-                } else {
-                    if (card) card.classList.remove('selected');
-                    if (row) row.classList.remove('table-primary');
-                }
-                updateBulkActionsState();
-            });
-        });
-
-        if (masterSelect) {
-            masterSelect.addEventListener('change', function() {
-                selectCheckboxes.forEach(cb => {
-                    cb.checked = masterSelect.checked;
-                    const event = new Event('change');
-                    cb.dispatchEvent(event);
-                });
-                updateBulkActionsState();
-            });
-        }
-
-        if (btnCancelSelection) {
-            btnCancelSelection.addEventListener('click', function() {
-                selectCheckboxes.forEach(cb => {
-                    cb.checked = false;
-                    const event = new Event('change');
-                    cb.dispatchEvent(event);
-                });
-                if (masterSelect) masterSelect.checked = false;
-                updateBulkActionsState();
-            });
-        }
-
-        // Bulk Delete API Call
-        if (btnBulkDelete) {
-            btnBulkDelete.addEventListener('click', function() {
-                const selectedIds = Array.from(selectCheckboxes)
-                    .filter(cb => cb.checked)
-                    .map(cb => cb.dataset.id);
-
-                if (selectedIds.length === 0) return;
-                if (!confirm(`Are you sure you want to delete the ${selectedIds.length} selected items?`)) return;
-
-                btnBulkDelete.disabled = true;
-                btnBulkDelete.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Deleting...';
-
-                fetch('{{ route("admin.media.bulk-delete") }}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ ids: selectedIds })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        window.location.reload();
-                    } else {
-                        alert(data.message || 'Bulk delete failed.');
-                        btnBulkDelete.disabled = false;
-                        btnBulkDelete.innerHTML = '<i class="bi bi-trash-fill me-1"></i>Delete Selected';
-                    }
-                })
-                .catch(() => {
-                    alert('Connection error occurred during bulk delete.');
-                    btnBulkDelete.disabled = false;
-                    btnBulkDelete.innerHTML = '<i class="bi bi-trash-fill me-1"></i>Delete Selected';
-                });
-            });
-        }
-
-        // Bulk Compress API Call
-        if (btnBulkCompress) {
-            btnBulkCompress.addEventListener('click', function() {
-                const selectedIds = Array.from(selectCheckboxes)
-                    .filter(cb => cb.checked)
-                    .map(cb => cb.dataset.id);
-
-                if (selectedIds.length === 0) return;
-
-                btnBulkCompress.disabled = true;
-                btnBulkCompress.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Compressing...';
-
-                fetch('{{ route("admin.media.bulk-compress") }}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ ids: selectedIds })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    alert(data.message || 'Bulk compression complete.');
-                    window.location.reload();
-                })
-                .catch(() => {
-                    alert('Connection error occurred during bulk compression.');
-                    btnBulkCompress.disabled = false;
-                    btnBulkCompress.innerHTML = '<i class="bi bi-file-zip me-1"></i>Compress Selected';
-                });
-            });
-        }
-
-        // Upload File AJAX script
+        // Upload File AJAX script — supports selecting & uploading multiple files at
+        // once, with a REAL per-file progress bar (each file's own upload % from its
+        // own XHR request, not a shared/simulated aggregate bar).
         const fileInput = document.getElementById('galleryPageFileInput');
         if (fileInput) {
             fileInput.addEventListener('change', function() {
-                const file = this.files[0];
-                if (!file) return;
-
-                const formData = new FormData();
-                formData.append('file', file);
+                const files = Array.from(this.files || []);
+                if (files.length === 0) return;
 
                 const progressContainer = document.getElementById('galleryPageProgressContainer');
-                const progressBar = document.getElementById('galleryPageProgressBar');
-                
+                const progressList = document.getElementById('galleryPageProgressList');
+
                 progressContainer.classList.remove('d-none');
-                progressBar.style.width = '0%';
+                progressList.innerHTML = '';
 
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', '{{ route("admin.media.store") }}', true);
-                xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
-                xhr.setRequestHeader('Accept', 'application/json');
+                const rows = files.map((file, index) => {
+                    const row = document.createElement('div');
+                    row.className = 'upload-progress-row';
+                    row.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-truncate text-dark fw-semibold" style="font-size: 0.8rem; max-width: 70%;">${file.name}</span>
+                            <span class="text-muted status-text" style="font-size: 0.75rem;">Queued</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 0%;"></div>
+                        </div>
+                    `;
+                    progressList.appendChild(row);
+                    return {
+                        bar: row.querySelector('.progress-bar'),
+                        status: row.querySelector('.status-text'),
+                    };
+                });
 
-                xhr.upload.onprogress = function(e) {
-                    if (e.lengthComputable) {
-                        const percentComplete = (e.loaded / e.total) * 100;
-                        progressBar.style.width = percentComplete + '%';
+                let uploadedCount = 0;
+                let failedCount = 0;
+
+                function uploadNext(index) {
+                    if (index >= files.length) {
+                        if (failedCount > 0) {
+                            alert(`${uploadedCount} file(s) uploaded, ${failedCount} failed. Check file size (max 200MB) and formats.`);
+                        }
+                        if (uploadedCount > 0) {
+                            window.location.reload();
+                        } else {
+                            progressContainer.classList.add('d-none');
+                        }
+                        return;
                     }
-                };
 
-                xhr.onload = function() {
-                    progressContainer.classList.add('d-none');
-                    if (xhr.status === 200) {
-                        window.location.reload();
-                    } else {
-                        alert('Upload failed. Check file size (max 20MB) and formats.');
-                    }
-                };
+                    const { bar, status } = rows[index];
+                    status.textContent = 'Uploading...';
 
-                xhr.onerror = function() {
-                    progressContainer.classList.add('d-none');
-                    alert('Connection error occurred during upload.');
-                };
+                    const formData = new FormData();
+                    formData.append('file', files[index]);
 
-                xhr.send(formData);
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', '{{ route("admin.media.store") }}', true);
+                    xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
+                    xhr.setRequestHeader('Accept', 'application/json');
+
+                    // Real progress for THIS file's own upload request.
+                    xhr.upload.onprogress = function(e) {
+                        if (e.lengthComputable) {
+                            const percent = Math.round((e.loaded / e.total) * 100);
+                            bar.style.width = percent + '%';
+                            status.textContent = percent + '%';
+                        }
+                    };
+
+                    xhr.onload = function() {
+                        if (xhr.status === 200) {
+                            uploadedCount++;
+                            bar.style.width = '100%';
+                            bar.classList.remove('bg-success');
+                            bar.classList.add('bg-success');
+                            status.textContent = 'Done';
+                            status.classList.add('text-success', 'fw-bold');
+                        } else {
+                            failedCount++;
+                            bar.classList.remove('bg-success');
+                            bar.classList.add('bg-danger');
+                            status.textContent = 'Failed';
+                            status.classList.add('text-danger', 'fw-bold');
+                        }
+                        uploadNext(index + 1);
+                    };
+
+                    xhr.onerror = function() {
+                        failedCount++;
+                        bar.classList.remove('bg-success');
+                        bar.classList.add('bg-danger');
+                        status.textContent = 'Failed';
+                        status.classList.add('text-danger', 'fw-bold');
+                        uploadNext(index + 1);
+                    };
+
+                    xhr.send(formData);
+                }
+
+                uploadNext(0);
             });
         }
     });

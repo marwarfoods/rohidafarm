@@ -34,7 +34,7 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function findBySlug(string $slug)
     {
-        return $this->model->with(['category', 'subCategory', 'brand', 'images', 'gallery', 'variants', 'reviews.user'])->where('slug', $slug)->firstOrFail();
+        return $this->model->with(['category', 'subCategory', 'brand', 'images', 'gallery', 'variants', 'reviews.user', 'faqs'])->where('slug', $slug)->firstOrFail();
     }
 
     public function getFeatured(int $limit = 4)

@@ -163,6 +163,20 @@ class ProductController extends Controller
             }
         }
 
+        // Save FAQs (question/answer pairs, in submitted order)
+        if ($request->has('faqs')) {
+            foreach ($request->input('faqs') as $index => $f) {
+                if (!empty($f['question']) && !empty($f['answer'])) {
+                    \App\Models\ProductFaq::create([
+                        'product_id' => $product->id,
+                        'question' => $f['question'],
+                        'answer' => $f['answer'],
+                        'sort_order' => $f['sort_order'] ?? $index,
+                    ]);
+                }
+            }
+        }
+
         self::logActivity('product_create', "Created product {$product->name} (SKU: {$product->sku})", ['product_id' => $product->id]);
 
         return redirect()->route('admin.products.index')->with('success', 'Product added successfully.');
@@ -175,7 +189,7 @@ class ProductController extends Controller
     {
         $product = Product::with(['images' => function($q) {
             $q->orderBy('sort_order', 'asc');
-        }, 'variants'])->findOrFail($id);
+        }, 'variants', 'faqs'])->findOrFail($id);
         $categories = Category::all();
         $subcategories = SubCategory::where('category_id', $product->category_id)->get();
         $brands = Brand::all();
@@ -302,9 +316,10 @@ class ProductController extends Controller
             ]);
         }
 
-        // Delete old variants and non-primary images
+        // Delete old variants, non-primary images, and FAQs
         ProductVariant::where('product_id', $product->id)->delete();
         ProductImage::where('product_id', $product->id)->where('is_primary', false)->delete();
+        \App\Models\ProductFaq::where('product_id', $product->id)->delete();
 
         // Save new gallery items
         if ($request->has('gallery')) {
@@ -332,6 +347,20 @@ class ProductController extends Controller
                         'sale_price' => $v['sale_price'] ?? $product->sale_price,
                         'stock' => $v['stock'] ?? $product->stock,
                         'max_cart_qty' => $v['max_cart_qty'] ?? null,
+                    ]);
+                }
+            }
+        }
+
+        // Save new FAQs (question/answer pairs, in submitted order)
+        if ($request->has('faqs')) {
+            foreach ($request->input('faqs') as $index => $f) {
+                if (!empty($f['question']) && !empty($f['answer'])) {
+                    \App\Models\ProductFaq::create([
+                        'product_id' => $product->id,
+                        'question' => $f['question'],
+                        'answer' => $f['answer'],
+                        'sort_order' => $f['sort_order'] ?? $index,
                     ]);
                 }
             }
@@ -373,6 +402,31 @@ class ProductController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Stock quantity updated successfully.'
+        ]);
+    }
+
+    /**
+     * Update a single product's active/featured status. Used both for the
+     * per-row toggle and, called once per selected product, by the bulk
+     * status action on the products list (so the UI can show real,
+     * item-by-item progress instead of one opaque bulk request).
+     */
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'field' => 'required|string|in:is_active,is_featured',
+            'value' => 'required|boolean',
+        ]);
+
+        $product = Product::findOrFail($id);
+        $product->update([$request->input('field') => $request->boolean('value')]);
+
+        self::logActivity('product_status_update', "Set {$request->input('field')} = " . ($request->boolean('value') ? 'true' : 'false') . " for {$product->name}", ['product_id' => $id]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Product status updated successfully.',
+            'product' => ['id' => $product->id, $request->input('field') => $product->{$request->input('field')}],
         ]);
     }
 
@@ -599,6 +653,7 @@ class ProductController extends Controller
 
         $review = \App\Models\ProductReview::create([
             'product_id'    => $request->product_id,
+            'user_id'       => \Illuminate\Support\Facades\Auth::id(),
             'customer_name' => $request->customer_name,
             'customer_email'=> $request->customer_email,
             'customer_phone'=> $request->customer_phone,

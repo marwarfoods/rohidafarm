@@ -79,7 +79,7 @@
                              data-index="0"
                              data-video="https://assets.mixkit.co/videos/preview/mixkit-pouring-honey-from-a-wooden-spoon-42358-large.mp4"
                              data-reviewer="Sita Devi"
-                             data-product="Pure Gir Ghee"
+                             data-product="Pure Ghee"
                              data-buy-url="">
                             <div class="position-relative" style="height: 380px;">
                                 <video src="https://assets.mixkit.co/videos/preview/mixkit-pouring-honey-from-a-wooden-spoon-42358-large.mp4" class="w-100 h-100 object-fit-cover rounded-top-4" muted playsinline preload="metadata" style="background-color: #000; pointer-events: none;" aria-label="Customer video review"></video>
@@ -92,7 +92,7 @@
                                     <img src="{{ asset('images/baner-1.png') }}" class="rounded-circle border" width="44" height="44" style="object-fit: cover; flex-shrink: 0;" loading="lazy" decoding="async" alt="Sita Devi">
                                     <div>
                                         <h6 class="fw-bold font-heading text-dark m-0 fs-6">Sita Devi</h6>
-                                        <small class="text-muted d-block">Pure Gir Ghee User</small>
+                                        <small class="text-muted d-block">Pure Ghee User</small>
                                     </div>
                                 </div>
                                 <button class="btn btn-secondary w-100 py-2 rounded-3 text-uppercase btn-video-buy" disabled style="font-size: 0.75rem;">Buy Now</button>

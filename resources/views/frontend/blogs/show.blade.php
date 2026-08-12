@@ -60,7 +60,9 @@
                 <h1 class="font-heading display-5 fw-bold text-dark mb-3" style="line-height: 1.25;">{{ $blog->title }}</h1>
                 
                 <div class="d-flex align-items-center text-muted mb-4 pb-3 border-bottom" style="font-size: 0.88rem; gap: 20px;">
-                    <span><i class="bi bi-person-circle text-success me-1"></i>By {{ $blog->author_name }}</span>
+                    @if($blog->author_name)
+                        <span><i class="bi bi-person-circle text-success me-1"></i>By {{ $blog->author_name }}</span>
+                    @endif
                     <span><i class="bi bi-calendar3 text-success me-1"></i>{{ $blog->published_at ? $blog->published_at->format('d M Y') : '' }}</span>
                     <span><i class="bi bi-eye text-success me-1"></i>{{ $blog->view_count }} reads</span>
                 </div>
@@ -111,8 +113,8 @@
 
                     <!-- Dynamic Promotional Box widget -->
                     <div class="card border-0 rounded-4 shadow-sm p-4 text-center border text-white" style="background-color: var(--dark-green) !important; border-color: var(--dark-green) !important;">
-                        <h5 class="font-heading fw-bold mb-2">Taste Real Purity</h5>
-                        <p class="text-white-50 mb-3" style="font-size: 0.85rem;">Prepared using traditional double wooden bilona churning.</p>
+                        <h5 class="font-heading fw-bold mb-2 text-white">Taste Real Purity</h5>
+                        <p class="text-white mb-3" style="font-size: 0.85rem;">Prepared using traditional double wooden bilona churning.</p>
                         <a href="/shop" class="btn btn-premium w-100 py-2 rounded-pill font-heading text-uppercase fs-6">Buy A2 Ghee Now</a>
                     </div>
                 </div>

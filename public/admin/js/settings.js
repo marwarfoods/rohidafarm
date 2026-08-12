@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentHash = window.location.hash || '#site'; // default to site
     
     // Validate hash, fallback if invalid
-    const validHashes = ['#site', '#smtp', '#seo', '#payments'];
+    const validHashes = ['#site', '#smtp', '#seo', '#payments', '#shipping', '#integrations', '#auth'];
     if (!validHashes.includes(currentHash)) {
         currentHash = '#site';
     }

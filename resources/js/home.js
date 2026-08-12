@@ -76,10 +76,19 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             freeMode: false,
             mousewheel: false,
-            slidesPerView: 1.5,
+            // Below 320px (very small/narrow devices), one full card fits without
+            // its badges/rating/title wrapping or overflowing — a partial second
+            // card peeking in has no room left to render cleanly at that width.
+            slidesPerView: 1,
             slidesPerGroup: 1,
-            spaceBetween: 16,
+            spaceBetween: 10,
             grabCursor: true,
+            // Let taps on the variant <select> inside a slide open the native
+            // picker normally on touch devices instead of Swiper's own touch/drag
+            // handling swallowing the tap — this is why the weight dropdown's
+            // "change" (and the price update that depends on it) never fired on
+            // mobile even though it worked fine with a mouse on desktop.
+            noSwipingSelector: 'select',
             observer: true,
             observeParents: true,
             navigation: {

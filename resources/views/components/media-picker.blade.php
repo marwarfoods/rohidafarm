@@ -35,7 +35,7 @@
                         <div class="border border-2 border-dashed rounded-4 p-5 text-center bg-white" style="border-color: #ECE7DD !important;">
                             <i class="bi bi-cloud-arrow-up text-success display-4 mb-3"></i>
                             <h5 class="fw-bold">Drag & Drop file here</h5>
-                            <p class="text-muted mb-4" style="font-size: 0.85rem;">or click to browse from your computer (Images or Videos max 20MB)</p>
+                            <p class="text-muted mb-4" style="font-size: 0.85rem;">or click to browse from your computer (Images or Videos max 200MB)</p>
                             <input type="file" id="pickerLocalFileInput" class="d-none">
                             <button type="button" class="btn btn-premium px-4 py-2 rounded-pill" onclick="document.getElementById('pickerLocalFileInput').click()">Browse Files</button>
                             <div class="progress mt-3 d-none" id="uploadProgressBarContainer" style="height: 6px;">

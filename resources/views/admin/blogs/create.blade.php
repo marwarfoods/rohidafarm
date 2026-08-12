@@ -17,7 +17,7 @@
 
                 <div class="mb-3">
                     <label for="title" class="form-label fw-bold">Post Title <span class="text-danger">*</span></label>
-                    <input type="text" name="title" id="title" class="form-control rounded-3 @error('title') is-invalid @enderror" value="{{ old('title') }}" required placeholder="e.g. Health Benefits of Pure Gir Cow A2 Ghee">
+                    <input type="text" name="title" id="title" class="form-control rounded-3 @error('title') is-invalid @enderror" value="{{ old('title') }}" required placeholder="e.g. Health Benefits of Pure Cow A2 Ghee">
                     @error('title')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror

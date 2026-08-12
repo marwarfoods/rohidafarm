@@ -33,3 +33,25 @@ document.addEventListener('DOMContentLoaded', function () {
         timelineObserver.observe(item);
     });
 });
+
+/* About Us — "Making Of" Video Play Button */
+document.addEventListener('DOMContentLoaded', function () {
+    const video = document.getElementById('aboutFeatureVideo');
+    const playBtn = document.getElementById('aboutVideoPlayBtn');
+    if (!video || !playBtn) return;
+
+    playBtn.addEventListener('click', function () {
+        video.controls = true;
+        video.play();
+        playBtn.classList.add('is-playing');
+    });
+
+    video.addEventListener('pause', function () {
+        if (!video.ended) return;
+        playBtn.classList.remove('is-playing');
+    });
+
+    video.addEventListener('ended', function () {
+        playBtn.classList.remove('is-playing');
+    });
+});

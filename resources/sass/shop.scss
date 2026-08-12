@@ -59,6 +59,19 @@
     }
 }
 
+/* On very small/narrow screens, two cards per row leaves too little width for
+   badges, ratings and titles — they wrap and overflow. Below this breakpoint,
+   fall back to one full-width card per row instead. */
+@media (max-width: 380px) {
+    #shopProductsGrid.row-cols-2 {
+        --bs-columns: 1;
+
+        > .col {
+            width: 100%;
+        }
+    }
+}
+
 /* Sticky Sidebar */
 .shop-sidebar-wrapper {
     position: sticky;

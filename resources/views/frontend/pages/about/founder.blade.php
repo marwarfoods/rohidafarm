@@ -1,55 +1,27 @@
-<!-- Looking Ahead & Founder's Note -->
+<!-- A Note From Our Founder -->
 <section class="about-founder-section">
     <div class="container">
-        <div class="row g-5 align-items-center">
-            
-            <!-- Left Side: Looking Ahead -->
-            <div class="col-lg-6" data-aos="fade-right">
-                <div class="ahead-box">
-                    <span class="text-uppercase fw-bold text-success mb-2 d-block" style="font-size: 0.82rem; letter-spacing: 2px;">The Vision</span>
-                    <h3>Looking Ahead</h3>
-                    <p class="text-muted" style="font-size: 1.05rem; line-height: 1.8;">
-                        Rohida Farm is more than a food company. We are building a movement that reconnects people with authentic Indian food traditions.
-                    </p>
-                    <p class="text-muted" style="font-size: 1.05rem; line-height: 1.8;">
-                        As we continue to grow, our commitment remains unchanged—to create products that are pure, traditional, and worthy of your family's trust.
-                    </p>
+        <div class="founder-panel">
+            <div class="row g-5 align-items-center">
 
-                    <div class="highlight-quote">
-                        <p>
-                            "Every meal deserves honest ingredients.<br>
-                            Every family deserves real food.<br>
-                            That is the promise of Rohida Farm."
-                        </p>
+                <div class="col-lg-6" data-aos="fade-right">
+                    <span class="text-uppercase fw-bold mb-2 d-block founder-eyebrow">The Vision</span>
+                    <h2 class="founder-heading">A Note From Our Founder</h2>
+                    <p class="founder-text">
+                        Rohida Farm's deep-seated passion for Indian culture and its timeless values has been the cornerstone of his belief system. He's fascinated by the wisdom of ancient Indian sciences and the Vedas. Over 20 years, he's worked in the health and fitness industry.
+                    </p>
+                    <p class="founder-text mb-0">
+                        Now, he wants to bring back the rich traditions of India to modern society. He believes that the milk from our indigenous Gir desi cows, as mentioned in ancient texts, is far better than milk from H/Jersey cows that flood the market. He hopes to make a positive impact on society by promoting India's rich heritage.
+                    </p>
+                </div>
+
+                <div class="col-lg-6" data-aos="fade-left">
+                    <div class="founder-visual">
+                        <img src="{{ asset('images/svgs/Rohida Farm Web Vector 05.svg') }}" alt="Rohida Farm Founder's Vision" loading="lazy">
                     </div>
                 </div>
+
             </div>
-
-            <!-- Right Side: Founder's Note Card -->
-            <div class="col-lg-6" data-aos="fade-left">
-                <div class="founder-card">
-                    <div class="quote-icon">
-                        <i class="fa-solid fa-quote-left"></i>
-                    </div>
-
-                    <h4>A Note From Our Founder</h4>
-                    <p>
-                        "When we started Rohida Farm, our vision wasn't to become another food brand. Our dream was to revive the traditional methods that our grandparents trusted and make them available to today's families without compromising purity or authenticity."
-                    </p>
-                    <p class="mb-0">
-                        "Every product we create represents our respect for Indian heritage, our love for honest food, and our commitment to quality. Thank you for making Rohida Farm a part of your family."
-                    </p>
-
-                    <div class="founder-signature d-flex align-items-center justify-content-between">
-                        <div>
-                            <div class="name">Founder, Rohida Farm</div>
-                            <div class="title">Rajasthan, India</div>
-                        </div>
-                        <i class="fa-solid fa-feather-pointed fs-3 text-muted opacity-50"></i>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
 </section>

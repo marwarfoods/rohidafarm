@@ -8,12 +8,36 @@
     @endif
 </div>
 
-<x-admin-table 
-    :headers="['ID', 'Product Name & Image', 'Category', 'SKU', 'Original / Off Price', 'Stock', 'Actions']" 
-    :items="$products" 
-    title="Products Catalog" 
+@if(auth()->user()->hasPermission('products-edit'))
+{{-- Bulk Status Action Bar --}}
+<div class="d-none align-items-center gap-2 mb-3 p-3 rounded-3 border border-success-subtle bg-success-subtle" id="bulkStatusBar">
+    <span class="fw-semibold text-dark" id="bulkSelectedCount" style="font-size: 0.85rem;">0 selected</span>
+    <select class="form-select form-select-sm border shadow-none" id="bulkStatusAction" style="font-size: 0.8rem; width: 190px;">
+        <option value="">Bulk Action...</option>
+        <option value="is_active:1">Mark Active</option>
+        <option value="is_active:0">Mark Inactive</option>
+        <option value="is_featured:1">Mark Featured</option>
+        <option value="is_featured:0">Unmark Featured</option>
+    </select>
+    <button type="button" class="btn btn-success btn-sm" id="bulkStatusApplyBtn"><i class="bi bi-check2-circle"></i> Apply</button>
+    <button type="button" class="btn btn-outline-secondary btn-sm" id="bulkStatusCancelBtn">Cancel</button>
+
+    {{-- Real, item-by-item progress — width/count only ever advance as each product's own request finishes --}}
+    <div class="d-none align-items-center gap-2 ms-2" id="bulkStatusProgressWrap" style="flex: 1; min-width: 200px;">
+        <div class="progress flex-grow-1" style="height: 8px;">
+            <div class="progress-bar bg-success" id="bulkStatusProgressBar" style="width: 0%;"></div>
+        </div>
+        <span class="text-muted fw-semibold" id="bulkStatusProgressText" style="font-size: 0.78rem; white-space: nowrap;">0 / 0</span>
+    </div>
+</div>
+@endif
+
+<x-admin-table
+    :headers="[auth()->user()->hasPermission('products-edit') ? '<input type=\'checkbox\' id=\'selectAllProducts\'>' : '', 'ID', 'Product Name & Image', 'Category', 'SKU', 'Original / Off Price', 'Stock', 'Status', 'Actions']"
+    :items="$products"
+    title="Products Catalog"
     description="Manage your store products, modify pricing, stock levels, and assign categories.">
-    
+
     <x-slot name="actions">
         @if(auth()->user()->hasPermission('products-create'))
         <a href="{{ route('admin.products.create') }}" class="btn btn-premium btn-sm rounded-pill text-uppercase font-heading" style="font-size: 0.75rem;"><i class="bi bi-plus-lg me-1"></i> Add Product</a>
@@ -21,7 +45,12 @@
     </x-slot>
 
     @forelse($products as $prod)
-        <tr style="font-size: 0.85rem;">
+        <tr style="font-size: 0.85rem;" id="productRow_{{ $prod->id }}">
+            @if(auth()->user()->hasPermission('products-edit'))
+            <td class="px-4 py-3">
+                <input type="checkbox" class="form-check-input product-row-checkbox" value="{{ $prod->id }}">
+            </td>
+            @endif
             <td class="fw-semibold px-4 py-3">#{{ $prod->id }}</td>
             <td class="px-4 py-3">
                 <div class="d-flex align-items-center gap-2">
@@ -45,6 +74,14 @@
                 <span class="fw-bold">{{ $prod->stock }}</span>
                 @endif
             </td>
+            <td class="px-4 py-3">
+                <span class="badge product-status-active-badge {{ $prod->is_active ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-secondary border' }} d-block mb-1" style="width: fit-content;">
+                    {{ $prod->is_active ? 'Active' : 'Inactive' }}
+                </span>
+                @if($prod->is_featured)
+                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle product-status-featured-badge" style="width: fit-content;">Featured</span>
+                @endif
+            </td>
             <td class="text-end px-4 py-3">
                 <div class="d-inline-flex gap-2">
                     @if(auth()->user()->hasPermission('products-edit'))
@@ -62,7 +99,7 @@
         </tr>
     @empty
         <tr>
-            <td colspan="7" class="text-center py-4 text-muted">No products available in database catalog.</td>
+            <td colspan="9" class="text-center py-4 text-muted">No products available in database catalog.</td>
         </tr>
     @endforelse
 </x-admin-table>
@@ -96,6 +133,128 @@
                 });
             });
         });
+
+        // ── Bulk Product Status Update (real per-item progress) ──
+        const selectAllProducts = document.getElementById('selectAllProducts');
+        const rowCheckboxes = document.querySelectorAll('.product-row-checkbox');
+        const bulkStatusBar = document.getElementById('bulkStatusBar');
+        const bulkSelectedCount = document.getElementById('bulkSelectedCount');
+        const bulkStatusAction = document.getElementById('bulkStatusAction');
+        const bulkStatusApplyBtn = document.getElementById('bulkStatusApplyBtn');
+        const bulkStatusCancelBtn = document.getElementById('bulkStatusCancelBtn');
+        const progressWrap = document.getElementById('bulkStatusProgressWrap');
+        const progressBar = document.getElementById('bulkStatusProgressBar');
+        const progressText = document.getElementById('bulkStatusProgressText');
+
+        function getCheckedIds() {
+            return Array.from(rowCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+        }
+
+        function refreshBulkBar() {
+            if (!bulkStatusBar) return;
+            const ids = getCheckedIds();
+            if (ids.length > 0) {
+                bulkStatusBar.classList.remove('d-none');
+                bulkStatusBar.classList.add('d-flex');
+                bulkSelectedCount.textContent = `${ids.length} selected`;
+            } else {
+                bulkStatusBar.classList.add('d-none');
+                bulkStatusBar.classList.remove('d-flex');
+            }
+        }
+
+        if (selectAllProducts) {
+            selectAllProducts.addEventListener('change', function () {
+                rowCheckboxes.forEach(cb => cb.checked = this.checked);
+                refreshBulkBar();
+            });
+        }
+
+        rowCheckboxes.forEach(cb => cb.addEventListener('change', refreshBulkBar));
+
+        if (bulkStatusCancelBtn) {
+            bulkStatusCancelBtn.addEventListener('click', function () {
+                rowCheckboxes.forEach(cb => cb.checked = false);
+                if (selectAllProducts) selectAllProducts.checked = false;
+                refreshBulkBar();
+            });
+        }
+
+        if (bulkStatusApplyBtn) {
+            bulkStatusApplyBtn.addEventListener('click', function () {
+                const raw = bulkStatusAction.value;
+                if (!raw) {
+                    alert('Please choose a bulk action first.');
+                    return;
+                }
+
+                const ids = getCheckedIds();
+                if (ids.length === 0) {
+                    alert('Please select at least one product.');
+                    return;
+                }
+
+                const [field, valueStr] = raw.split(':');
+                const value = valueStr === '1';
+                const label = bulkStatusAction.options[bulkStatusAction.selectedIndex].text;
+
+                if (!confirm(`${label} for ${ids.length} selected product(s)?`)) return;
+
+                bulkStatusApplyBtn.disabled = true;
+                bulkStatusCancelBtn.disabled = true;
+                progressWrap.classList.remove('d-none');
+                progressWrap.classList.add('d-flex');
+                progressBar.style.width = '0%';
+                progressText.textContent = `0 / ${ids.length}`;
+
+                let completed = 0;
+                let failed = 0;
+
+                function updateNext(index) {
+                    if (index >= ids.length) {
+                        bulkStatusApplyBtn.disabled = false;
+                        bulkStatusCancelBtn.disabled = false;
+                        if (failed > 0) {
+                            alert(`${completed} product(s) updated, ${failed} failed.`);
+                        }
+                        if (completed > 0) {
+                            window.location.reload();
+                        }
+                        return;
+                    }
+
+                    const id = ids[index];
+
+                    fetch(`/admin/products/${id}/status`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({ field: field, value: value })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            completed++;
+                        } else {
+                            failed++;
+                        }
+                    })
+                    .catch(() => { failed++; })
+                    .finally(() => {
+                        // Real progress: only advances once THIS product's own request has actually completed.
+                        const done = completed + failed;
+                        const percent = Math.round((done / ids.length) * 100);
+                        progressBar.style.width = percent + '%';
+                        progressText.textContent = `${done} / ${ids.length}`;
+                        updateNext(index + 1);
+                    });
+                }
+
+                updateNext(0);
+            });
+        }
     });
 </script>
 @endpush

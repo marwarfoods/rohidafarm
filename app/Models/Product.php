@@ -128,6 +128,14 @@ class Product extends Model
     }
 
     /**
+     * Product FAQs relation (ordered for display/reordering).
+     */
+    public function faqs(): HasMany
+    {
+        return $this->hasMany(ProductFaq::class)->orderBy('sort_order');
+    }
+
+    /**
      * Check if product is in stock.
      */
     public function inStock(): bool

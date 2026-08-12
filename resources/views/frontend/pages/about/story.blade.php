@@ -1,54 +1,48 @@
 <!-- Our Story Section -->
 <section class="about-story-section" id="our-story">
     <div class="container">
-        <div class="row g-5 align-items-center">
-            
-            <!-- Left Side: Image Art Card -->
+
+        <!-- Block 1: Text Left, Image Right -->
+        <div class="row g-5 align-items-center story-block">
             <div class="col-lg-6" data-aos="fade-right">
-                <div class="story-image-wrapper">
-                    <img src="{{ asset('assets/images/about/story.jpg') }}" onerror="this.onerror=null;this.src='{{ asset('assets/images/products/placeholder.jpg') }}';" alt="Rohida Farm Village Heritage" loading="lazy">
-                    <div class="story-image-overlay-badge d-flex align-items-center gap-3">
-                        <i class="fa-solid fa-seedling text-success fs-3"></i>
-                        <div>
-                            <h6 class="mb-0 fw-bold text-dark font-heading">100% Traditional & Chemical-Free</h6>
-                            <small class="text-muted">Directly from the pastures of Rajasthan</small>
-                        </div>
-                    </div>
+                <h2 class="story-heading">Our Story</h2>
+                <p class="story-text">
+                    At Rohida Farm, our journey began with a simple belief — <strong>good food has the power to bring people together</strong>. What started as a passion for wholesome, authentic flavors soon grew into a mission: to create food that's not only delicious but also nourishing, sustainable, and crafted with care.
+                </p>
+                <p class="story-text">
+                    We source our ingredients responsibly, working closely with farmers and trusted suppliers who share our values. Every product we create is born from the perfect balance of traditional recipes and modern sensibilities, ensuring that every bite is rich in taste and goodness.
+                </p>
+                <p class="story-text mb-0">
+                    From our humble beginnings to where we stand today, Rohida Farm has always been about <strong>quality without compromise</strong>. We are constantly evolving, yet our core remains the same — freshness, flavor, and a genuine love for food.
+                </p>
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="story-visual">
+                    <img src="{{ asset('images/svgs/Rohida Frm Web Vactor 02.svg') }}" alt="Rohida Farm Heritage" loading="lazy">
                 </div>
             </div>
+        </div>
 
-            <!-- Right Side: Narrative Content -->
-            <div class="col-lg-6" data-aos="fade-left">
-                <span class="text-uppercase fw-bold text-success mb-2 d-block" style="font-size: 0.82rem; letter-spacing: 2px;">Our Heritage</span>
-                <h2 class="font-heading display-6 fw-bold mb-3" style="color: #362518;">Our Story</h2>
-                <p class="fs-5 fw-semibold mb-4" style="color: #8B5A2B;">
-                    Long before Rohida Farm became a brand, it was a family's dream.
-                </p>
-                <p class="text-muted" style="line-height: 1.8; font-size: 1.02rem;">
-                    Growing up in Rajasthan, we experienced food in its purest form—fresh milk from indigenous cows, hand-churned Bilona ghee, stone-ground grains, and ingredients that came directly from nature without unnecessary processing.
-                </p>
-                <p class="text-muted" style="line-height: 1.8; font-size: 1.02rem;">
-                    As the market became filled with refined, adulterated, and heavily processed foods, we realized something important:
-                </p>
-                
-                <div class="p-3 my-3 rounded-3 bg-light border-start border-4 border-warning">
-                    <p class="mb-0 fw-bold text-dark font-heading" style="font-size: 1.1rem;">
-                        "People were no longer buying food—they were buying labels."
-                    </p>
+        <!-- Block 2: Image Left, Text Right -->
+        <div class="row g-5 align-items-center story-block story-block-reverse">
+            <div class="col-lg-6 order-lg-1" data-aos="fade-right">
+                <div class="story-visual">
+                    <img src="{{ asset('images/svgs/Rohida Farm Web Vector 11.svg') }}" alt="Rohida Farm Bilona Craft" loading="lazy">
                 </div>
-
-                <p class="text-muted" style="line-height: 1.8; font-size: 1.02rem;">
-                    That realization inspired us to build Rohida Farm. Our mission was never simply to sell products. It was to preserve India's traditional food culture while making genuinely pure products accessible to modern families.
+            </div>
+            <div class="col-lg-6 order-lg-2" data-aos="fade-left">
+                <h2 class="story-heading">We Are Proudly And Passionately Obsessed With Everything Organic!</h2>
+                <p class="story-text mb-0">
+                    In our daily routine, we sometimes forget to take stock of what we are eating and how we are eating. The choices we make with respect to food affects us and our entire family. So, we must consciously invest energy in finding the right kinds of food for us and our family to help build immunity.
                 </p>
 
-                <!-- Triad Pill Highlights -->
                 <div class="story-triad-pills">
                     <span class="triad-pill"><i class="fa-solid fa-circle-check"></i> Purity</span>
                     <span class="triad-pill"><i class="fa-solid fa-circle-check"></i> Transparency</span>
                     <span class="triad-pill"><i class="fa-solid fa-circle-check"></i> Tradition</span>
                 </div>
             </div>
-
         </div>
+
     </div>
 </section>

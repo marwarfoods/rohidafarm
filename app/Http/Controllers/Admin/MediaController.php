@@ -23,38 +23,57 @@ class MediaController extends Controller
         $folder = $request->input('folder', 'all');
         $search = $request->input('search');
 
-        $query = MediaItem::orderBy('created_at', 'desc');
+        $builtInImages = collect($this->scanBuiltInImages());
 
-        if ($search) {
-            $query->where('filename', 'like', "%{$search}%");
+        if ($folder === 'built-in') {
+            $filtered = $search
+                ? $builtInImages->filter(fn($i) => stripos($i->filename, $search) !== false)->values()
+                : $builtInImages;
+
+            $page = (int) $request->input('page', 1);
+            $perPage = 18;
+
+            $mediaItems = new \Illuminate\Pagination\LengthAwarePaginator(
+                $filtered->forPage($page, $perPage)->values(),
+                $filtered->count(),
+                $perPage,
+                $page,
+                ['path' => $request->url(), 'query' => $request->query()]
+            );
+        } else {
+            $query = MediaItem::orderBy('created_at', 'desc');
+
+            if ($search) {
+                $query->where('filename', 'like', "%{$search}%");
+            }
+
+            switch ($folder) {
+                case 'product-images':
+                    $query->where('file_path', 'like', '%uploads/products/%')->where('file_type', 'image');
+                    break;
+                case 'sliders':
+                    $query->where('file_path', 'like', '%uploads/sliders/%')->where('file_type', 'image');
+                    break;
+                case 'reviews':
+                    $query->where('file_path', 'like', '%uploads/reviews/%')->where('file_type', 'image');
+                    break;
+                case 'settings':
+                    $query->where('file_path', 'like', '%uploads/settings/%')->where('file_type', 'image');
+                    break;
+                case 'videos':
+                    $query->where('file_type', 'video');
+                    break;
+                case 'unsplash':
+                    $query->whereNotNull('url');
+                    break;
+                case 'trash':
+                    $query->where('id', '=', 0); // Mock empty trash
+                    break;
+            }
+
+            $mediaItems = $query->paginate(18)->withQueryString();
         }
 
-        switch ($folder) {
-            case 'product-images':
-                $query->where('file_path', 'like', '%uploads/products/%')->where('file_type', 'image');
-                break;
-            case 'sliders':
-                $query->where('file_path', 'like', '%uploads/sliders/%')->where('file_type', 'image');
-                break;
-            case 'reviews':
-                $query->where('file_path', 'like', '%uploads/reviews/%')->where('file_type', 'image');
-                break;
-            case 'settings':
-                $query->where('file_path', 'like', '%uploads/settings/%')->where('file_type', 'image');
-                break;
-            case 'videos':
-                $query->where('file_type', 'video');
-                break;
-            case 'unsplash':
-                $query->whereNotNull('url');
-                break;
-            case 'trash':
-                $query->where('id', '=', 0); // Mock empty trash
-                break;
-        }
-
-        $mediaItems = $query->paginate(18)->withQueryString();
-        
         $totalSizeBytes = MediaItem::sum('file_size') ?: 0;
         $totalSizeFormatted = $this->formatSize($totalSizeBytes);
 
@@ -66,10 +85,64 @@ class MediaController extends Controller
             'settings' => MediaItem::where('file_path', 'like', '%uploads/settings/%')->where('file_type', 'image')->count(),
             'videos' => MediaItem::where('file_type', 'video')->count(),
             'unsplash' => MediaItem::whereNotNull('url')->count(),
+            'built-in' => $builtInImages->count(),
             'trash' => 0
         ];
 
         return view('admin.media.index', compact('mediaItems', 'totalSizeFormatted', 'folder', 'counts', 'search'));
+    }
+
+    /**
+     * Scan public/images (the app's bundled/built-in static assets) and return them
+     * as lightweight read-only pseudo media items — never persisted to media_items,
+     * so they can never be deleted through the gallery's delete/bulk-delete routes.
+     */
+    private function scanBuiltInImages(): array
+    {
+        $basePath = public_path('images');
+        if (!is_dir($basePath)) {
+            return [];
+        }
+
+        $imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+        $items = [];
+
+        try {
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($basePath, \RecursiveDirectoryIterator::SKIP_DOTS)
+            );
+
+            foreach ($iterator as $file) {
+                if (!$file->isFile()) {
+                    continue;
+                }
+
+                $extension = strtolower($file->getExtension());
+                if (!in_array($extension, $imageExts)) {
+                    continue;
+                }
+
+                $relativePath = 'images/' . ltrim(str_replace('\\', '/', str_replace($basePath, '', $file->getPathname())), '/');
+
+                $items[] = (object) [
+                    'id' => 'builtin_' . md5($relativePath),
+                    'filename' => $file->getFilename(),
+                    'file_path' => $relativePath,
+                    'file_type' => 'image',
+                    'file_size' => $file->getSize(),
+                    'url' => null,
+                    'full_url' => asset($relativePath),
+                    'is_builtin' => true,
+                    'created_at' => \Illuminate\Support\Carbon::createFromTimestamp($file->getMTime()),
+                ];
+            }
+        } catch (\Exception $e) {
+            // Silence exceptions in case the directory cannot be iterated due to permissions
+        }
+
+        usort($items, fn($a, $b) => strcmp($a->filename, $b->filename));
+
+        return $items;
     }
 
     /**
@@ -143,7 +216,7 @@ class MediaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|max:20480', // 20MB max
+            'file' => 'required|file|max:204800', // 200MB max
         ]);
 
         try {
@@ -226,12 +299,13 @@ class MediaController extends Controller
     public function listAjax(Request $request)
     {
         $type = $request->input('type'); // 'image' or 'video' or null
-        
+        $page = (int) $request->input('page', 1);
+
         $query = MediaItem::orderBy('created_at', 'desc');
         if ($type) {
             $query->where('file_type', $type);
         }
-        
+
         $media = $query->paginate(12);
 
         // Append a full_url field so the JS picker can use absolute URLs for <img src>
@@ -247,6 +321,14 @@ class MediaController extends Controller
             }
             return $data;
         })->values()->all();
+
+        // On the first page, surface the app's built-in (bundled) images too so they
+        // can be picked/copied from anywhere the media picker is used — they are
+        // never stored in media_items, so they stay undeletable through this picker.
+        if ($page === 1 && $type !== 'video') {
+            $builtIn = collect($this->scanBuiltInImages())->map(fn($item) => (array) $item)->all();
+            $items = array_merge($builtIn, $items);
+        }
 
         return response()->json([
             'status' => 'success',

@@ -50,15 +50,6 @@
             <div class="col-lg-6" data-aos="fade-left">
                 <div class="ps-lg-2">
                     
-                    <!-- Subtitle Pill Badge -->
-                    <div class="d-inline-flex align-items-center gap-2 px-3.5 py-1.5 rounded-pill font-heading fw-bold text-uppercase mb-3" 
-                         style="font-size: 0.8rem; letter-spacing: 2px; color: #5C3D2E; background: rgba(196, 154, 69, 0.15); border: 1px solid rgba(196, 154, 69, 0.35);">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2L14.5 9H22L16 13.5L18.5 20.5L12 16L5.5 20.5L8 13.5L2 9H9.5L12 2Z" fill="#C49A45"/>
-                        </svg>
-                        <span>Our Roots &amp; Heritage</span>
-                    </div>
-
                     <!-- Section Title -->
                     <h2 class="display-5 font-heading fw-bold mb-3" style="color: #5C3D2E; line-height: 1.2;">
                         The Rohida Farm Journey &amp; Traditional Values
@@ -91,8 +82,8 @@
                                     <i class="bi bi-shield-heart-fill fs-5"></i>
                                 </div>
                                 <div>
-                                    <h6 class="fw-bold font-heading m-0" style="color: #5C3D2E; font-size: 0.92rem;">Hormone-Free Purity</h6>
-                                    <small style="color: #705849; font-size: 0.78rem;">Zero oxytocin, antibiotics, or synthetic chemicals.</small>
+                                    <h6 class="fw-bold font-heading m-0" style="color: #5C3D2E; font-size: 0.92rem;">Lactose-Free Goodness</h6>
+                                    <small style="color: #705849; font-size: 0.78rem;">Naturally free of lactose and easy on digestion.</small>
                                 </div>
                             </div>
                         </div>
@@ -102,9 +93,6 @@
                     <div class="d-flex flex-wrap align-items-center gap-3">
                         <a href="{{ route('about') }}" class="btn btn-story-primary px-4 py-2.5 rounded-pill font-heading fw-bold" style="font-size: 0.88rem;">
                             Discover Our Story <i class="bi bi-arrow-right ms-1"></i>
-                        </a>
-                        <a href="#" data-bs-toggle="modal" data-bs-target="#labReportsModal" class="btn btn-story-outline px-4 py-2.5 rounded-pill font-heading fw-bold" style="font-size: 0.88rem;">
-                            <i class="bi bi-file-earmark-check me-1"></i> Lab Reports
                         </a>
                     </div>
 

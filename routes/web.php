@@ -158,6 +158,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/products/{id}/update', [AdminProductController::class, 'update'])->name('products.update');
         Route::delete('/products/{id}/delete', [AdminProductController::class, 'destroy'])->name('products.delete');
         Route::post('/products/{id}/stock', [AdminProductController::class, 'updateStock'])->name('products.stock');
+        Route::post('/products/{id}/status', [AdminProductController::class, 'updateStatus'])->name('products.status');
     });
 
     // Reviews
@@ -225,6 +226,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
         Route::get('/orders/trash', [AdminOrderController::class, 'trash'])->name('orders.trash');
         Route::post('/orders/bulk-delete', [AdminOrderController::class, 'bulkDelete'])->name('orders.bulk-delete');
+        Route::post('/orders/bulk-update-status', [AdminOrderController::class, 'bulkUpdateStatus'])->name('orders.bulk-update-status');
         Route::post('/orders/trash/bulk-restore', [AdminOrderController::class, 'bulkRestore'])->name('orders.bulk-restore');
         Route::post('/orders/trash/bulk-force-delete', [AdminOrderController::class, 'bulkForceDelete'])->name('orders.bulk-force-delete');
         Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('orders.show');

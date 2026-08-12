@@ -33,26 +33,21 @@
             <div id="ajaxSearchResultsList" class="d-flex flex-column gap-3"></div>
         </div>
 
-        <!-- Trending Searches -->
+        <!-- Shop By Category (real, dynamic categories from the database) -->
+        @php
+            $searchOffcanvasCategories = \App\Models\Category::where('is_active', true)->orderBy('name')->get();
+        @endphp
         <div id="trendingSearchesCard" class="trending-searches card border-0 rounded-4 shadow-sm p-4 bg-white">
-            <h6 class="fw-bold text-dark text-uppercase font-heading mb-3" style="font-size: 0.75rem; letter-spacing: 1px;">Trending Searches</h6>
+            <h6 class="fw-bold text-dark text-uppercase font-heading mb-3" style="font-size: 0.75rem; letter-spacing: 1px;">Shop By Category</h6>
             <div class="d-flex flex-column gap-2" style="font-size: 0.9rem;">
-                <a href="{{ route('shop.index', ['search' => 'A2 Vedic']) }}" class="text-muted hover-gold text-decoration-none py-2 border-bottom d-flex align-items-center justify-content-between">
-                    <span>A2 Vedic Bilona Cow Ghee</span>
-                    <i class="bi bi-chevron-right text-success" style="font-size: 0.75rem;"></i>
-                </a>
-                <a href="{{ route('shop.index', ['search' => 'Buffalo']) }}" class="text-muted hover-gold text-decoration-none py-2 border-bottom d-flex align-items-center justify-content-between">
-                    <span>Pure Buffalo Ghee</span>
-                    <i class="bi bi-chevron-right text-success" style="font-size: 0.75rem;"></i>
-                </a>
-                <a href="{{ route('shop.index', ['search' => 'Cold Pressed']) }}" class="text-muted hover-gold text-decoration-none py-2 border-bottom d-flex align-items-center justify-content-between">
-                    <span>Cold Pressed Mustard Oil</span>
-                    <i class="bi bi-chevron-right text-success" style="font-size: 0.75rem;"></i>
-                </a>
-                <a href="{{ route('shop.index', ['search' => 'Honey']) }}" class="text-muted hover-gold text-decoration-none py-2 d-flex align-items-center justify-content-between">
-                    <span>Wild Forest Organic Honey</span>
-                    <i class="bi bi-chevron-right text-success" style="font-size: 0.75rem;"></i>
-                </a>
+                @forelse($searchOffcanvasCategories as $cat)
+                    <a href="{{ route('shop.category', ['category' => $cat->slug]) }}" class="text-muted hover-gold text-decoration-none py-2 {{ $loop->last ? '' : 'border-bottom' }} d-flex align-items-center justify-content-between">
+                        <span><i class="bi {{ $cat->icon ?? 'bi-tags' }} text-success me-2"></i>{{ $cat->name }}</span>
+                        <i class="bi bi-chevron-right text-success" style="font-size: 0.75rem;"></i>
+                    </a>
+                @empty
+                    <span class="text-muted">No categories available.</span>
+                @endforelse
             </div>
         </div>
     </div>

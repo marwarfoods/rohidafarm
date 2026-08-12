@@ -48,7 +48,6 @@
     }
     .product-card .badge {
         font-size: 0.55rem !important;
-        padding: 2px 5px !important;
     }
     .product-card .px-3 {
         padding-left: 10px !important;
@@ -65,5 +64,36 @@
     }
     .product-image-container {
         border-radius: 12px 12px 0 0 !important;
+    }
+}
+
+/* On narrow devices, a 2-up product grid leaves the variant dropdown and price
+   too little side-by-side room — text wraps/overlaps. Below this width, stack
+   them instead: price full-width on top, variant select full-width beneath it,
+   then Add to Cart (already full-width) below that. */
+@media (max-width: 480px) {
+    .product-card .price-select-row {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+    .product-card .price-select-row > .w-50 {
+        width: 100% !important;
+    }
+    /* Price block first */
+    .product-card .price-select-row > .price-container {
+        order: 1;
+        align-items: flex-start !important;
+        margin-bottom: 6px;
+    }
+    .product-card .price-select-row > .price-container .d-flex {
+        justify-content: flex-start !important;
+    }
+    /* Variant select second, directly above Add to Cart */
+    .product-card .price-select-row > div:not(.price-container) {
+        order: 2;
+    }
+    .product-card .price-select-row .variant-selector {
+        width: 100% !important;
+        padding: 2px 5px !important;
     }
 }

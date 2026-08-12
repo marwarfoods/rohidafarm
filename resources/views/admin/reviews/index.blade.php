@@ -10,6 +10,9 @@
     </div>
     <div class="d-flex gap-2 align-items-center">
         <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fs-6">{{ $reviews->total() }} Total</span>
+        <a href="{{ route('admin.reviews.create') }}" class="btn btn-success rounded-pill px-4">
+            <i class="bi bi-plus-lg me-1"></i> Add Review
+        </a>
     </div>
 </div>
 
@@ -285,7 +288,7 @@
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form id="editReviewForm" method="POST" action="">
+            <form id="editReviewForm" method="POST" action="" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body p-4">
                     <div class="row g-3 mb-3">
@@ -330,9 +333,12 @@
                     </div>
 
                     {{-- ── Review Photos ── --}}
-                    <div id="editReviewImagesSection" class="mt-3" style="display:none;">
-                        <label class="form-label fw-semibold text-dark mb-2">Review Photos</label>
-                        <div id="editReviewImageGrid" class="d-flex flex-wrap gap-2"></div>
+                    <div class="mt-3">
+                        <label class="form-label fw-semibold text-dark mb-2">Review Photos <span class="text-muted fw-normal" style="font-size:0.75rem;">(max 4 total)</span></label>
+                        <div id="editReviewImageGrid" class="d-flex flex-wrap gap-2 mb-2"></div>
+                        <div id="editReviewImagesContainer"></div>
+                        <input type="file" name="review_images[]" id="editReviewImagesInput" class="form-control border p-2" accept="image/*" multiple>
+                        <div class="form-text">Select new photos to add. Click the ✕ on an existing photo to remove it.</div>
                     </div>
                 </div>
                 <div class="modal-footer border-top">
@@ -384,36 +390,52 @@ document.addEventListener('DOMContentLoaded', function () {
         let images = [];
         try { images = JSON.parse(btn.dataset.reviewImages || '[]'); } catch(err) {}
 
-        const section = document.getElementById('editReviewImagesSection');
-        const grid    = document.getElementById('editReviewImageGrid');
+        const grid      = document.getElementById('editReviewImageGrid');
+        const removeBox = document.getElementById('editReviewImagesContainer');
+        const fileInput = document.getElementById('editReviewImagesInput');
         grid.innerHTML = '';
+        removeBox.innerHTML = '';
+        fileInput.value = '';
 
-        if (images.length > 0) {
-            section.style.display = 'block';
-            images.forEach(src => {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'position-relative';
-                wrapper.style.cssText = 'cursor:pointer;';
+        images.forEach(src => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'position-relative';
+            wrapper.style.cssText = 'cursor:pointer;';
 
-                const img = document.createElement('img');
-                img.src = src.startsWith('http') ? src : (window.location.origin + '/' + src.replace(/^\//, ''));
-                img.className = 'rounded-3 border';
-                img.style.cssText = 'width:80px;height:80px;object-fit:cover;transition:transform 0.15s,box-shadow 0.15s;';
-                img.title = 'Click to enlarge';
+            const img = document.createElement('img');
+            img.src = src.startsWith('http') ? src : (window.location.origin + '/' + src.replace(/^\//, ''));
+            img.className = 'rounded-3 border';
+            img.style.cssText = 'width:80px;height:80px;object-fit:cover;transition:transform 0.15s,box-shadow 0.15s;';
+            img.title = 'Click to enlarge';
 
-                // Hover effect
-                img.addEventListener('mouseenter', () => { img.style.transform='scale(1.06)'; img.style.boxShadow='0 4px 16px rgba(0,0,0,0.18)'; });
-                img.addEventListener('mouseleave', () => { img.style.transform='scale(1)'; img.style.boxShadow=''; });
+            // Hover effect
+            img.addEventListener('mouseenter', () => { img.style.transform='scale(1.06)'; img.style.boxShadow='0 4px 16px rgba(0,0,0,0.18)'; });
+            img.addEventListener('mouseleave', () => { img.style.transform='scale(1)'; img.style.boxShadow=''; });
 
-                // Lightbox click
-                img.addEventListener('click', () => openLightbox(img.src));
+            // Lightbox click
+            img.addEventListener('click', () => openLightbox(img.src));
 
-                wrapper.appendChild(img);
-                grid.appendChild(wrapper);
+            // Remove button
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'btn btn-danger btn-sm rounded-circle position-absolute';
+            removeBtn.style.cssText = 'top:-8px;right:-8px;width:22px;height:22px;padding:0;line-height:1;font-size:0.7rem;';
+            removeBtn.innerHTML = '<i class="bi bi-x"></i>';
+            removeBtn.title = 'Remove this photo';
+            removeBtn.addEventListener('click', (ev) => {
+                ev.stopPropagation();
+                const hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.name = 'remove_images[]';
+                hidden.value = src;
+                removeBox.appendChild(hidden);
+                wrapper.remove();
             });
-        } else {
-            section.style.display = 'none';
-        }
+
+            wrapper.appendChild(img);
+            wrapper.appendChild(removeBtn);
+            grid.appendChild(wrapper);
+        });
     });
 
     // ── Lightbox opener ──

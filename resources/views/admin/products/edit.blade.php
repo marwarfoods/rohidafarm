@@ -35,7 +35,7 @@
     </div>
 @endif
 
-<form action="{{ route('admin.products.update', $product->id) }}" method="POST" enctype="multipart/form-data" id="productForm" data-gallery-count="{{ $product->images->where('is_primary', false)->count() }}" data-variant-count="{{ $product->variants->count() }}">
+<form action="{{ route('admin.products.update', $product->id) }}" method="POST" enctype="multipart/form-data" id="productForm" data-gallery-count="{{ $product->images->where('is_primary', false)->count() }}" data-variant-count="{{ $product->variants->count() }}" data-faq-count="{{ $product->faqs->count() }}">
     @csrf
 
     <div class="row g-4 align-items-start">
@@ -129,7 +129,15 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-borderless align-middle m-0" id="variantsTable">
+                        <table class="table table-borderless align-middle m-0" id="variantsTable" style="table-layout: fixed;">
+                            <colgroup>
+                                <col style="width: 13%;">
+                                <col style="width: 23%;">
+                                <col style="width: 23%;">
+                                <col style="width: 14%;">
+                                <col style="width: 13%;">
+                                <col style="width: 14%;">
+                            </colgroup>
                             <thead class="bg-light text-muted" style="font-size:0.8rem;">
                                 <tr>
                                     <th class="px-4 py-3">Weight *</th>
@@ -155,6 +163,39 @@
                                 @endforeach
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+
+            {{-- ── PRODUCT FAQs with Drag-and-Drop ── --}}
+            <div class="card border-0 shadow-sm rounded-4 bg-white mb-4">
+                <div class="card-header bg-white rounded-top-4 px-4 py-3 border-bottom d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="fw-bold text-dark m-0"><i class="bi bi-question-circle text-success me-2"></i>Product FAQs</h6>
+                        <p class="text-muted m-0 mt-1" style="font-size:0.78rem;">
+                            <i class="bi bi-grip-vertical me-1"></i>Drag the handle on the left to reorder · Order is saved on submit.
+                        </p>
+                    </div>
+                    <button type="button" class="btn btn-success btn-sm rounded-pill px-3" id="btnAddFaq">
+                        <i class="bi bi-plus-lg me-1"></i> Add FAQ
+                    </button>
+                </div>
+                <div class="card-body p-4">
+                    <div id="faqsContainer" class="d-flex flex-column gap-3">
+                        @foreach($product->faqs as $index => $faq)
+                            <div class="faq-item-card d-flex align-items-start gap-3 border rounded-3 p-3 bg-light">
+                                <div class="faq-drag-handle text-muted pt-2" style="cursor: grab;"><i class="bi bi-grip-vertical fs-5"></i></div>
+                                <div class="flex-grow-1">
+                                    <input type="text" name="faqs[{{ $index }}][question]" class="form-control border mb-2 faq-question-input" placeholder="Question" required value="{{ $faq->question }}">
+                                    <textarea name="faqs[{{ $index }}][answer]" class="form-control border faq-answer-input" rows="2" placeholder="Answer" required>{{ $faq->answer }}</textarea>
+                                    <input type="hidden" class="faq-sort-order" name="faqs[{{ $index }}][sort_order]" value="{{ $index }}">
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-danger border rounded-pill btn-remove-faq"><i class="bi bi-trash"></i></button>
+                            </div>
+                        @endforeach
+                        <div class="text-center py-3 text-muted" id="faqsEmpty" style="font-size:0.85rem; {{ $product->faqs->count() > 0 ? 'display:none;' : '' }}">
+                            <i class="bi bi-question-circle me-1"></i> No FAQs added yet.
+                        </div>
                     </div>
                 </div>
             </div>

@@ -63,7 +63,7 @@ class HomeController extends Controller
             ->where('is_approved', true)->where('is_featured', true)->limit(6)->get();
 
         // ── Video Reviews ─────────────────────────────────────────────
-        $videoReviews = VideoReview::with('product:id,name,slug')
+        $videoReviews = VideoReview::with('product:id,name,slug,sale_price,mrp')
             ->where('is_active', true)->orderBy('sort_order')->get();
 
         // ── Native Ingredients ────────────────────────────────────────

@@ -1,6 +1,10 @@
 {{-- ── Instagram Feed Marquee Section (Homepage Bottom) ── --}}
-<section class="instagram-section py-5 position-relative overflow-hidden" style="background-color: #fafbfc; border-top: 1px solid var(--border-color);">
-    <div class="container py-2">
+<section class="instagram-section py-5 position-relative overflow-hidden"
+    style="background: url('{{ asset('images/vectors/bg10.png') }}') center center / cover no-repeat; border-top: 1px solid var(--border-color);">
+    <div class="position-absolute top-0 start-0 w-100 h-100"
+         style="background: rgba(255, 255, 255, 0.55); z-index: 0; pointer-events: none;"></div>
+
+    <div class="container py-2 position-relative" style="z-index: 1;">
         <!-- Section Header -->
         <div class="text-center mb-4 mb-md-5" data-aos="fade-up">
             <span class="badge px-3 py-2 rounded-pill font-heading text-uppercase fw-semibold mb-2" 

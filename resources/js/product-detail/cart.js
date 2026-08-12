@@ -6,11 +6,12 @@
 export function initCart() {
 
     // ── Quantity Selector & Real-Time Price Shimmer ──────────────────
-    const qtyInput     = document.getElementById('purchaseQuantity');
-    const hiddenQty    = document.getElementById('hiddenQuantity');
-    const mobileQty    = document.getElementById('mobileHiddenQuantity');
-    const productPrice = document.getElementById('productPrice');
-    const productMrp   = document.getElementById('productMrp');
+    const qtyInput       = document.getElementById('purchaseQuantity');
+    const hiddenQty      = document.getElementById('hiddenQuantity');
+    const mobileQty      = document.getElementById('mobileHiddenQuantity');
+    const mobileQtyInput = document.getElementById('mobilePurchaseQuantity');
+    const productPrice   = document.getElementById('productPrice');
+    const productMrp     = document.getElementById('productMrp');
 
     const updatePriceDisplay = (qty) => {
         const activeVariant = document.querySelector('.variant-card.active');

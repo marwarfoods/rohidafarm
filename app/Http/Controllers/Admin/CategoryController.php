@@ -53,6 +53,7 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255|unique:categories,name',
             'description' => 'nullable|string',
             'icon' => 'nullable|string|max:255',
+            'image' => 'nullable|string|max:500',
         ]);
 
         $category = Category::create([
@@ -60,6 +61,7 @@ class CategoryController extends Controller
             'slug' => Str::slug($request->input('name')),
             'description' => $request->input('description'),
             'icon' => $request->input('icon', 'bi-tags'),
+            'image' => $request->input('image'),
             'is_active' => true
         ]);
 
@@ -117,6 +119,7 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255|unique:categories,name,' . $id,
             'description' => 'nullable|string',
             'icon' => 'nullable|string|max:255',
+            'image' => 'nullable|string|max:500',
         ]);
 
         $category->update([
@@ -124,6 +127,7 @@ class CategoryController extends Controller
             'slug' => Str::slug($request->input('name')),
             'description' => $request->input('description'),
             'icon' => $request->input('icon', 'bi-tags'),
+            'image' => $request->input('image'),
         ]);
 
         self::logActivity('category_update', "Updated category {$category->name}");

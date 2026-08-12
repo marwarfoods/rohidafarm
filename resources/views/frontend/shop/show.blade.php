@@ -5,7 +5,7 @@
     {{-- @include('frontend.shop.partials.breadcrumb') --}}
 
     {{-- Main Product Detail Container --}}
-    <section class="py-4 py-lg-5" style="background-color: var(--cream-bg);">
+    <section class="py-4 py-lg-5" style="background: url('{{ asset('images/vectors/bg11.png') }}') top left repeat, var(--cream-bg);">
         <div class="product-detail-container">
             {{-- Skeleton & Product Main Info (Gallery & Description) --}}
             @include('frontend.shop.partials.product-main')
@@ -18,6 +18,9 @@
 
             {{-- Ratings & Reviews (Flipkart Style review sliders) --}}
             @include('frontend.shop.partials.reviews')
+
+            {{-- Product FAQs --}}
+            @include('frontend.shop.partials.faqs')
 
             {{-- Recently Viewed Products Slider --}}
             @include('frontend.shop.partials.recently-viewed')

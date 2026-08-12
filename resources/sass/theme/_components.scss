@@ -278,12 +278,25 @@
 
 // FOOTER STYLES
 .footer {
+    // Slightly bolder text on mobile only — desktop weight stays as-is.
+    @media (max-width: 767px) {
+        font-weight: 500;
+
+        p, span, div, a {
+            font-weight: 500;
+        }
+
+        .footer-link {
+            font-weight: 600;
+        }
+    }
+
     .footer-link {
-        color: rgba(255,255,255,0.8);
+        color: #5c5044;
         text-decoration: none;
         transition: color 0.22s ease;
 
-        &:hover { color: #a8d5a2; }
+        &:hover { color: var(--primary-green); }
     }
 
     .footer-social-icon {
@@ -293,9 +306,9 @@
         width: 38px;
         height: 38px;
         border-radius: 50%;
-        background: rgba(255,255,255,0.08);
-        border: 1px solid rgba(255,255,255,0.12);
-        color: rgba(255,255,255,0.65);
+        background: transparent;
+        border: 1px solid var(--primary-green);
+        color: var(--primary-green);
         font-size: 1rem;
         text-decoration: none;
         transition: all 0.22s ease;
@@ -306,6 +319,14 @@
             color: #fff;
             transform: translateY(-2px);
         }
+    }
+
+    .footer-heading-divider {
+        width: 46px;
+        height: 2px;
+        background: var(--gold-accent, #C49A45);
+        opacity: 0.6;
+        margin-bottom: 0.25rem;
     }
 
     .footer-accordion-toggle {

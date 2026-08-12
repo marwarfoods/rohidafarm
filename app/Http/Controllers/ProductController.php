@@ -134,11 +134,12 @@ class ProductController extends Controller
             'rating' => 'required|integer|min:1|max:5',
             'title' => 'required|string|max:255',
             'review' => 'required|string',
+            'guest_name' => 'required|string|max:255',
+            'review_images' => 'nullable|array|max:2',
             'review_images.*' => 'nullable|image|max:2048',
         ];
 
         if (!auth()->check()) {
-            $rules['guest_name'] = 'required|string|max:255';
             $rules['guest_email'] = 'required|email|max:255';
             $rules['guest_phone'] = 'nullable|string|max:20';
         }
@@ -146,21 +147,24 @@ class ProductController extends Controller
         $request->validate($rules);
 
         $userId = null;
-        $customerName = null;
         $customerEmail = null;
         $customerPhone = null;
+
+        // The name field is always shown (pre-filled from the account when logged in,
+        // but still editable) so the review always carries the display name the
+        // reviewer actually chose to submit — for both guests and registered users.
+        $customerName = $request->input('guest_name');
 
         if (auth()->check()) {
             $userId = auth()->id();
         } else {
-            $customerName = $request->input('guest_name');
             $customerEmail = $request->input('guest_email');
             $customerPhone = $request->input('guest_phone');
         }
 
         $uploadedImages = [];
         if ($request->hasFile('review_images')) {
-            $files = array_slice($request->file('review_images'), 0, 4); // Max 4 images
+            $files = array_slice($request->file('review_images'), 0, 2); // Max 2 images per review
             foreach ($files as $file) {
                 $fileName = time() . '_' . rand(100, 999) . '_' . $file->getClientOriginalName();
                 $file->move(public_path('uploads/reviews'), $fileName);

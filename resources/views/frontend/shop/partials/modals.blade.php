@@ -18,64 +18,43 @@
     </div>
 </div>
 
-<!-- ═══════════ DETAILED REVIEW DETAIL MODAL ═══════════ -->
+<!-- ═══════════ DETAILED REVIEW MODAL (photo left + full text right, like a product-review lightbox) ═══════════ -->
 <div class="modal fade" id="reviewDetailModal" tabindex="-1" aria-hidden="true" style="z-index:1060;">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content rounded-4 border-0 shadow-lg" style="background: #fff;">
-            <div class="modal-header border-bottom-0 pb-0">
-                <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body pt-0 pb-4">
-                <div class="d-flex align-items-center gap-2 mb-2">
-                    <span class="badge bg-success py-1 px-2 rounded d-inline-flex align-items-center gap-1 text-white fw-bold" id="modalReviewRating" style="font-size: 0.75rem; color: #fff !important;">
-                        5 <i class="bi bi-star-fill text-white" style="font-size: 0.65rem;"></i>
-                    </span>
-                    <h5 class="fw-bold font-heading text-dark m-0" id="modalReviewTitle" style="font-size: 0.95rem;">Headline</h5>
-                </div>
-                <p class="text-muted mb-3" style="font-size: 0.85rem; line-height: 1.6;" id="modalReviewText">Content...</p>
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content rounded-4 border-0 shadow-lg overflow-hidden">
+            <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"
+                    style="z-index:20;background-color:rgba(0,0,0,0.55);border-radius:50%;padding:10px;filter:invert(1) grayscale(100%) brightness(200%);"></button>
 
-                {{-- Clickable image thumbnails --}}
-                <div class="d-flex gap-2 mb-3 flex-wrap" id="modalReviewImages">
-                    <!-- Images injected dynamically with click-to-lightbox -->
+            <div class="row g-0">
+                <!-- Photo column (hidden entirely when the review has no photos) -->
+                <div class="col-md-6 bg-dark position-relative d-flex align-items-center justify-content-center d-none" id="modalReviewImageCol" style="min-height: 340px;">
+                    <img id="modalReviewMainImg" src="" alt="Review photo" class="img-fluid" style="max-height: 70vh; max-width: 100%; object-fit: contain;">
+
+                    <button type="button" id="modalReviewImgPrev"
+                            style="position:absolute;left:12px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;border:none;background:rgba(0,0,0,0.55);cursor:pointer;display:flex;align-items:center;justify-content:center;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15,18 9,12 15,6"/></svg>
+                    </button>
+                    <button type="button" id="modalReviewImgNext"
+                            style="position:absolute;right:12px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;border:none;background:rgba(0,0,0,0.55);cursor:pointer;display:flex;align-items:center;justify-content:center;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
+                    </button>
+
+                    <div id="modalReviewImgThumbs" class="position-absolute bottom-0 start-0 w-100 d-flex gap-2 justify-content-center p-2" style="background: rgba(0,0,0,0.35);"></div>
                 </div>
 
-                <div class="d-flex align-items-center justify-content-between border-top pt-2" style="font-size: 0.75rem; border-color:#f6f3eb !important;">
-                    <div class="d-flex align-items-center gap-1.5 text-muted">
-                        <span class="fw-bold text-dark" id="modalReviewUser">User</span>
-                        <span class="text-success"><i class="bi bi-patch-check-fill"></i> Certified Buyer</span>
+                <!-- Text column (full-width when there is no photo column) -->
+                <div class="col-md-6 p-4 p-md-5" id="modalReviewTextCol">
+                    <div class="text-warning mb-3" id="modalReviewStars" style="font-size: 1rem;"></div>
+
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <div class="rounded-circle bg-success-subtle text-success d-flex align-items-center justify-content-center fw-bold flex-shrink-0" style="width: 36px; height: 36px; font-size: 0.9rem;" id="modalReviewAvatar"></div>
+                        <span class="fw-bold text-dark" id="modalReviewUser" style="font-size: 1rem;">User</span>
                     </div>
-                    <span class="text-muted" id="modalReviewDate">Date</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                    <div class="text-muted mb-3" id="modalReviewDate" style="font-size: 0.8rem;">Date</div>
 
-<!-- ═══════════ REVIEW IMAGE LIGHTBOX ═══════════ -->
-<div class="modal fade" id="reviewImgLightboxFrontend" tabindex="-1" aria-hidden="true" style="z-index:1090;background:rgba(0,0,0,0.88);">
-    <div class="modal-dialog modal-dialog-centered" style="max-width:92vw;">
-        <div class="modal-content border-0" style="background:transparent;">
-            <div class="modal-body p-0 text-center position-relative">
-                <!-- Close button -->
-                <button type="button" data-bs-dismiss="modal" aria-label="Close"
-                        style="position:absolute;top:-14px;right:-14px;z-index:10;width:36px;height:36px;border-radius:50%;border:none;background:rgba(255,255,255,0.18);backdrop-filter:blur(6px);cursor:pointer;display:flex;align-items:center;justify-content:center;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
-                <!-- Main image display -->
-                <img id="reviewLightboxImg" src="" alt="Review photo"
-                     class="img-fluid rounded-4"
-                     style="max-height:82vh;max-width:90vw;object-fit:contain;box-shadow:0 24px 60px rgba(0,0,0,0.6);">
-                <!-- Prev/Next -->
-                <button id="reviewLightboxPrev"
-                        style="position:absolute;left:0;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;border:none;background:rgba(255,255,255,0.18);backdrop-filter:blur(6px);cursor:pointer;display:flex;align-items:center;justify-content:center;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="15,18 9,12 15,6"/></svg>
-                </button>
-                <button id="reviewLightboxNext"
-                        style="position:absolute;right:0;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;border:none;background:rgba(255,255,255,0.18);backdrop-filter:blur(6px);cursor:pointer;display:flex;align-items:center;justify-content:center;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
-                </button>
-                <!-- Counter -->
-                <div id="reviewLightboxCounter" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.7);font-size:0.8rem;backdrop-filter:blur(4px);background:rgba(0,0,0,0.35);padding:3px 12px;border-radius:20px;"></div>
+                    <h5 class="fw-bold font-heading text-dark mb-2" id="modalReviewTitle" style="font-size: 1.05rem;">Headline</h5>
+                    <p class="text-muted mb-0" id="modalReviewText" style="font-size: 0.92rem; line-height: 1.75; white-space: pre-line;">Content...</p>
+                </div>
             </div>
         </div>
     </div>
@@ -95,12 +74,12 @@
                 @endif
                 <form action="{{ route('product.reviews.store', $product->id) }}" method="POST" enctype="multipart/form-data">
                     @csrf
-                    @guest
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold text-dark">Your Name *</label>
-                                <input type="text" name="guest_name" class="form-control border p-2" required placeholder="e.g. Rajendra">
-                            </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold text-dark">Your Name *</label>
+                            <input type="text" name="guest_name" class="form-control border p-2" required placeholder="e.g. Rajendra" value="{{ auth()->check() ? auth()->user()->name : old('guest_name') }}">
+                        </div>
+                        @guest
                             <div class="col-md-4">
                                 <label class="form-label fw-semibold text-dark">Your Email *</label>
                                 <input type="email" name="guest_email" class="form-control border p-2" required placeholder="e.g. raj@example.com">
@@ -109,8 +88,8 @@
                                 <label class="form-label fw-semibold text-dark">Mobile (Optional)</label>
                                 <input type="text" name="guest_phone" class="form-control border p-2" placeholder="e.g. 9876543210">
                             </div>
-                        </div>
-                    @endguest
+                        @endguest
+                    </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-semibold text-dark d-block">Overall Rating *</label>
@@ -136,7 +115,7 @@
 
                     <div class="mb-4">
                         <label class="form-label fw-semibold text-dark">
-                            Photos <span class="text-muted fw-normal">(Optional, max 4 images)</span>
+                            Photos <span class="text-muted fw-normal">(Optional, max 2 images)</span>
                         </label>
 
                         {{-- Custom upload trigger --}}
@@ -149,7 +128,7 @@
                              ondrop="handleReviewImageDrop(event)">
                             <i class="bi bi-cloud-upload text-muted" style="font-size:1.6rem;"></i>
                             <p class="text-muted mb-0 mt-1" style="font-size:0.82rem;">Click or drag images here</p>
-                            <p class="text-muted mb-0" style="font-size:0.72rem;">JPG · PNG · WEBP · Max 2MB each · Up to 4 photos</p>
+                            <p class="text-muted mb-0" style="font-size:0.72rem;">JPG · PNG · WEBP · Max 2MB each · Up to 2 photos</p>
                         </div>
 
                         {{-- Hidden real file input --}}
@@ -253,3 +232,81 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // ── Write Review: Photo picker (max 2 images) ──
+    const REVIEW_MAX_IMAGES = 2;
+    const reviewInput = document.getElementById('reviewImagesInput');
+    const reviewPreviews = document.getElementById('reviewImagePreviews');
+    let reviewFilesStore = new DataTransfer();
+
+    function renderReviewPreviews() {
+        if (!reviewPreviews) return;
+        reviewPreviews.innerHTML = '';
+        Array.from(reviewFilesStore.files).forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'position-relative';
+                wrapper.style.cssText = 'width:70px;height:70px;';
+                wrapper.innerHTML = `
+                    <img src="${e.target.result}" class="rounded-3 border w-100 h-100" style="object-fit:cover;">
+                    <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 p-0 d-flex align-items-center justify-content-center review-img-remove"
+                            style="width:20px;height:20px;margin:2px;border-radius:50%;" data-index="${index}">
+                        <i class="bi bi-x" style="font-size:0.8rem;"></i>
+                    </button>
+                `;
+                reviewPreviews.appendChild(wrapper);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function addReviewFiles(fileList) {
+        const incoming = Array.from(fileList || []);
+        if (incoming.length === 0) return;
+
+        const remainingSlots = REVIEW_MAX_IMAGES - reviewFilesStore.files.length;
+        if (remainingSlots <= 0) {
+            alert(`You can upload a maximum of ${REVIEW_MAX_IMAGES} photos.`);
+            return;
+        }
+
+        if (incoming.length > remainingSlots) {
+            alert(`You can upload a maximum of ${REVIEW_MAX_IMAGES} photos. Only the first ${remainingSlots} selected file(s) were added.`);
+        }
+
+        incoming.slice(0, remainingSlots).forEach(file => reviewFilesStore.items.add(file));
+        reviewInput.files = reviewFilesStore.files;
+        renderReviewPreviews();
+    }
+
+    if (reviewInput) {
+        reviewInput.addEventListener('change', function () {
+            addReviewFiles(this.files);
+        });
+    }
+
+    if (reviewPreviews) {
+        reviewPreviews.addEventListener('click', function (e) {
+            const btn = e.target.closest('.review-img-remove');
+            if (!btn) return;
+            const index = parseInt(btn.getAttribute('data-index'));
+            const newStore = new DataTransfer();
+            Array.from(reviewFilesStore.files).forEach((file, i) => {
+                if (i !== index) newStore.items.add(file);
+            });
+            reviewFilesStore = newStore;
+            reviewInput.files = reviewFilesStore.files;
+            renderReviewPreviews();
+        });
+    }
+
+    window.handleReviewImageDrop = function (event) {
+        event.preventDefault();
+        event.currentTarget.style.background = '#fafafa';
+        addReviewFiles(event.dataTransfer.files);
+    };
+});
+</script>

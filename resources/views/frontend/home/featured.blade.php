@@ -89,6 +89,9 @@
                         <!-- Pagination (Mobile only) -->
                         <div class="swiper-pagination d-block d-md-none mt-2"></div>
                     </div>
+                    <!-- Prev/Next Navigation Arrows (Desktop only) -->
+                    <div class="swiper-button-prev d-none d-md-flex"></div>
+                    <div class="swiper-button-next d-none d-md-flex"></div>
                 </div>
                 <!-- See All button aligned to right of the slider bounds -->
                 <div class="d-flex justify-content-end mt-2 px-md-5 px-3">
@@ -142,6 +145,9 @@
                             <!-- Pagination (Mobile only) -->
                             <div class="swiper-pagination d-block d-md-none mt-2"></div>
                         </div>
+                        <!-- Prev/Next Navigation Arrows (Desktop only) -->
+                        <div class="swiper-button-prev d-none d-md-flex"></div>
+                        <div class="swiper-button-next d-none d-md-flex"></div>
                     </div>
                     <!-- See All button aligned to right of the slider bounds -->
                     <div class="d-flex justify-content-end mt-2 px-md-5 px-3">

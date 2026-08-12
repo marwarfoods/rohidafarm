@@ -56,27 +56,27 @@
 
                         <!-- Shop Dropdown / Mega Menu -->
                         <li class="nav-item dropdown dropdown-hover position-static">
-                            <a class="nav-link text-dark hover-gold dropdown-toggle fw-semibold py-1" href="{{ route('shop.index') }}" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link text-dark hover-gold dropdown-toggle fw-semibold py-1" href="{{ route('shop.index') }}" aria-expanded="false">
                                 Shop
                             </a>
                             <div class="dropdown-menu border-0 p-4 rounded-0 shadow-lg w-100 start-0 end-0 mt-0" style="background-color: var(--white); border-top: 3px solid var(--primary-green) !important;">
                                 <div class="container position-relative px-5">
                                     @php
-                                        $megaMenuProducts = \App\Models\Product::with('images')->where('is_active', true)->take(15)->get();
+                                        $megaMenuCategories = \App\Models\Category::where('is_active', true)->orderBy('name')->get();
                                     @endphp
 
                                     <div class="swiper mega-menu-slider overflow-hidden py-3">
                                         <div class="swiper-wrapper">
-                                            @foreach($megaMenuProducts as $product)
+                                            @foreach($megaMenuCategories as $cat)
                                                 @php
-                                                    $img = $product->primaryImage ? asset($product->primaryImage->image_path) : asset('/assets/images/products/placeholder.jpg');
+                                                    $img = $cat->image ? asset($cat->image) : asset('/assets/images/products/placeholder.jpg');
                                                 @endphp
                                                 <div class="swiper-slide text-center">
-                                                    <a href="{{ route('shop.show', $product->slug) }}" class="d-block text-decoration-none">
+                                                    <a href="{{ route('shop.category', ['category' => $cat->slug]) }}" class="d-block text-decoration-none">
                                                         <div class="mega-menu-img-wrap rounded overflow-hidden shadow-sm border mb-2 mx-auto" style="aspect-ratio: 1/1; max-width: 140px;">
-                                                            <img src="{{ $img }}" alt="{{ $product->name }}" class="w-100 h-100 object-fit-cover hover-scale" style="transition: transform 0.4s ease;">
+                                                            <img src="{{ $img }}" alt="{{ $cat->name }}" class="w-100 h-100 object-fit-cover hover-scale" style="transition: transform 0.4s ease;">
                                                         </div>
-                                                        <h6 class="text-dark font-heading fw-bold m-0" style="font-size: 0.8rem; line-height: 1.2;">{{ Str::limit($product->name, 25) }}</h6>
+                                                        <h6 class="text-dark font-heading fw-bold m-0" style="font-size: 0.8rem; line-height: 1.2;">{{ $cat->name }}</h6>
                                                     </a>
                                                 </div>
                                             @endforeach

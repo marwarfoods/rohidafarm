@@ -23,7 +23,7 @@
     </div>
 @endif
 
-<form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" id="productForm" data-gallery-count="0" data-variant-count="0">
+<form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" id="productForm" data-gallery-count="0" data-variant-count="0" data-faq-count="0">
     @csrf
 
     <div class="row g-4 align-items-start">
@@ -123,7 +123,15 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-borderless align-middle m-0" id="variantsTable">
+                        <table class="table table-borderless align-middle m-0" id="variantsTable" style="table-layout: fixed;">
+                            <colgroup>
+                                <col style="width: 13%;">
+                                <col style="width: 23%;">
+                                <col style="width: 23%;">
+                                <col style="width: 14%;">
+                                <col style="width: 13%;">
+                                <col style="width: 14%;">
+                            </colgroup>
                             <thead class="bg-light text-muted" style="font-size:0.8rem;">
                                 <tr>
                                     <th class="px-4 py-3">Weight *</th>
@@ -142,6 +150,28 @@
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+
+            {{-- ── PRODUCT FAQs with Drag-and-Drop ── --}}
+            <div class="card border-0 shadow-sm rounded-4 bg-white mb-4">
+                <div class="card-header bg-white rounded-top-4 px-4 py-3 border-bottom d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="fw-bold text-dark m-0"><i class="bi bi-question-circle text-success me-2"></i>Product FAQs</h6>
+                        <p class="text-muted m-0 mt-1" style="font-size:0.78rem;">
+                            <i class="bi bi-grip-vertical me-1"></i>Drag the handle on the left to reorder · Order is saved on submit.
+                        </p>
+                    </div>
+                    <button type="button" class="btn btn-success btn-sm rounded-pill px-3" id="btnAddFaq">
+                        <i class="bi bi-plus-lg me-1"></i> Add FAQ
+                    </button>
+                </div>
+                <div class="card-body p-4">
+                    <div id="faqsContainer" class="d-flex flex-column gap-3">
+                        <div class="text-center py-3 text-muted" id="faqsEmpty" style="font-size:0.85rem;">
+                            <i class="bi bi-question-circle me-1"></i> No FAQs added yet.
+                        </div>
                     </div>
                 </div>
             </div>

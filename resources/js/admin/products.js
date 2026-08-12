@@ -47,6 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         refreshGallerySortOrders();
+        refreshFaqSortOrders();
     });
 
     // 4. MRP & Sale Price Discount Badge
@@ -186,6 +187,71 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.closest('.gallery-item-card').remove();
                 refreshGallerySortOrders();
             });
+        });
+    }
+
+    // 7b. Product FAQs — Add / Remove / Drag-to-Reorder (SortableJS)
+    let faqIndex = parseInt(form.dataset.faqCount || '0');
+    const btnAddFaq = document.getElementById('btnAddFaq');
+    const faqsContainer = document.getElementById('faqsContainer');
+
+    function refreshFaqSortOrders() {
+        if (!faqsContainer) return;
+        const cards = faqsContainer.querySelectorAll('.faq-item-card');
+        cards.forEach((card, i) => {
+            const q = card.querySelector('.faq-question-input');
+            const a = card.querySelector('.faq-answer-input');
+            const s = card.querySelector('.faq-sort-order');
+            if (q) q.name = `faqs[${i}][question]`;
+            if (a) a.name = `faqs[${i}][answer]`;
+            if (s) { s.name = `faqs[${i}][sort_order]`; s.value = i; }
+        });
+    }
+
+    function appendFaqItem(question = '', answer = '') {
+        if (!faqsContainer) return;
+        document.getElementById('faqsEmpty')?.remove();
+
+        const card = document.createElement('div');
+        card.className = 'faq-item-card d-flex align-items-start gap-3 border rounded-3 p-3 bg-light';
+        card.innerHTML = `
+            <div class="faq-drag-handle text-muted pt-2" style="cursor: grab;"><i class="bi bi-grip-vertical fs-5"></i></div>
+            <div class="flex-grow-1">
+                <input type="text" name="faqs[${faqIndex}][question]" class="form-control border mb-2 faq-question-input" placeholder="Question" required value="${question}">
+                <textarea name="faqs[${faqIndex}][answer]" class="form-control border faq-answer-input" rows="2" placeholder="Answer" required>${answer}</textarea>
+                <input type="hidden" class="faq-sort-order" name="faqs[${faqIndex}][sort_order]" value="${faqIndex}">
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-danger border rounded-pill btn-remove-faq"><i class="bi bi-trash"></i></button>
+        `;
+        faqsContainer.appendChild(card);
+        faqIndex++;
+        card.querySelector('.btn-remove-faq').addEventListener('click', () => {
+            card.remove();
+            refreshFaqSortOrders();
+        });
+    }
+
+    if (btnAddFaq) {
+        btnAddFaq.addEventListener('click', () => appendFaqItem());
+    }
+
+    // Wire remove buttons for existing FAQ rows (Edit mode)
+    if (faqsContainer) {
+        faqsContainer.querySelectorAll('.btn-remove-faq').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.closest('.faq-item-card').remove();
+                refreshFaqSortOrders();
+            });
+        });
+    }
+
+    if (faqsContainer && typeof Sortable !== 'undefined') {
+        Sortable.create(faqsContainer, {
+            animation: 180,
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            handle: '.faq-drag-handle',
+            onEnd: refreshFaqSortOrders
         });
     }
 

@@ -9,7 +9,7 @@
     }
 </style>
 
-<div class="offcanvas offcanvas-end border-0 shadow-lg" tabindex="-1" id="cartOffcanvas" aria-labelledby="cartOffcanvasLabel" style="width: 440px; background-color: #F9F8F6;">
+<div class="offcanvas offcanvas-end border-0 shadow-lg" tabindex="-1" id="cartOffcanvas" aria-labelledby="cartOffcanvasLabel" style="width: 440px; background-color: #FFFFFF;">
     @php
         $cartService = app(\App\Services\CartService::class);
         $cartItems = $cartService->getItems();

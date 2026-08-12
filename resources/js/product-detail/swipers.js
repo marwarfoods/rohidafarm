@@ -10,6 +10,12 @@ export function initSwipers() {
         new Swiper('.related-products-slider', {
             slidesPerView: 1.5,
             spaceBetween: 16,
+            // Let taps on the variant <select> inside a slide open the native
+            // picker normally on touch devices instead of Swiper's own touch/drag
+            // handling swallowing the tap — this is why the weight dropdown's
+            // "change" (and the price update that depends on it) never fired on
+            // mobile even though it worked fine with a mouse on desktop.
+            noSwipingSelector: 'select',
             navigation: {
                 nextEl: '.related-products-slider .swiper-button-next',
                 prevEl: '.related-products-slider .swiper-button-prev',

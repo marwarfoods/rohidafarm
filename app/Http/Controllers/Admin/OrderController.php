@@ -31,7 +31,8 @@ class OrderController extends Controller
         }
 
         $orders = $query->orderBy('created_at', 'desc')->paginate(15);
-        return view('admin.orders.index', compact('orders'));
+        $trashedCount = Order::onlyTrashed()->count();
+        return view('admin.orders.index', compact('orders', 'trashedCount'));
     }
 
     /**
@@ -139,6 +140,36 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
+    }
+
+    /**
+     * Bulk update status for multiple selected orders at once.
+     */
+    public function bulkUpdateStatus(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'status' => 'required|string|in:pending,processing,shipped,delivered,cancelled,refunded,cancellation_requested',
+        ]);
+
+        $successCount = 0;
+        $failCount = 0;
+
+        foreach ($request->ids as $id) {
+            try {
+                $this->orderService->updateStatus($id, $request->input('status'));
+                $successCount++;
+            } catch (\Exception $e) {
+                $failCount++;
+            }
+        }
+
+        $message = "{$successCount} order(s) updated to " . ucfirst($request->input('status')) . ".";
+        if ($failCount > 0) {
+            $message .= " {$failCount} order(s) failed to update.";
+        }
+
+        return back()->with($failCount > 0 && $successCount === 0 ? 'error' : 'success', $message);
     }
 
     /**

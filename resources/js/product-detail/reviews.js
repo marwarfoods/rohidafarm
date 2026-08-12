@@ -1,6 +1,6 @@
 // =================================================
-// Reviews Module – Review Card Modal, Review Image
-//                 Lightbox & Multiple Modal Fix
+// Reviews Module – Review Card Click → Combined Detail
+//                 Modal (photo left + full text right)
 // resources/js/product-detail/reviews.js
 // =================================================
 
@@ -29,58 +29,54 @@ export function initReviews() {
     }
 
 
-    // ── Review Image Lightbox State ───────────────────
-    let _lbImages = [];
-    let _lbIndex  = 0;
-    const lbModal   = document.getElementById('reviewImgLightboxFrontend');
-    const lbImg     = document.getElementById('reviewLightboxImg');
-    const lbCounter = document.getElementById('reviewLightboxCounter');
-    const lbPrev    = document.getElementById('reviewLightboxPrev');
-    const lbNext    = document.getElementById('reviewLightboxNext');
+    // ── Combined Review Detail Modal (image left + text right) ─
+    const modalEl       = document.getElementById('reviewDetailModal');
+    const imageCol       = document.getElementById('modalReviewImageCol');
+    const textCol        = document.getElementById('modalReviewTextCol');
+    const mainImg        = document.getElementById('modalReviewMainImg');
+    const imgPrevBtn     = document.getElementById('modalReviewImgPrev');
+    const imgNextBtn     = document.getElementById('modalReviewImgNext');
+    const imgThumbsWrap  = document.getElementById('modalReviewImgThumbs');
 
-    function openReviewLightbox(images, startIndex) {
-        _lbImages = images;
-        _lbIndex  = startIndex;
-        updateLightboxSlide();
-        let lb = bootstrap.Modal.getInstance(lbModal);
-        if (!lb) {
-            lb = new bootstrap.Modal(lbModal, { backdrop: true });
+    let _images = [];
+    let _index  = 0;
+
+    function renderModalImage() {
+        if (!_images.length) return;
+        mainImg.src = _images[_index];
+
+        const showNav = _images.length > 1;
+        if (imgPrevBtn) imgPrevBtn.style.display = showNav ? 'flex' : 'none';
+        if (imgNextBtn) imgNextBtn.style.display = showNav ? 'flex' : 'none';
+
+        if (imgThumbsWrap) {
+            imgThumbsWrap.innerHTML = '';
+            if (showNav) {
+                _images.forEach((src, idx) => {
+                    const thumb = document.createElement('img');
+                    thumb.src = src;
+                    thumb.style.cssText = `width:44px;height:44px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid ${idx === _index ? '#fff' : 'transparent'};opacity:${idx === _index ? '1' : '0.6'};`;
+                    thumb.addEventListener('click', () => { _index = idx; renderModalImage(); });
+                    imgThumbsWrap.appendChild(thumb);
+                });
+            }
         }
-        lb.show();
     }
 
-    function updateLightboxSlide() {
-        if (!lbImg || !_lbImages.length) return;
-        lbImg.style.opacity = '0';
-        lbImg.style.transform = 'scale(0.96)';
-        setTimeout(() => {
-            lbImg.src = _lbImages[_lbIndex];
-            lbImg.style.transition = 'opacity 0.22s,transform 0.22s';
-            lbImg.style.opacity = '1';
-            lbImg.style.transform = 'scale(1)';
-        }, 120);
-        if (lbCounter) lbCounter.textContent = (_lbIndex + 1) + ' / ' + _lbImages.length;
-        if (lbPrev)    lbPrev.style.display = _lbImages.length > 1 ? 'flex' : 'none';
-        if (lbNext)    lbNext.style.display = _lbImages.length > 1 ? 'flex' : 'none';
-    }
-
-    if (lbPrev) lbPrev.addEventListener('click', () => {
-        _lbIndex = (_lbIndex - 1 + _lbImages.length) % _lbImages.length;
-        updateLightboxSlide();
+    if (imgPrevBtn) imgPrevBtn.addEventListener('click', () => {
+        _index = (_index - 1 + _images.length) % _images.length;
+        renderModalImage();
     });
-    if (lbNext) lbNext.addEventListener('click', () => {
-        _lbIndex = (_lbIndex + 1) % _lbImages.length;
-        updateLightboxSlide();
+    if (imgNextBtn) imgNextBtn.addEventListener('click', () => {
+        _index = (_index + 1) % _images.length;
+        renderModalImage();
     });
 
-    // Keyboard navigation for review lightbox
     document.addEventListener('keydown', (e) => {
-        if (!lbModal || !lbModal.classList.contains('show')) return;
-        if (e.key === 'ArrowLeft')  { _lbIndex = (_lbIndex - 1 + _lbImages.length) % _lbImages.length; updateLightboxSlide(); }
-        if (e.key === 'ArrowRight') { _lbIndex = (_lbIndex + 1) % _lbImages.length; updateLightboxSlide(); }
-        if (e.key === 'Escape')     { bootstrap.Modal.getInstance(lbModal)?.hide(); }
+        if (!modalEl || !modalEl.classList.contains('show') || _images.length < 2) return;
+        if (e.key === 'ArrowLeft')  { _index = (_index - 1 + _images.length) % _images.length; renderModalImage(); }
+        if (e.key === 'ArrowRight') { _index = (_index + 1) % _images.length; renderModalImage(); }
     });
-
 
     // ── Review Card Click → Detail Modal ─────────────
     document.querySelectorAll('.review-card-click-trigger').forEach(card => {
@@ -95,9 +91,14 @@ export function initReviews() {
             let images   = [];
             try { images = JSON.parse(this.getAttribute('data-images') || '[]'); } catch (err) {}
 
-            // Populate modal fields
-            const ratingEl = document.getElementById('modalReviewRating');
-            if (ratingEl) ratingEl.innerHTML = `${rating} <i class="bi bi-star-fill text-white" style="font-size:0.65rem;"></i>`;
+            // Populate text column
+            const starsEl = document.getElementById('modalReviewStars');
+            if (starsEl) {
+                starsEl.innerHTML = '';
+                for (let s = 1; s <= 5; s++) {
+                    starsEl.innerHTML += `<i class="bi ${s <= rating ? 'bi-star-fill' : 'bi-star'}"></i>`;
+                }
+            }
             const titleEl = document.getElementById('modalReviewTitle');
             if (titleEl) titleEl.textContent = title;
             const textEl = document.getElementById('modalReviewText');
@@ -106,48 +107,24 @@ export function initReviews() {
             if (userEl) userEl.textContent = user;
             const dateEl = document.getElementById('modalReviewDate');
             if (dateEl) dateEl.textContent = date;
+            const avatarEl = document.getElementById('modalReviewAvatar');
+            if (avatarEl) avatarEl.textContent = (user || 'A').charAt(0).toUpperCase();
 
-            // Inject clickable image thumbnails into detail modal
-            const imgContainer = document.getElementById('modalReviewImages');
-            if (imgContainer) {
-                imgContainer.innerHTML = '';
-                images.forEach((src, idx) => {
-                    const wrapper = document.createElement('div');
-                    wrapper.style.cssText = 'position:relative;cursor:pointer;';
-
-                    const img = document.createElement('img');
-                    img.src = src;
-                    img.className = 'rounded-3 border';
-                    img.style.cssText = 'width:72px;height:72px;object-fit:cover;transition:transform 0.18s,box-shadow 0.18s;';
-                    img.alt = 'Review photo ' + (idx + 1);
-                    img.title = 'Click to enlarge';
-
-                    img.addEventListener('mouseenter', () => {
-                        img.style.transform = 'scale(1.08)';
-                        img.style.boxShadow = '0 4px 16px rgba(0,0,0,0.22)';
-                    });
-                    img.addEventListener('mouseleave', () => {
-                        img.style.transform = 'scale(1)';
-                        img.style.boxShadow = '';
-                    });
-                    img.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        openReviewLightbox(images, idx);
-                    });
-
-                    // Magnify icon overlay
-                    const overlay = document.createElement('div');
-                    overlay.style.cssText = 'position:absolute;bottom:3px;right:3px;background:rgba(0,0,0,0.45);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;pointer-events:none;';
-                    overlay.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
-
-                    wrapper.appendChild(img);
-                    wrapper.appendChild(overlay);
-                    imgContainer.appendChild(wrapper);
-                });
+            // Populate / toggle photo column
+            _images = images;
+            _index  = 0;
+            if (images.length > 0) {
+                imageCol.classList.remove('d-none');
+                textCol.classList.remove('col-md-12');
+                textCol.classList.add('col-md-6');
+                renderModalImage();
+            } else {
+                imageCol.classList.add('d-none');
+                textCol.classList.remove('col-md-6');
+                textCol.classList.add('col-md-12');
             }
 
             // Open review detail modal
-            const modalEl = document.getElementById('reviewDetailModal');
             if (modalEl) {
                 const modal = new bootstrap.Modal(modalEl);
                 modal.show();

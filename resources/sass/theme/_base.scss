@@ -35,6 +35,18 @@ body.offcanvas-active {
     touch-action: none;
 }
 
+// Hide native number input spin (up/down) arrows site-wide — quantity inputs
+// on the product page, cart, cart offcanvas, and checkout all use type="number".
+input[type="number"] {
+    -moz-appearance: textfield;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+}
+
 // Prevent background scroll chaining on mobile
 .offcanvas {
     overscroll-behavior: contain;
