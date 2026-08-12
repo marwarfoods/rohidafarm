@@ -1,6 +1,6 @@
 <!-- ── The Traditional Journey Of Our Ghee (2-Column: Left BG visible, Right Steps) ── -->
 <section class="py-3 py-md-4 bilona-kasutam-section position-relative overflow-hidden" id="bilona-process"
-    style="background: url('{{ asset('images/vedic-craftsmanship.png') }}') left bottom / cover no-repeat; min-height: 480px;">
+    style="background: url('{{ asset('images/vectors/full-tree.png') }}') left bottom / cover no-repeat; min-height: 480px;">
 
     {{-- Full-width overlay — image shows through uniformly on both left & right --}}
     <div class="position-absolute top-0 start-0 w-100 h-100"
