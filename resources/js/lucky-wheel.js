@@ -85,8 +85,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     drawWheel();
 
-    // Unlock spin button only after email submit
-    const emailInput = document.getElementById('luckyWheelEmail');
+    // Unlock spin button only after name + mobile submit
+    const nameInput = document.getElementById('luckyWheelName');
+    const mobileInput = document.getElementById('luckyWheelMobile');
     const submitBtn = document.getElementById('luckyWheelSubmitBtn');
     const spinBtn = document.getElementById('luckyWheelSpinBtn');
     const errorDiv = document.getElementById('luckyWheelError');
@@ -95,20 +96,35 @@ document.addEventListener('DOMContentLoaded', function () {
     spinBtn.disabled = true;
 
     submitBtn.addEventListener('click', function () {
-        const email = emailInput.value.trim();
-        if (!email || !email.includes('@')) {
+        const name = nameInput.value.trim();
+        const mobile = mobileInput.value.trim();
+        if (!name || !/^[0-9]{10}$/.test(mobile)) {
             errorDiv.style.display = 'block';
             return;
         }
         errorDiv.style.display = 'none';
-        
-        // Hide email box and unlock spin button with nice visuals
-        document.querySelector('.lucky-wheel-form').style.display = 'none';
-        spinBtn.disabled = false;
-        spinBtn.style.animation = 'pulse 1s infinite alternate';
-        
-        // Auto trigger spin for seamless UX
-        triggerSpin();
+        submitBtn.disabled = true;
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+        fetch('/wheel-entry', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken || '',
+            },
+            body: JSON.stringify({ name: name, mobile_number: mobile }),
+        }).finally(() => {
+            // Hide the form and unlock spin button regardless of network
+            // hiccups — the visitor should never be blocked from spinning.
+            document.querySelector('.lucky-wheel-form').style.display = 'none';
+            spinBtn.disabled = false;
+            spinBtn.style.animation = 'pulse 1s infinite alternate';
+
+            // Auto trigger spin for seamless UX
+            triggerSpin();
+        });
     });
 
     spinBtn.addEventListener('click', triggerSpin);

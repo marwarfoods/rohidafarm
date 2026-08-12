@@ -29,6 +29,8 @@ use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\StockController;
 use App\Http\Controllers\Admin\RoleController as AdminRoleController;
 use App\Http\Controllers\Admin\CertificationController as AdminCertificationController;
+use App\Http\Controllers\Admin\WheelEntryController as AdminWheelEntryController;
+use App\Http\Controllers\WheelEntryController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -64,6 +66,7 @@ Route::post('/api/check-delivery', [ProductController::class, 'checkDelivery'])-
 
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::post('/contact/submit', [PageController::class, 'contactSubmit'])->name('contact.submit');
+Route::post('/wheel-entry', [WheelEntryController::class, 'store'])->name('wheel-entry.store');
 Route::get('/track-order', [PageController::class, 'trackOrder'])->name('track-order');
 
 /*
@@ -246,6 +249,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('/coupons/{id}/edit', [AdminCouponController::class, 'edit'])->name('coupons.edit');
         Route::post('/coupons/{id}/update', [AdminCouponController::class, 'update'])->name('coupons.update');
         Route::delete('/coupons/{id}/delete', [AdminCouponController::class, 'destroy'])->name('coupons.delete');
+    });
+
+    // Wheel Popup Entries
+    Route::middleware('permission:wheel-entries')->group(function () {
+        Route::get('/wheel-entries', [AdminWheelEntryController::class, 'index'])->name('wheel-entries.index');
+        Route::delete('/wheel-entries/{id}/delete', [AdminWheelEntryController::class, 'destroy'])->name('wheel-entries.delete');
     });
 
     // Stock

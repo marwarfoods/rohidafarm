@@ -21,28 +21,6 @@
                              decoding="async">
                     </div>
 
-                    <!-- Floating Cruelty-Free Badge (Bottom Left) -->
-                    <div class="position-absolute bottom-0 start-0 translate-middle-y bg-white p-3 p-md-3.5 story-badge-floating ms-2 ms-sm-3 mb-n4" 
-                         style="max-width: 270px; z-index: 3;">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0" 
-                                 style="width: 46px; height: 46px; background: linear-gradient(135deg, #5C3D2E 0%, #3E2723 100%);">
-                                <i class="bi bi-heart-fill text-warning fs-5"></i>
-                            </div>
-                            <div>
-                                <h6 class="fw-bold font-heading m-0" style="color: #5C3D2E; font-size: 0.92rem;">Cruelty-Free Milking</h6>
-                                <small style="color: #705849; font-size: 0.76rem; line-height: 1.3; display: block;">Calves fed first with love before milking</small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Floating Pure A2 Circle Badge (Top Right) -->
-                    <div class="position-absolute top-0 end-0 translate-middle-y me-n2 me-sm-n3 mt-3 d-flex flex-column align-items-center justify-content-center text-center text-white rounded-circle shadow-lg" 
-                         style="width: 94px; height: 94px; background: #5C3D2E; border: 3px solid #FAF7EE; z-index: 3;">
-                        <span class="font-heading fw-bold text-warning" style="font-size: 1.2rem; line-height: 1;">100%</span>
-                        <span class="font-heading fw-semibold text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px; opacity: 0.95;">Pure A2</span>
-                    </div>
-
                 </div>
             </div>
 

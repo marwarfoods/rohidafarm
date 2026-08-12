@@ -253,6 +253,18 @@ document.addEventListener('DOMContentLoaded', function () {
             if (cardVideo) {
                 cardVideo.muted = true;
 
+                // Force the browser to decode & paint the first frame as a thumbnail.
+                // Mobile browsers (iOS Safari, some Android Chrome) leave the video
+                // element black with only preload="metadata" — nudging currentTime
+                // forward after metadata loads makes them render a real frame.
+                const paintFirstFrame = () => {
+                    if (cardVideo.readyState >= 1) {
+                        cardVideo.currentTime = 0.1;
+                    }
+                };
+                cardVideo.addEventListener('loadedmetadata', paintFirstFrame);
+                if (cardVideo.readyState >= 1) paintFirstFrame();
+
                 card.addEventListener('mouseenter', () => {
                     const playPromise = cardVideo.play();
                     if (playPromise !== undefined) {

@@ -49,7 +49,7 @@
         </ul>
 
         {{-- Catalog --}}
-        @if(auth()->user()->hasPermission('products-view') || auth()->user()->hasPermission('categories-view') || auth()->user()->hasPermission('coupons-view') || auth()->user()->hasPermission('stock-view'))
+        @if(auth()->user()->hasPermission('products-view') || auth()->user()->hasPermission('categories-view') || auth()->user()->hasPermission('coupons-view') || auth()->user()->hasPermission('stock-view') || auth()->user()->hasPermission('wheel-entries-view'))
         <p class="sidebar-section-title">Catalog</p>
         <ul class="sidebar-nav">
             @if(auth()->user()->hasPermission('products-view'))
@@ -85,6 +85,15 @@
                    class="sidebar-nav-link {{ Route::is('admin.stock.*') ? 'active' : '' }}">
                     <i class="bi bi-boxes sidebar-icon"></i>
                     <span class="sidebar-label">Stock Management</span>
+                </a>
+            </li>
+            @endif
+            @if(auth()->user()->hasPermission('wheel-entries-view'))
+            <li>
+                <a href="{{ route('admin.wheel-entries.index') }}"
+                   class="sidebar-nav-link {{ Route::is('admin.wheel-entries.*') ? 'active' : '' }}">
+                    <i class="bi bi-life-preserver sidebar-icon"></i>
+                    <span class="sidebar-label">Wheel Popup Entries</span>
                 </a>
             </li>
             @endif
