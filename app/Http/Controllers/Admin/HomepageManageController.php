@@ -8,6 +8,7 @@ use App\Models\Banner;
 use App\Models\HeaderTicker;
 use App\Traits\LogsActivity;
 use App\Models\NativeIngredient;
+use App\Models\BilonaStep;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -25,8 +26,9 @@ class HomepageManageController extends Controller
         $banners = Banner::orderBy('id')->get();
         $tickers = HeaderTicker::orderBy('sort_order')->get();
         $nativeIngredients = NativeIngredient::orderBy('sort_order')->get();
+        $bilonaSteps = BilonaStep::orderBy('sort_order')->get();
         $coupons = \App\Models\Coupon::where('is_active', true)->get();
-        return view('admin.homepage.index', compact('sliders', 'banners', 'tickers', 'nativeIngredients', 'coupons'));
+        return view('admin.homepage.index', compact('sliders', 'banners', 'tickers', 'nativeIngredients', 'bilonaSteps', 'coupons'));
     }
 
     /**
@@ -95,7 +97,7 @@ class HomepageManageController extends Controller
 
         $this->logActivity('Uploaded home slider banner slide ID: ' . $slider->id);
 
-        return redirect()->route('admin.homepage.index')->with('success', 'Banner slide added successfully.');
+        return redirect()->route('admin.homepage.index', ['#slider-content'])->with('success', 'Banner slide added successfully.');
     }
 
     /**
@@ -119,7 +121,7 @@ class HomepageManageController extends Controller
 
         $this->logActivity('Updated home slider banner slide ID: ' . $id);
 
-        return redirect()->route('admin.homepage.index')->with('success', 'Banner slide updated successfully.');
+        return redirect()->route('admin.homepage.index', ['#slider-content'])->with('success', 'Banner slide updated successfully.');
     }
 
     /**
@@ -164,7 +166,7 @@ class HomepageManageController extends Controller
 
         $this->logActivity('Deleted home slider slide ID: ' . $id);
 
-        return redirect()->route('admin.homepage.index')->with('success', 'Banner slide deleted successfully.');
+        return redirect()->route('admin.homepage.index', ['#slider-content'])->with('success', 'Banner slide deleted successfully.');
     }
 
     /**
@@ -186,7 +188,7 @@ class HomepageManageController extends Controller
 
         $this->logActivity('Created top header ticker: ' . $ticker->text);
 
-        return redirect()->route('admin.homepage.index')->with('success', 'Ticker point added successfully.');
+        return redirect()->route('admin.homepage.index', ['#ticker-content'])->with('success', 'Ticker point added successfully.');
     }
 
     /**
@@ -222,7 +224,7 @@ class HomepageManageController extends Controller
 
         $this->logActivity('Deleted top header ticker ID: ' . $id);
 
-        return redirect()->route('admin.homepage.index')->with('success', 'Ticker point deleted successfully.');
+        return redirect()->route('admin.homepage.index', ['#ticker-content'])->with('success', 'Ticker point deleted successfully.');
     }
 
     /**
@@ -246,7 +248,7 @@ class HomepageManageController extends Controller
 
         $this->logActivity('Added Native Ingredient ID: ' . $ingredient->id);
 
-        return redirect()->route('admin.homepage.index')->with('success', 'Native ingredient added successfully.');
+        return redirect()->route('admin.homepage.index', ['#native-content'])->with('success', 'Native ingredient added successfully.');
     }
 
     /**
@@ -270,7 +272,7 @@ class HomepageManageController extends Controller
 
         $this->logActivity('Updated Native Ingredient ID: ' . $id);
 
-        return redirect()->route('admin.homepage.index')->with('success', 'Native ingredient updated successfully.');
+        return redirect()->route('admin.homepage.index', ['#native-content'])->with('success', 'Native ingredient updated successfully.');
     }
 
     /**
@@ -315,6 +317,126 @@ class HomepageManageController extends Controller
 
         $this->logActivity('Deleted Native Ingredient ID: ' . $id);
 
-        return redirect()->route('admin.homepage.index')->with('success', 'Native ingredient deleted successfully.');
+        return redirect()->route('admin.homepage.index', ['#native-content'])->with('success', 'Native ingredient deleted successfully.');
+    }
+
+    /**
+     * Store a newly created Bilona (Vedic Craftsmanship) process step.
+     */
+    public function bilonaStepStore(Request $request)
+    {
+        \Illuminate\Support\Facades\Log::info("📥 BILONA STEP CREATE REQUEST RECEIVED — raw_payload=" . json_encode($request->only(['image_path', 'title', 'description'])));
+
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'image_path' => 'required|string|max:1000',
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            \Illuminate\Support\Facades\Log::warning('❌ BILONA STEP CREATE VALIDATION FAILED — errors=' . json_encode($validator->errors()->all()));
+            return redirect()->route('admin.homepage.index', ['#bilona-content'])
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $step = BilonaStep::create([
+            'title' => $request->input('title'),
+            'description' => $request->input('description'),
+            'image_path' => $request->input('image_path'),
+            'sort_order' => BilonaStep::max('sort_order') + 1,
+            'is_active' => true,
+        ]);
+
+        \Illuminate\Support\Facades\Log::info("✅ BILONA STEP CREATED — id={$step->id} title=\"{$step->title}\" image_path={$step->image_path}");
+
+        $this->logActivity('Added Vedic Craftsmanship step ID: ' . $step->id);
+
+        return redirect()->route('admin.homepage.index', ['#bilona-content'])->with('success', 'Process step added successfully.');
+    }
+
+    /**
+     * Update the specified Bilona process step.
+     */
+    public function bilonaStepUpdate(Request $request, $id)
+    {
+        $step = BilonaStep::findOrFail($id);
+
+        \Illuminate\Support\Facades\Log::info("📥 BILONA STEP UPDATE REQUEST RECEIVED — id={$id} raw_payload=" . json_encode($request->only(['image_path', 'title', 'description'])));
+
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'image_path' => 'required|string|max:1000',
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            \Illuminate\Support\Facades\Log::warning("❌ BILONA STEP UPDATE VALIDATION FAILED — id={$id} errors=" . json_encode($validator->errors()->all()));
+            return redirect()->route('admin.homepage.index', ['#bilona-content'])
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $oldImagePath = $step->image_path;
+
+        $step->update([
+            'title' => $request->input('title'),
+            'description' => $request->input('description'),
+            'image_path' => $request->input('image_path'),
+        ]);
+
+        $step->refresh();
+        $imageChanged = $oldImagePath !== $step->image_path;
+        \Illuminate\Support\Facades\Log::info(
+            ($imageChanged ? '🔄' : '⚠️') . " BILONA STEP UPDATED — id={$id} title=\"{$step->title}\" old_image={$oldImagePath} new_image={$step->image_path} image_changed=" . ($imageChanged ? 'YES' : 'NO (same path submitted)')
+        );
+
+        $this->logActivity('Updated Vedic Craftsmanship step ID: ' . $id);
+
+        return redirect()->route('admin.homepage.index', ['#bilona-content'])->with('success', 'Process step updated successfully.');
+    }
+
+    /**
+     * Handle bulk AJAX drag & drop reordering of Bilona process steps.
+     */
+    public function bilonaStepReorder(Request $request)
+    {
+        $request->validate([
+            'order' => 'required|array',
+            'order.*' => 'integer|exists:bilona_steps,id',
+        ]);
+
+        $order = $request->input('order');
+        foreach ($order as $index => $id) {
+            BilonaStep::where('id', $id)->update(['sort_order' => $index]);
+        }
+
+        $this->logActivity('Updated Vedic Craftsmanship steps sorting order.');
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Process steps sorting order updated successfully.'
+        ]);
+    }
+
+    /**
+     * Delete the specified Bilona process step.
+     */
+    public function bilonaStepDelete($id)
+    {
+        $step = BilonaStep::findOrFail($id);
+
+        if ($step->image_path && !str_starts_with($step->image_path, 'http')) {
+            $absolutePath = public_path($step->image_path);
+            if (File::exists($absolutePath)) {
+                File::delete($absolutePath);
+            }
+        }
+
+        $step->delete();
+
+        $this->logActivity('Deleted Vedic Craftsmanship step ID: ' . $id);
+
+        return redirect()->route('admin.homepage.index', ['#bilona-content'])->with('success', 'Process step deleted successfully.');
     }
 }

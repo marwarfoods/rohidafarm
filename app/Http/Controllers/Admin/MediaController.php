@@ -272,6 +272,8 @@ class MediaController extends Controller
                 'file_size' => filesize(public_path($folder . '/' . $filename)),
             ]);
 
+            \Illuminate\Support\Facades\Log::info("📤 MEDIA UPLOAD SAVED — id={$media->id} file_path={$media->file_path} original_name={$originalName} folder={$folder}");
+
             self::logActivity('media_upload', "Uploaded media file {$originalName}");
 
             if ($request->expectsJson()) {
@@ -299,14 +301,62 @@ class MediaController extends Controller
     public function listAjax(Request $request)
     {
         $type = $request->input('type'); // 'image' or 'video' or null
+        $folder = $request->input('folder', 'all');
+        $search = $request->input('search');
         $page = (int) $request->input('page', 1);
+        $perPage = 18;
 
-        $query = MediaItem::orderBy('created_at', 'desc');
-        if ($type) {
-            $query->where('file_type', $type);
+        // Built-in (bundled) app images live on disk only, never in media_items,
+        // so they're paginated separately from the DB-backed folders below.
+        if ($folder === 'built-in') {
+            $builtIn = collect($this->scanBuiltInImages());
+            if ($search) {
+                $builtIn = $builtIn->filter(fn($i) => stripos($i->filename, $search) !== false)->values();
+            }
+
+            $items = $builtIn->forPage($page, $perPage)->map(fn($item) => (array) $item)->values()->all();
+            $hasMore = $builtIn->count() > $page * $perPage;
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $items,
+                'next_page_url' => $hasMore ? $request->fullUrlWithQuery(['page' => $page + 1]) : null,
+            ]);
         }
 
-        $media = $query->paginate(12);
+        $query = MediaItem::orderBy('created_at', 'desc');
+
+        if ($search) {
+            $query->where('filename', 'like', "%{$search}%");
+        }
+
+        switch ($folder) {
+            case 'product-images':
+                $query->where('file_path', 'like', '%uploads/products/%')->where('file_type', 'image');
+                break;
+            case 'sliders':
+                $query->where('file_path', 'like', '%uploads/sliders/%')->where('file_type', 'image');
+                break;
+            case 'reviews':
+                $query->where('file_path', 'like', '%uploads/reviews/%')->where('file_type', 'image');
+                break;
+            case 'settings':
+                $query->where('file_path', 'like', '%uploads/settings/%')->where('file_type', 'image');
+                break;
+            case 'videos':
+                $query->where('file_type', 'video');
+                break;
+            case 'unsplash':
+                $query->whereNotNull('url');
+                break;
+            default: // 'all' — respect the picker's fixed type context (e.g. image-only forms)
+                if ($type) {
+                    $query->where('file_type', $type);
+                }
+                break;
+        }
+
+        $media = $query->paginate($perPage)->withQueryString();
 
         // Append a full_url field so the JS picker can use absolute URLs for <img src>
         // regardless of which admin page the picker is opened from.
@@ -321,14 +371,6 @@ class MediaController extends Controller
             }
             return $data;
         })->values()->all();
-
-        // On the first page, surface the app's built-in (bundled) images too so they
-        // can be picked/copied from anywhere the media picker is used — they are
-        // never stored in media_items, so they stay undeletable through this picker.
-        if ($page === 1 && $type !== 'video') {
-            $builtIn = collect($this->scanBuiltInImages())->map(fn($item) => (array) $item)->all();
-            $items = array_merge($builtIn, $items);
-        }
 
         return response()->json([
             'status' => 'success',

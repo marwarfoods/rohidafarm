@@ -151,6 +151,26 @@
     display: block !important;
 }
 
+// ── Recently Viewed slider: on mobile, drop the nav arrows below the slides instead of overlapping them ──
+@media (max-width: 767.98px) {
+    .recently-viewed-slider-wrapper .related-viewed-nav {
+        display: flex !important;
+        justify-content: center !important;
+        gap: 1rem !important;
+        margin-top: 0.75rem !important;
+    }
+
+    .recently-viewed-slider-wrapper .related-viewed-nav .swiper-button-prev,
+    .recently-viewed-slider-wrapper .related-viewed-nav .swiper-button-next {
+        position: static !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        transform: none !important;
+        margin: 0 !important;
+    }
+}
+
 // Mobile Horizontal Thumbnails
 @media (max-width: 767.98px) {
     .mobile-thumbs-container {

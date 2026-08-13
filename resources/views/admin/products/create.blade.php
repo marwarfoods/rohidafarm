@@ -122,34 +122,10 @@
                     </button>
                 </div>
                 <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-borderless align-middle m-0" id="variantsTable" style="table-layout: fixed;">
-                            <colgroup>
-                                <col style="width: 13%;">
-                                <col style="width: 23%;">
-                                <col style="width: 23%;">
-                                <col style="width: 14%;">
-                                <col style="width: 13%;">
-                                <col style="width: 14%;">
-                            </colgroup>
-                            <thead class="bg-light text-muted" style="font-size:0.8rem;">
-                                <tr>
-                                    <th class="px-4 py-3">Weight *</th>
-                                    <th class="px-4 py-3">MRP (₹)</th>
-                                    <th class="px-4 py-3">Sale Price (₹)</th>
-                                    <th class="px-4 py-3">Stock</th>
-                                    <th class="px-4 py-3">Max Cart Qty</th>
-                                    <th class="px-4 py-3 text-center">Remove</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr id="emptyVariantRow">
-                                    <td colspan="5" class="text-center py-4 text-muted" style="font-size:0.85rem;">
-                                        <i class="bi bi-plus-circle me-1"></i> Click "Add Option" to add weight variants.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div id="variantsContainer">
+                        <div class="text-center py-4 text-muted" id="emptyVariantRow" style="font-size:0.85rem;">
+                            <i class="bi bi-plus-circle me-1"></i> Click "Add Option" to add weight variants.
+                        </div>
                     </div>
                 </div>
             </div>

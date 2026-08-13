@@ -21,6 +21,15 @@
         {{-- Main --}}
         <p class="sidebar-section-title">Main</p>
         <ul class="sidebar-nav">
+            @if(auth()->user()->hasPermission('media-view'))
+            <li>
+                <a href="{{ route('admin.homepage.index') }}"
+                   class="sidebar-nav-link {{ Route::is('admin.homepage.*') ? 'active' : '' }}">
+                    <i class="bi bi-layout-text-window-reverse sidebar-icon"></i>
+                    <span class="sidebar-label">Homepage</span>
+                </a>
+            </li>
+            @endif
             <li>
                 <a href="{{ route('admin.dashboard') }}"
                    class="sidebar-nav-link {{ Route::is('admin.dashboard') ? 'active' : '' }}">
@@ -173,13 +182,6 @@
                    class="sidebar-nav-link {{ Route::is('admin.media.*') ? 'active' : '' }}">
                     <i class="bi bi-images sidebar-icon"></i>
                     <span class="sidebar-label">Media Gallery</span>
-                </a>
-            </li>
-            <li>
-                <a href="{{ route('admin.homepage.index') }}"
-                   class="sidebar-nav-link {{ Route::is('admin.homepage.*') ? 'active' : '' }}">
-                    <i class="bi bi-layout-text-window-reverse sidebar-icon"></i>
-                    <span class="sidebar-label">Homepage</span>
                 </a>
             </li>
             @endif

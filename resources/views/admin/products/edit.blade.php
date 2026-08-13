@@ -128,41 +128,43 @@
                     </button>
                 </div>
                 <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-borderless align-middle m-0" id="variantsTable" style="table-layout: fixed;">
-                            <colgroup>
-                                <col style="width: 13%;">
-                                <col style="width: 23%;">
-                                <col style="width: 23%;">
-                                <col style="width: 14%;">
-                                <col style="width: 13%;">
-                                <col style="width: 14%;">
-                            </colgroup>
-                            <thead class="bg-light text-muted" style="font-size:0.8rem;">
-                                <tr>
-                                    <th class="px-4 py-3">Weight *</th>
-                                    <th class="px-4 py-3">MRP (₹)</th>
-                                    <th class="px-4 py-3">Sale Price (₹)</th>
-                                    <th class="px-4 py-3">Stock</th>
-                                    <th class="px-4 py-3">Max Cart Qty</th>
-                                    <th class="px-4 py-3 text-center">Remove</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($product->variants as $index => $v)
-                                    <tr>
-                                        <td class="px-4 py-2"><input type="text" name="variants[{{ $index }}][weight]" class="form-control border" required value="{{ $v->weight }}"></td>
-                                        <td class="px-4 py-2"><input type="number" step="0.01" name="variants[{{ $index }}][mrp]" class="form-control border" value="{{ $v->mrp }}"></td>
-                                        <td class="px-4 py-2"><input type="number" step="0.01" name="variants[{{ $index }}][sale_price]" class="form-control border" value="{{ $v->sale_price }}"></td>
-                                        <td class="px-4 py-2"><input type="number" name="variants[{{ $index }}][stock]" class="form-control border" value="{{ $v->stock }}"></td>
-                                        <td class="px-4 py-2"><input type="number" name="variants[{{ $index }}][max_cart_qty]" class="form-control border" value="{{ $v->max_cart_qty }}" placeholder="No limit"></td>
-                                        <td class="px-4 py-2 text-center">
-                                            <button type="button" class="btn btn-sm btn-outline-danger border rounded-pill btn-remove-variant"><i class="bi bi-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                    <div id="variantsContainer">
+                        @foreach($product->variants as $index => $v)
+                            <div class="variant-item px-4 py-3 border-bottom">
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label text-muted mb-1" style="font-size:0.8rem;">Weight *</label>
+                                        <input type="text" name="variants[{{ $index }}][weight]" class="form-control border" required value="{{ $v->weight }}">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label text-muted mb-1" style="font-size:0.8rem;">MRP (₹)</label>
+                                        <input type="number" step="0.01" name="variants[{{ $index }}][mrp]" class="form-control border" value="{{ $v->mrp }}">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label text-muted mb-1" style="font-size:0.8rem;">Sale Price (₹)</label>
+                                        <input type="number" step="0.01" name="variants[{{ $index }}][sale_price]" class="form-control border" value="{{ $v->sale_price }}">
+                                    </div>
+                                </div>
+                                <div class="row g-3 align-items-end">
+                                    <div class="col-md-4">
+                                        <label class="form-label text-muted mb-1" style="font-size:0.8rem;">Stock</label>
+                                        <input type="number" name="variants[{{ $index }}][stock]" class="form-control border" value="{{ $v->stock }}">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label text-muted mb-1" style="font-size:0.8rem;">Max Cart Qty</label>
+                                        <input type="number" name="variants[{{ $index }}][max_cart_qty]" class="form-control border" value="{{ $v->max_cart_qty }}" placeholder="No limit">
+                                    </div>
+                                    <div class="col-md-4 d-flex justify-content-md-end">
+                                        <button type="button" class="btn btn-sm btn-outline-danger border rounded-pill px-3 btn-remove-variant"><i class="bi bi-trash me-1"></i>Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                        @if($product->variants->isEmpty())
+                            <div class="text-center py-4 text-muted" id="emptyVariantRow" style="font-size:0.85rem;">
+                                <i class="bi bi-plus-circle me-1"></i> Click "Add Option" to add weight variants.
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

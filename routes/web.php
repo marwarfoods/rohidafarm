@@ -211,6 +211,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/homepage/native-ingredient/{id}/update', [HomepageManageController::class, 'nativeIngredientUpdate'])->name('homepage.native.update');
         Route::post('/homepage/native-ingredient/reorder', [HomepageManageController::class, 'nativeIngredientReorder'])->name('homepage.native.reorder');
         Route::delete('/homepage/native-ingredient/{id}/delete', [HomepageManageController::class, 'nativeIngredientDelete'])->name('homepage.native.delete');
+        Route::post('/homepage/bilona-step/store', [HomepageManageController::class, 'bilonaStepStore'])->name('homepage.bilona.store');
+        Route::post('/homepage/bilona-step/{id}/update', [HomepageManageController::class, 'bilonaStepUpdate'])->name('homepage.bilona.update');
+        Route::post('/homepage/bilona-step/reorder', [HomepageManageController::class, 'bilonaStepReorder'])->name('homepage.bilona.reorder');
+        Route::delete('/homepage/bilona-step/{id}/delete', [HomepageManageController::class, 'bilonaStepDelete'])->name('homepage.bilona.delete');
     });
 
     // Categories

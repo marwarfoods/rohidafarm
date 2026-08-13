@@ -90,13 +90,7 @@
             <!-- Star Ratings and Reviews Count -->
             <div class="d-flex align-items-center mb-1">
                 <div class="text-warning me-2" style="font-size: 0.75rem;">
-                    @for($i = 1; $i <= 5; $i++)
-                        @if($i <= round($product->rating))
-                            <i class="bi bi-star-fill"></i>
-                        @else
-                            <i class="bi bi-star"></i>
-                        @endif
-                    @endfor
+                    <i class="bi bi-star-fill"></i>
                 </div>
                 <span class="text-dark fw-bold" style="font-size: 0.75rem;">{{ number_format($product->rating, 1) }}</span>
                 <span class="text-muted ms-1" style="font-size: 0.7rem;">({{ $product->reviews_count ?? 0 }} reviews)</span>

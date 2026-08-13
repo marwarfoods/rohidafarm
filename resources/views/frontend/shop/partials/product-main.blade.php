@@ -136,15 +136,9 @@
                 <!-- Review Stars -->
                 <div class="d-flex align-items-center mb-3 fs-6">
                     <div class="text-warning me-2" style="font-size:0.95rem;">
-                        @for($i = 1; $i <= 5; $i++)
-                            @if($i <= round($product->rating))
-                                <i class="bi bi-star-fill"></i>
-                            @else
-                                <i class="bi bi-star"></i>
-                            @endif
-                        @endfor
+                        <i class="bi bi-star-fill"></i>
                     </div>
-                    <span class="text-muted fw-semibold">({{ $product->reviews_count ?: 45 }} verified reviews)</span>
+                    <span class="text-muted fw-semibold">({{ $product->reviews_count ?? 0 }} verified reviews)</span>
                 </div>
 
                 <!-- Pricing -->
@@ -357,7 +351,7 @@
                 </div>
                 <div class="d-flex flex-column align-items-center flex-shrink-0" style="min-width: 75px;">
                     <span class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded-circle mb-1" style="width:34px;height:34px;"><i class="bi bi-arrow-left-right fs-6"></i></span>
-                    <h6 class="fw-bold text-dark mb-0" style="font-size:0.68rem;">30 Day Return</h6>
+                    <h6 class="fw-bold text-dark mb-0" style="font-size:0.68rem;">7 Day Return</h6>
                     <span class="text-muted" style="font-size:0.6rem;">Hassle-Free</span>
                 </div>
                 <div class="d-flex flex-column align-items-center flex-shrink-0" style="min-width: 75px;">

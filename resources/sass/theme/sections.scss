@@ -169,14 +169,6 @@
         align-items: center;
         justify-content: center;
     }
-    .kasutam-scalloped-svg {
-        position: absolute;
-        inset: -6px;
-        width: calc(100% + 12px);
-        height: calc(100% + 12px);
-        z-index: 2;
-        pointer-events: none;
-    }
     .kasutam-step-img {
         width: 100%;
         height: 100%;

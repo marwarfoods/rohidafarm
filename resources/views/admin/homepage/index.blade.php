@@ -37,6 +37,11 @@
                     <i class="bi bi-image me-2"></i> Section Image
                 </button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link fw-semibold text-muted border-0 px-4 py-3 position-relative" id="bilona-tab" data-bs-toggle="tab" data-bs-target="#bilona-content" type="button" role="tab" aria-controls="bilona-content" aria-selected="false" style="font-size: 0.9rem; background: transparent;">
+                    <i class="bi bi-signpost-split me-2"></i> Vedic Craftsmanship Steps
+                </button>
+            </li>
         </ul>
     </div>
 
@@ -63,6 +68,11 @@
         <!-- TAB 5: SECTION IMAGE -->
         <div class="tab-pane fade col-12" id="section-image-content" role="tabpanel" aria-labelledby="section-image-tab">
             @include('admin.homepage.tabs.section-image')
+        </div>
+
+        <!-- TAB 6: VEDIC CRAFTSMANSHIP (BILONA PROCESS) STEPS -->
+        <div class="tab-pane fade col-12" id="bilona-content" role="tabpanel" aria-labelledby="bilona-tab">
+            @include('admin.homepage.tabs.bilona-steps')
         </div>
     </div>
 </div>
@@ -319,6 +329,49 @@
             @foreach($nativeIngredients as $item)
                 initMediaPicker('#nativeImageInputEdit{{ $item->id }}', '#nativeImagePreviewEdit{{ $item->id }}', 'image');
                 setupPreview('nativeImageInputEdit{{ $item->id }}', 'nativeImagePreviewEdit{{ $item->id }}');
+            @endforeach
+        }
+
+        // Initialize SortableJS for Vedic Craftsmanship (Bilona) process steps
+        var bilonaTableEl = document.getElementById('bilona-table');
+        var bilonaEl = bilonaTableEl ? bilonaTableEl.querySelector('tbody') : null;
+        if (bilonaEl) {
+            Sortable.create(bilonaEl, {
+                animation: 200,
+                handle: '.cursor-move',
+                ghostClass: 'bg-light-subtle',
+                chosenClass: 'bg-light',
+                onEnd: function (evt) {
+                    var order = [];
+                    bilonaEl.querySelectorAll('tr[data-id]').forEach(function(item) {
+                        order.push(item.getAttribute('data-id'));
+                    });
+
+                    fetch('{{ route("admin.homepage.bilona.reorder") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ order: order })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            window.location.reload();
+                        }
+                    });
+                }
+            });
+        }
+
+        // Register Vedic Craftsmanship Step Media Pickers
+        if (window.initMediaPicker) {
+            initMediaPicker('#bilonaImageInput', '#bilonaImagePreview', 'image');
+            setupPreview('bilonaImageInput', 'bilonaImagePreview', 'bilonaImagePlaceholder');
+            @foreach($bilonaSteps as $item)
+                initMediaPicker('#bilonaImageInputEdit{{ $item->id }}', '#bilonaImagePreviewEdit{{ $item->id }}', 'image');
+                setupPreview('bilonaImageInputEdit{{ $item->id }}', 'bilonaImagePreviewEdit{{ $item->id }}');
             @endforeach
         }
 

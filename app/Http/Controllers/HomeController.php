@@ -70,6 +70,12 @@ class HomeController extends Controller
         $nativeIngredients = \App\Models\NativeIngredient::where('is_active', true)
             ->orderBy('sort_order')->get();
 
+        // ── Vedic Craftsmanship (Bilona Process) Steps ─────────────────
+        $bilonaSteps = \App\Models\BilonaStep::where('is_active', true)
+            ->orderBy('sort_order')->get();
+
+        \Illuminate\Support\Facades\Log::info('🏠 HOMEPAGE LOAD — Vedic Craftsmanship steps fetched from DB: ' . $bilonaSteps->map(fn($s) => "[#{$s->id} \"{$s->title}\" -> {$s->image_path}]")->implode(' | '));
+
         // ── All Products Grid ─────────────────────────────────────────
         $allProducts = Product::with(['category:id,name,slug', 'images', 'primaryImage', 'variants'])
             ->where('is_active', true)
@@ -105,6 +111,7 @@ class HomeController extends Controller
             'videoReviews',
             'seo',
             'nativeIngredients',
+            'bilonaSteps',
             'allProducts',
             'certifications',
             'instaRow1',

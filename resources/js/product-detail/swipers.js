@@ -6,10 +6,13 @@
 export function initSwipers() {
 
     // ── Related Products Slider ──────────────────────
-    if (document.querySelector('.related-products-slider')) {
-        new Swiper('.related-products-slider', {
+    const relatedSliderEl = document.querySelector('.related-products-slider');
+    if (relatedSliderEl) {
+        const relatedWrapper = relatedSliderEl.closest('.products-slider-wrapper');
+        new Swiper(relatedSliderEl, {
             slidesPerView: 1.5,
             spaceBetween: 16,
+            watchOverflow: true,
             // Let taps on the variant <select> inside a slide open the native
             // picker normally on touch devices instead of Swiper's own touch/drag
             // handling swallowing the tap — this is why the weight dropdown's
@@ -17,8 +20,8 @@ export function initSwipers() {
             // mobile even though it worked fine with a mouse on desktop.
             noSwipingSelector: 'select',
             navigation: {
-                nextEl: '.related-products-slider .swiper-button-next',
-                prevEl: '.related-products-slider .swiper-button-prev',
+                nextEl: relatedWrapper ? relatedWrapper.querySelector('.swiper-button-next') : null,
+                prevEl: relatedWrapper ? relatedWrapper.querySelector('.swiper-button-prev') : null,
             },
             breakpoints: {
                 576: { slidesPerView: 2 },

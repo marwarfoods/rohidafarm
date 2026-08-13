@@ -71,30 +71,52 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 5. Weight Variants
     const btnAddVariant = document.getElementById('btnAddVariant');
-    const variantsTable = document.querySelector('#variantsTable tbody');
+    const variantsContainer = document.getElementById('variantsContainer');
 
-    if (btnAddVariant && variantsTable) {
+    if (btnAddVariant && variantsContainer) {
         // Wire existing delete buttons
-        variantsTable.querySelectorAll('.btn-remove-variant').forEach(btn => {
+        variantsContainer.querySelectorAll('.btn-remove-variant').forEach(btn => {
             btn.addEventListener('click', function() {
-                this.closest('tr').remove();
+                this.closest('.variant-item').remove();
             });
         });
 
         btnAddVariant.addEventListener('click', () => {
             document.getElementById('emptyVariantRow')?.remove();
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td class="px-4 py-2"><input type="text" name="variants[${variantIndex}][weight]" class="form-control border" required placeholder="e.g. 500ml"></td>
-                <td class="px-4 py-2"><input type="number" step="0.01" name="variants[${variantIndex}][mrp]" class="form-control border" placeholder="999"></td>
-                <td class="px-4 py-2"><input type="number" step="0.01" name="variants[${variantIndex}][sale_price]" class="form-control border" placeholder="799"></td>
-                <td class="px-4 py-2"><input type="number" name="variants[${variantIndex}][stock]" class="form-control border" value="100"></td>
-                <td class="px-4 py-2"><input type="number" name="variants[${variantIndex}][max_cart_qty]" class="form-control border" placeholder="No limit"></td>
-                <td class="px-4 py-2 text-center"><button type="button" class="btn btn-sm btn-outline-danger border rounded-pill btn-remove-variant"><i class="bi bi-trash"></i></button></td>
+            const item = document.createElement('div');
+            item.className = 'variant-item px-4 py-3 border-bottom';
+            item.innerHTML = `
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label text-muted mb-1" style="font-size:0.8rem;">Weight *</label>
+                        <input type="text" name="variants[${variantIndex}][weight]" class="form-control border" required placeholder="e.g. 500ml">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-muted mb-1" style="font-size:0.8rem;">MRP (₹)</label>
+                        <input type="number" step="0.01" name="variants[${variantIndex}][mrp]" class="form-control border" placeholder="999">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-muted mb-1" style="font-size:0.8rem;">Sale Price (₹)</label>
+                        <input type="number" step="0.01" name="variants[${variantIndex}][sale_price]" class="form-control border" placeholder="799">
+                    </div>
+                </div>
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label text-muted mb-1" style="font-size:0.8rem;">Stock</label>
+                        <input type="number" name="variants[${variantIndex}][stock]" class="form-control border" value="100">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-muted mb-1" style="font-size:0.8rem;">Max Cart Qty</label>
+                        <input type="number" name="variants[${variantIndex}][max_cart_qty]" class="form-control border" placeholder="No limit">
+                    </div>
+                    <div class="col-md-4 d-flex justify-content-md-end">
+                        <button type="button" class="btn btn-sm btn-outline-danger border rounded-pill px-3 btn-remove-variant"><i class="bi bi-trash me-1"></i>Remove</button>
+                    </div>
+                </div>
             `;
-            variantsTable.appendChild(row);
+            variantsContainer.appendChild(item);
             variantIndex++;
-            row.querySelector('.btn-remove-variant').addEventListener('click', () => row.remove());
+            item.querySelector('.btn-remove-variant').addEventListener('click', () => item.remove());
         });
     }
 

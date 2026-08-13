@@ -6,3 +6,94 @@
 .cursor-pointer {
     cursor: pointer;
 }
+
+/* ── Enlarged Media Picker Modal ── */
+.media-picker-dialog {
+    max-width: 1140px;
+    width: 95vw;
+    /* Bootstrap's .modal has overflow-y:auto by default — if the dialog's total
+       rendered height ever exceeds the viewport, the WHOLE dialog (including the
+       header/tabs) scrolls as one unit instead of just the inner grid. Capping
+       height relative to the viewport here guarantees it always fits. */
+    max-height: calc(100vh - 3.5rem);
+}
+.media-picker-content {
+    height: calc(100vh - 3.5rem);
+    max-height: 800px;
+    overflow: hidden;
+}
+
+/* Nested flex children default to min-height:auto, which stops them shrinking
+   below their content's natural size — that's what let the grid balloon the
+   whole modal taller than its box. min-height:0 down the whole chain lets each
+   level actually respect the height budget from its parent instead. */
+.media-picker-content .modal-body,
+#mediaPickerTabsContent,
+#mediaPickerTabsContent .tab-pane,
+.media-picker-gallery-pane > .d-flex,
+.media-picker-gallery-pane .d-flex.flex-column {
+    min-height: 0;
+}
+
+.media-picker-content .modal-body {
+    overflow: hidden;
+}
+#mediaPickerTabsContent {
+    overflow: hidden;
+}
+#tab-upload,
+#tab-url {
+    overflow-y: auto;
+}
+.media-picker-gallery-pane {
+    overflow: hidden;
+    min-height: 0;
+}
+
+/* ── Folder Sidebar ── */
+.media-picker-sidebar {
+    width: 220px;
+    min-width: 220px;
+    overflow-y: auto;
+}
+.media-picker-folder-link {
+    display: block;
+    border: none;
+    background: transparent;
+    padding: 0.55rem 0.75rem;
+    border-radius: 0.65rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #4A4A4A;
+    transition: all 0.15s ease;
+    margin-bottom: 2px;
+}
+.media-picker-folder-link:hover {
+    background-color: #f4f2ea;
+    color: #248443;
+}
+.media-picker-folder-link.active {
+    background-color: rgba(36, 132, 67, 0.12);
+    color: #248443;
+}
+
+@media (max-width: 767.98px) {
+    .media-picker-dialog {
+        max-height: calc(100vh - 1rem);
+    }
+    .media-picker-content {
+        height: calc(100vh - 1rem);
+        max-height: none;
+    }
+    .media-picker-sidebar {
+        width: 150px;
+        min-width: 150px;
+    }
+    .media-picker-folder-link {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.5rem;
+    }
+    .media-picker-folder-link .float-end {
+        display: none;
+    }
+}

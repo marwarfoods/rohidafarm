@@ -64,41 +64,6 @@
                                     </form>
                                 </td>
                             </tr>
-
-                            <!-- Edit Modal -->
-                            <div class="modal fade" id="editNativeModal{{ $item->id }}" tabindex="-1" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content border-0 rounded-4 shadow-lg">
-                                        <form action="{{ route('admin.homepage.native.update', $item->id) }}" method="POST">
-                                            @csrf
-                                            <div class="modal-header border-bottom-0 pb-0">
-                                                <h5 class="modal-title font-heading fw-bold">Edit Native Ingredient</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body py-4">
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-semibold" style="font-size: 0.85rem;">Image <span class="text-danger">*</span></label>
-                                                    <input type="text" name="image_path" id="nativeImageInputEdit{{ $item->id }}" class="form-control" value="{{ $item->image_path }}" readonly required>
-                                                    <div class="mt-2 text-center p-2 border rounded">
-                                                        <img id="nativeImagePreviewEdit{{ $item->id }}" src="{{ Str::startsWith($item->image_path, 'http') ? $item->image_path : asset($item->image_path) }}" style="max-height: 80px; object-fit: contain;">
-                                                    </div>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-semibold" style="font-size: 0.85rem;">Alt Title</label>
-                                                    <input type="text" name="title" class="form-control" value="{{ $item->title }}">
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-semibold" style="font-size: 0.85rem;">Link URL</label>
-                                                    <input type="text" name="link" class="form-control" value="{{ $item->link }}">
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer border-top-0 pt-0">
-                                                <button type="submit" class="btn btn-warning px-4 py-2 rounded-3 w-100 fw-bold text-dark">Save Changes</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
                         @endforeach
                         @if($nativeIngredients->isEmpty())
                             <tr><td colspan="4" class="text-center text-muted py-4">No native ingredients found.</td></tr>
@@ -109,3 +74,45 @@
         </div>
     </div>
 </div>
+
+{{--
+    Edit modals live HERE, outside the <table>. <tbody> can only legally contain <tr>
+    elements — rendering them inside the @foreach above caused the browser to
+    foster-parent that invalid content out of the table, which silently detached the
+    image_path <input> from its <form> (same bug confirmed on the Bilona steps tab).
+--}}
+@foreach($nativeIngredients as $item)
+    <div class="modal fade" id="editNativeModal{{ $item->id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content border-0 rounded-4 shadow-lg">
+                <form action="{{ route('admin.homepage.native.update', $item->id) }}" method="POST">
+                    @csrf
+                    <div class="modal-header border-bottom-0 pb-0">
+                        <h5 class="modal-title font-heading fw-bold">Edit Native Ingredient</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body py-4">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" style="font-size: 0.85rem;">Image <span class="text-danger">*</span></label>
+                            <input type="text" name="image_path" id="nativeImageInputEdit{{ $item->id }}" class="form-control" value="{{ $item->image_path }}" readonly required>
+                            <div class="mt-2 text-center p-2 border rounded">
+                                <img id="nativeImagePreviewEdit{{ $item->id }}" src="{{ Str::startsWith($item->image_path, 'http') ? $item->image_path : asset($item->image_path) }}" style="max-height: 80px; object-fit: contain;">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" style="font-size: 0.85rem;">Alt Title</label>
+                            <input type="text" name="title" class="form-control" value="{{ $item->title }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" style="font-size: 0.85rem;">Link URL</label>
+                            <input type="text" name="link" class="form-control" value="{{ $item->link }}">
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top-0 pt-0">
+                        <button type="submit" class="btn btn-warning px-4 py-2 rounded-3 w-100 fw-bold text-dark">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+@endforeach

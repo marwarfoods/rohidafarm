@@ -3,6 +3,9 @@
     let activePreviewContainer = null;
     let nextMediaPageUrl = null;
     let currentMediaTypeFilter = 'image'; // default filter
+    let currentFolder = 'all';
+    let currentSearch = '';
+    let searchDebounceTimer = null;
 
     // Define function globally immediately so page inline scripts don't hit race conditions
     window.initMediaPicker = function(inputSelector, previewSelector = null, type = 'image') {
@@ -26,13 +29,19 @@
                 activeTargetInput = input;
                 activePreviewContainer = previewSelector ? document.querySelector(previewSelector) : null;
                 currentMediaTypeFilter = type;
-                
-                // Reset modal and fetch gallery
-                nextMediaPageUrl = `/admin/media/ajax-list?type=${type}`;
-                const container = document.getElementById('galleryGridContainer');
-                if (container) container.innerHTML = '';
-                loadGallery();
-                
+                currentFolder = 'all';
+                currentSearch = '';
+
+                const searchInput = document.getElementById('mediaPickerSearchInput');
+                if (searchInput) searchInput.value = '';
+
+                // The Videos folder only makes sense when the picker isn't locked to images
+                const videoFolderLi = document.querySelector('.media-picker-folder-video-only');
+                if (videoFolderLi) videoFolderLi.style.display = (type === 'video') ? '' : 'none';
+
+                setActiveFolderUI('all');
+                resetAndLoadGallery();
+
                 const modal = new bootstrap.Modal(document.getElementById('mediaPickerModal'));
                 modal.show();
             });
@@ -40,12 +49,45 @@
         });
     };
 
+    // Shows a toast if the shared AdminToast helper (resources/js/admin/tables.js) is
+    // loaded on this page; falls back to a plain alert otherwise so feedback is never silent.
+    function notify(type, message) {
+        if (typeof window.AdminToast === 'function') {
+            window.AdminToast(type, message);
+        } else if (type === 'error') {
+            alert(message);
+        }
+    }
+
+    function buildGalleryUrl(page = 1) {
+        const params = new URLSearchParams({
+            type: currentMediaTypeFilter,
+            folder: currentFolder,
+            page: page
+        });
+        if (currentSearch) params.set('search', currentSearch);
+        return `/admin/media/ajax-list?${params.toString()}`;
+    }
+
+    function resetAndLoadGallery() {
+        nextMediaPageUrl = buildGalleryUrl(1);
+        const container = document.getElementById('galleryGridContainer');
+        if (container) container.innerHTML = '';
+        loadGallery();
+    }
+
+    function setActiveFolderUI(folder) {
+        document.querySelectorAll('.media-picker-folder-link').forEach(link => {
+            link.classList.toggle('active', link.getAttribute('data-folder') === folder);
+        });
+    }
+
     // Load Gallery Function
     function loadGallery(append = false) {
         if (!nextMediaPageUrl) return;
         const container = document.getElementById('galleryGridContainer');
         if (!container) return;
-        
+
         fetch(nextMediaPageUrl)
             .then(res => res.json())
             .then(response => {
@@ -97,17 +139,31 @@
 
     // Selection Action — filePath is relative (stored in DB), fullUrl is absolute (for img src preview)
     function selectMedia(filePath, fullUrl) {
-        // Fallback: if no fullUrl given, assume file_path is already absolute or construct from origin
-        const previewSrc = fullUrl || (filePath.startsWith('http') ? filePath : window.location.origin + '/' + filePath.replace(/^\//, ''));
+        // DB records are inconsistent — some have a leading slash, some don't. Normalize
+        // to root-relative ("/uploads/...") so any consumer of the input's raw value
+        // (including pages' own duplicate preview listeners) resolves it against the
+        // domain root instead of the current admin page path (which was producing
+        // broken "/admin/uploads/..." 404s).
+        const normalizedPath = filePath.startsWith('http') || filePath.startsWith('/')
+            ? filePath
+            : '/' + filePath;
+
+        // Fallback: if no fullUrl given, construct an absolute URL from the origin.
+        const previewSrc = fullUrl || (normalizedPath.startsWith('http') ? normalizedPath : window.location.origin + normalizedPath);
 
         if (activeTargetInput) {
-            activeTargetInput.value = filePath;
-            
-            // Trigger change event dynamically
+            activeTargetInput.value = normalizedPath;
+
+            // Trigger change event dynamically (some pages listen for this to run their own preview/validation)
             activeTargetInput.dispatchEvent(new Event('change'));
 
+            // Set our own preview LAST so it wins over any page-level 'change' listener
+            // that might set a broken relative src.
             if (activePreviewContainer) {
-                if (currentMediaTypeFilter === 'video') {
+                if (activePreviewContainer.tagName === 'IMG') {
+                    activePreviewContainer.src = previewSrc;
+                    activePreviewContainer.style.display = 'block';
+                } else if (currentMediaTypeFilter === 'video') {
                     activePreviewContainer.innerHTML = `<video src="${previewSrc}" class="w-100 rounded-3 mt-2" style="max-height: 150px;" controls></video>`;
                 } else {
                     activePreviewContainer.innerHTML = `<img src="${previewSrc}" class="rounded-3 mt-2 img-fluid border" style="max-height: 120px; object-fit: cover;">`;
@@ -127,6 +183,30 @@
         if (loadMore) {
             loadMore.addEventListener('click', () => {
                 loadGallery(true);
+            });
+        }
+
+        // Folder sidebar switching
+        document.querySelectorAll('.media-picker-folder-link').forEach(link => {
+            link.addEventListener('click', function() {
+                const folder = this.getAttribute('data-folder');
+                if (folder === currentFolder) return;
+                currentFolder = folder;
+                setActiveFolderUI(folder);
+                resetAndLoadGallery();
+            });
+        });
+
+        // Search box (debounced)
+        const searchInput = document.getElementById('mediaPickerSearchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchDebounceTimer);
+                const value = this.value.trim();
+                searchDebounceTimer = setTimeout(() => {
+                    currentSearch = value;
+                    resetAndLoadGallery();
+                }, 350);
             });
         }
 
@@ -174,18 +254,19 @@
                     if (data.status === 'success') {
                         urlInput.value = '';
                         // Build full_url from relative file_path
-                        const fullUrl = data.media.url && data.media.url.startsWith('http') 
-                            ? data.media.url 
+                        const fullUrl = data.media.url && data.media.url.startsWith('http')
+                            ? data.media.url
                             : window.location.origin + '/' + data.media.file_path.replace(/^\//, '');
+                        notify('success', 'Image imported successfully.');
                         selectMedia(data.media.file_path, fullUrl);
                     } else {
-                        alert(data.message || 'Import failed.');
+                        notify('error', data.message || 'Import failed.');
                     }
                 })
                 .catch(err => {
                     btn.innerHTML = 'Import Asset';
                     btn.disabled = false;
-                    alert('Connection error occurred.');
+                    notify('error', 'Connection error occurred.');
                 });
             });
         }
@@ -223,18 +304,22 @@
                         const response = JSON.parse(xhr.responseText);
                         if (response.status === 'success') {
                             const fullUrl = window.location.origin + '/' + response.media.file_path.replace(/^\//, '');
+                            notify('success', 'Image uploaded successfully.');
                             selectMedia(response.media.file_path, fullUrl);
                         } else {
-                            alert(response.message || 'Upload failed.');
+                            notify('error', response.message || 'Upload failed.');
                         }
                     } else {
-                        alert('Upload failed. Check file type and size.');
+                        notify('error', 'Upload failed. Check file type and size.');
                     }
+                    // Reset the file input so choosing the same file again re-triggers 'change'
+                    localFileInput.value = '';
                 };
 
                 xhr.onerror = function() {
                     if (progressContainer) progressContainer.classList.add('d-none');
-                    alert('Upload network error occurred.');
+                    notify('error', 'Upload network error occurred.');
+                    localFileInput.value = '';
                 };
 
                 xhr.send(formData);

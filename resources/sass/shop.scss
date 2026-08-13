@@ -1,3 +1,33 @@
+/* Rich-text tables inside product Description/Benefits/Ingredients accordion (CKEditor output) */
+#productDetailAccordion .accordion-body {
+    figure.table {
+        margin: 0.5rem 0 1rem;
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0.5rem 0 1rem;
+    }
+
+    table th,
+    table td {
+        border: 1px solid #e5e1d5;
+        padding: 0.6rem 0.85rem;
+        text-align: left;
+        vertical-align: top;
+        font-size: 0.9rem;
+    }
+
+    table th {
+        background: #f8f6ef;
+        font-weight: 700;
+        color: var(--dark-brown, #3a2e1f);
+    }
+}
+
 /* Category capsule tabs matching homepage */
 .capsule-tab {
     background: #ffffff !important;

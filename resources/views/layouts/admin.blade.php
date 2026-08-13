@@ -14,6 +14,9 @@
     {{-- Admin Bundle (SCSS + JS compiled by Vite) --}}
     @vite(['resources/sass/admin.scss', 'resources/js/admin.js'])
 
+    {{-- Media Picker (component lives in <body> below, so its CSS can't reach here via @push/@stack in time) --}}
+    <link rel="stylesheet" href="{{ asset('admin/css/media-picker.css') }}?v={{ @filemtime(public_path('admin/css/media-picker.css')) }}">
+
     @stack('admin_styles')
 </head>
 <body>
@@ -41,6 +44,10 @@
 @endif
 @if(session('info'))
     <span data-flash-toast="info" class="d-none">{{ session('info') }}</span>
+@endif
+{{-- Validation failures previously failed silently (redirect back with no visible message) — surface them the same way. --}}
+@if($errors->any())
+    <span data-flash-toast="error" class="d-none">{{ $errors->first() }}</span>
 @endif
 
 {{-- App Shell --}}
@@ -75,6 +82,9 @@
 
 {{-- Bootstrap JS (deferred) --}}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+
+{{-- Media Picker JS --}}
+<script src="{{ asset('admin/js/media-picker.js') }}?v={{ @filemtime(public_path('admin/js/media-picker.js')) }}"></script>
 
 @stack('admin_scripts')
 <script>

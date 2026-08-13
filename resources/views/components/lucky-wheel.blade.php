@@ -35,13 +35,11 @@
                 </div>
 
                 <div class="lucky-wheel-form mt-4 text-start">
-                    <label for="luckyWheelName" class="lucky-wheel-label">Your Name</label>
                     <div class="lucky-wheel-input-group mb-3">
                         <i class="bi bi-person"></i>
                         <input type="text" id="luckyWheelName" class="form-control" placeholder="Enter your name" required>
                     </div>
 
-                    <label for="luckyWheelMobile" class="lucky-wheel-label">Mobile Number</label>
                     <div class="lucky-wheel-input-group mb-4">
                         <i class="bi bi-telephone"></i>
                         <input type="tel" id="luckyWheelMobile" class="form-control" placeholder="Enter your mobile number" required maxlength="10" inputmode="numeric" pattern="[0-9]*">
