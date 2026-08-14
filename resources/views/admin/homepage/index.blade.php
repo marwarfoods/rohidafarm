@@ -1,5 +1,22 @@
 @extends('layouts.admin')
 
+@push('admin_styles')
+<style>
+    #homepageTabs .nav-link {
+        border-radius: 8px 8px 0 0;
+        transition: all 0.2s ease-in-out;
+        margin-bottom: -1px;
+    }
+    #homepageTabs .nav-link:hover {
+        background-color: #f3f8f5 !important;
+    }
+    #homepageTabs .nav-link.active {
+        background-color: #e8f5e9 !important;
+        border-bottom: 3px solid #1a6b36 !important;
+    }
+</style>
+@endpush
+
 @section('admin_content')
 <div class="row">
     <div class="col-12 mb-4 d-flex justify-content-between align-items-center">
@@ -144,8 +161,13 @@
                 e.target.classList.remove('text-muted');
                 e.target.classList.add('text-success');
                 
-                // Update URL Hash
-                window.location.hash = e.target.getAttribute('data-bs-target');
+                // Update URL Hash without scrolling
+                const targetHash = e.target.getAttribute('data-bs-target');
+                if (history.replaceState) {
+                    history.replaceState(null, null, targetHash);
+                } else {
+                    window.location.hash = targetHash;
+                }
             });
         });
         // Initialize Media Pickers for all slider banner fields

@@ -1,5 +1,14 @@
 @extends('layouts.admin')
 
+@push('admin_styles')
+<style>
+    .media-card .media-select-checkbox:checked {
+        background-color: #1a6b36 !important;
+        border-color: #1a6b36 !important;
+    }
+</style>
+@endpush
+
 @section('admin_content')
 <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom flex-wrap gap-3">
     <h1 class="display-6 font-heading fw-bold m-0"><i class="bi bi-images text-success me-2"></i>Media Manager</h1>

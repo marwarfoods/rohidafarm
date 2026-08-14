@@ -309,6 +309,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('/customers', [AdminCustomerController::class, 'index'])->name('customers.index');
         Route::get('/customers/create', [AdminCustomerController::class, 'create'])->name('customers.create');
         Route::post('/customers/store', [AdminCustomerController::class, 'store'])->name('customers.store');
+        Route::post('/customers/export/csv', [AdminCustomerController::class, 'exportCsv'])->name('customers.export.csv');
+        Route::post('/customers/export/pdf', [AdminCustomerController::class, 'exportPdf'])->name('customers.export.pdf');
         Route::get('/customers/{id}', [AdminCustomerController::class, 'show'])->name('customers.show');
         Route::get('/customers/{id}/edit', [AdminCustomerController::class, 'edit'])->name('customers.edit');
         Route::put('/customers/{id}/update', [AdminCustomerController::class, 'update'])->name('customers.update');

@@ -157,7 +157,7 @@
                     </div>
                     <span class="d-none d-md-inline" style="color:#d9c9ae;">|</span>
                     <div class="d-flex align-items-center gap-1" style="font-size:0.75rem;color:#5c5044;">
-                        <i class="bi bi-arrow-return-left text-success"></i> 30-Day Returns
+                        <i class="bi bi-arrow-return-left text-success"></i> 7-Day Returns
                     </div>
                 </div>
             </div>

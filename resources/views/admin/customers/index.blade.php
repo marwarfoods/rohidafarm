@@ -62,27 +62,51 @@
     </div>
 </div>
 
-{{-- Search Bar --}}
+{{-- Toolbar --}}
 <div class="card border-0 rounded-4 mb-4 shadow-sm">
-    <div class="card-body p-3">
-        <form method="GET" action="{{ route('admin.customers.index') }}" class="d-flex gap-2">
+    <div class="card-body p-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <form method="GET" action="{{ route('admin.customers.index') }}" class="d-flex gap-2 align-items-center">
+            <input type="hidden" name="per_page" value="{{ request('per_page') }}">
             <input
                 type="text"
                 name="search"
                 value="{{ request('search') }}"
                 class="form-control rounded-3"
                 placeholder="Search by name, email or phone..."
-                style="max-width:400px;"
+                style="max-width:300px;"
             >
-            <button type="submit" class="btn btn-success rounded-3 px-4">
-                <i class="bi bi-search me-1"></i> Search
+            <button type="submit" class="btn btn-success rounded-3 px-3">
+                <i class="bi bi-search"></i>
             </button>
             @if(request('search'))
                 <a href="{{ route('admin.customers.index') }}" class="btn btn-outline-secondary rounded-3 px-3">
-                    <i class="bi bi-x-lg"></i> Clear
+                    Clear
                 </a>
             @endif
         </form>
+
+        <div class="d-flex align-items-center gap-2">
+            <form method="GET" action="{{ route('admin.customers.index') }}" class="m-0 d-flex align-items-center gap-2">
+                <input type="hidden" name="search" value="{{ request('search') }}">
+                <label class="text-muted fw-semibold" style="font-size:0.85rem; white-space:nowrap;">Per Page:</label>
+                <select name="per_page" class="form-select form-select-sm rounded-3" style="width:80px;" onchange="this.form.submit()">
+                    <option value="20" {{ request('per_page') == 20 ? 'selected' : '' }}>20</option>
+                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                    <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
+                    <option value="all" {{ request('per_page') === 'all' ? 'selected' : '' }}>All</option>
+                </select>
+            </form>
+            
+            <div class="dropdown">
+                <button class="btn btn-primary rounded-3 px-3 fw-semibold dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-download me-1"></i> Export
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                    <li><button type="button" class="dropdown-item" onclick="submitExport('pdf')"><i class="bi bi-file-earmark-pdf text-danger me-2"></i>Export to PDF</button></li>
+                    <li><button type="button" class="dropdown-item" onclick="submitExport('csv')"><i class="bi bi-file-earmark-excel text-success me-2"></i>Export to Excel (CSV)</button></li>
+                </ul>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -113,11 +137,13 @@
             <table class="table align-middle mb-0">
                 <thead>
                     <tr>
+                        <th style="width: 40px;">
+                            <input type="checkbox" class="form-check-input" id="selectAllCustomers">
+                        </th>
                         <th>#</th>
                         <th>Customer</th>
                         <th>Email</th>
                         <th>Phone</th>
-                        <th>Wallet</th>
                         <th>Orders</th>
                         <th>Joined</th>
                         <th class="text-center">Actions</th>
@@ -126,6 +152,9 @@
                 <tbody>
                     @foreach($customers as $i => $customer)
                         <tr>
+                            <td>
+                                <input type="checkbox" class="form-check-input customer-checkbox" value="{{ $customer->id }}">
+                            </td>
                             <td class="text-muted" style="font-size:0.82rem;">
                                 {{ ($customers->currentPage() - 1) * $customers->perPage() + $loop->iteration }}
                             </td>
@@ -148,11 +177,6 @@
                             </td>
                             <td style="font-size:0.88rem;">{{ $customer->email }}</td>
                             <td style="font-size:0.88rem;">{{ $customer->phone ?? '—' }}</td>
-                            <td>
-                                <span class="badge bg-success-subtle text-success fw-semibold">
-                                    ₹{{ number_format($customer->wallet_balance ?? 0, 2) }}
-                                </span>
-                            </td>
                             <td>
                                 <span class="badge bg-info-subtle text-info fw-semibold">
                                     {{ $customer->orders_count }} orders
@@ -246,6 +270,47 @@ function confirmDelete(id, name) {
     document.getElementById('deleteCustomerName').textContent = name;
     document.getElementById('deleteForm').action = '/admin/customers/' + id + '/delete';
     new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+
+document.getElementById('selectAllCustomers')?.addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.customer-checkbox');
+    checkboxes.forEach(cb => cb.checked = this.checked);
+});
+
+function submitExport(type) {
+    const selectedIds = Array.from(document.querySelectorAll('.customer-checkbox:checked')).map(cb => cb.value);
+    
+    // Create a form dynamically
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = type === 'pdf' ? '{{ route("admin.customers.export.pdf") }}' : '{{ route("admin.customers.export.csv") }}';
+    
+    // CSRF token
+    const csrf = document.createElement('input');
+    csrf.type = 'hidden';
+    csrf.name = '_token';
+    csrf.value = '{{ csrf_token() }}';
+    form.appendChild(csrf);
+    
+    // Search param
+    const search = document.createElement('input');
+    search.type = 'hidden';
+    search.name = 'search';
+    search.value = '{{ request("search") }}';
+    form.appendChild(search);
+    
+    // Selected IDs
+    if (selectedIds.length > 0) {
+        const ids = document.createElement('input');
+        ids.type = 'hidden';
+        ids.name = 'selected_ids';
+        ids.value = selectedIds.join(',');
+        form.appendChild(ids);
+    }
+    
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
 }
 </script>
 @endpush

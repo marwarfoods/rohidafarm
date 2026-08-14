@@ -123,26 +123,6 @@
                         <small class="text-muted">Assigning an administrative role gives control panel access based on the role's permissions.</small>
                     </div>
 
-                    {{-- Wallet Balance --}}
-                    <div class="mb-3">
-                        <label for="wallet_balance" class="form-label fw-semibold" style="font-size:0.88rem;">
-                            Wallet Balance (₹)
-                        </label>
-                        <input
-                            type="number"
-                            id="wallet_balance"
-                            name="wallet_balance"
-                            value="{{ old('wallet_balance', $customer->wallet_balance ?? 0) }}"
-                            class="form-control rounded-3 @error('wallet_balance') is-invalid @enderror"
-                            placeholder="0.00"
-                            step="0.01"
-                            min="0"
-                        >
-                        @error('wallet_balance')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                        <small class="text-muted">You can manually adjust the wallet balance here.</small>
-                    </div>
 
                     <hr class="my-4">
                     <p class="text-muted mb-3" style="font-size:0.85rem;">

@@ -30,9 +30,97 @@ class CustomerController extends Controller
             });
         }
 
-        $customers = $query->orderBy('created_at', 'desc')->paginate(20)->withQueryString();
+        // Dynamic pagination
+        $perPage = $request->input('per_page', 20);
+        
+        // Ensure perPage is a valid number (or very large for "All")
+        if ($perPage === 'all') {
+            $perPage = $query->count();
+            // Prevent error if count is 0
+            $perPage = $perPage > 0 ? $perPage : 1;
+        } else {
+            $perPage = (int)$perPage > 0 ? (int)$perPage : 20;
+        }
+
+        $customers = $query->orderBy('created_at', 'desc')->paginate($perPage)->withQueryString();
 
         return view('admin.customers.index', compact('customers'));
+    }
+
+    /**
+     * Helper to get customer export query
+     */
+    private function getExportQuery(Request $request)
+    {
+        $query = User::where('role', 'customer')->withCount('orders');
+
+        // Search logic from index
+        if ($request->filled('search')) {
+            $s = $request->input('search');
+            $query->where(function ($q) use ($s) {
+                $q->where('name', 'like', "%{$s}%")
+                  ->orWhere('email', 'like', "%{$s}%")
+                  ->orWhere('phone', 'like', "%{$s}%");
+            });
+        }
+
+        // If specific IDs are selected
+        if ($request->filled('selected_ids')) {
+            $ids = explode(',', $request->input('selected_ids'));
+            $query->whereIn('id', $ids);
+        }
+
+        return $query->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Export customers as CSV.
+     */
+    public function exportCsv(Request $request)
+    {
+        $customers = $this->getExportQuery($request)->get();
+
+        $headers = [
+            'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0',
+            'Content-type'        => 'text/csv',
+            'Content-Disposition' => 'attachment; filename=customers_export_' . date('Y_m_d_His') . '.csv',
+            'Expires'             => '0',
+            'Pragma'              => 'public',
+        ];
+
+        $columns = ['ID', 'Name', 'Email', 'Phone', 'Total Orders', 'Joined At'];
+
+        $callback = function () use ($customers, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($customers as $customer) {
+                $row = [
+                    $customer->id,
+                    $customer->name,
+                    $customer->email,
+                    $customer->phone,
+                    $customer->orders_count,
+                    $customer->created_at->format('Y-m-d H:i:s'),
+                ];
+                fputcsv($file, $row);
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Export customers as PDF.
+     */
+    public function exportPdf(Request $request)
+    {
+        $customers = $this->getExportQuery($request)->get();
+        
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.customers.pdf', compact('customers'));
+        
+        return $pdf->download('customers_export_' . date('Y_m_d_His') . '.pdf');
     }
 
     /**
@@ -102,7 +190,6 @@ class CustomerController extends Controller
             'name'  => 'required|string|max:255',
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($customer->id)],
             'phone' => 'nullable|string|max:20',
-            'wallet_balance' => 'nullable|numeric|min:0',
             'password' => 'nullable|string|min:8|confirmed',
             'role_id' => 'nullable|string' // can be "customer" or role ID
         ]);
@@ -111,7 +198,6 @@ class CustomerController extends Controller
             'name'           => $request->name,
             'email'          => $request->email,
             'phone'          => $request->phone,
-            'wallet_balance' => $request->wallet_balance ?? $customer->wallet_balance,
         ];
 
         if ($request->filled('password')) {
