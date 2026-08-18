@@ -137,6 +137,7 @@ class ProductController extends Controller
             'guest_name' => 'required|string|max:255',
             'review_images' => 'nullable|array|max:2',
             'review_images.*' => 'nullable|image|max:2048',
+            'cf-turnstile-response' => [new \App\Rules\Turnstile()],
         ];
 
         if (!auth()->check()) {

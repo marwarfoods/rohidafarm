@@ -90,6 +90,8 @@ class OrderService
                 'shipping_postal_code' => $shippingData['postal_code'],
                 'shipping_country' => $shippingData['country'] ?? 'India',
                 'estimated_delivery' => now()->addDays(5),
+                'advance_amount' => $totals['cod_advance'] ?? 0,
+                'cod_due_amount' => $totals['cod_due'] ?? 0,
             ]);
 
             // 4. Create order items & deduct stock

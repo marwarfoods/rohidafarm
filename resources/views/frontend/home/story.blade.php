@@ -44,7 +44,7 @@
                             <div class="story-feature-card d-flex align-items-start gap-3">
                                 <div class="rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0" 
                                      style="width: 38px; height: 38px; background: rgba(196, 154, 69, 0.15); color: #C49A45;">
-                                    <i class="bi bi-check-circle-fill fs-5"></i>
+                                    <i class="fa-solid fa-circle-check fs-5"></i>
                                 </div>
                                 <div>
                                     <h6 class="fw-bold font-heading m-0" style="color: #5C3D2E; font-size: 0.92rem;">A2 Vedic Churning</h6>
@@ -57,7 +57,7 @@
                             <div class="story-feature-card d-flex align-items-start gap-3">
                                 <div class="rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0" 
                                      style="width: 38px; height: 38px; background: rgba(196, 154, 69, 0.15); color: #C49A45;">
-                                    <i class="bi bi-shield-heart-fill fs-5"></i>
+                                    <i class="fa-solid fa-shield-heart fs-5"></i>
                                 </div>
                                 <div>
                                     <h6 class="fw-bold font-heading m-0" style="color: #5C3D2E; font-size: 0.92rem;">Lactose-Free Goodness</h6>
@@ -70,7 +70,7 @@
                     <!-- Action Buttons -->
                     <div class="d-flex flex-wrap align-items-center gap-3">
                         <a href="{{ route('about') }}" class="btn btn-story-primary px-4 py-2.5 rounded-pill font-heading fw-bold" style="font-size: 0.88rem;">
-                            Discover Our Story <i class="bi bi-arrow-right ms-1"></i>
+                            Discover Our Story <i class="fa-solid fa-arrow-right ms-1"></i>
                         </a>
                     </div>
 

@@ -420,6 +420,18 @@ class CartService
 
         $total = $taxableAmount + $tax + $shipping + $paymentAdjustment;
 
+        $codAdvance = 0.00;
+        $codDue = 0.00;
+        if ($paymentMethod === 'cod') {
+            $advanceSetting = (float) \App\Models\Setting::get('cod_advance_amount', 0);
+            if ($advanceSetting > 0) {
+                $codAdvance = min($advanceSetting, $total);
+                $codDue = max(0, $total - $codAdvance);
+            } else {
+                $codDue = $total;
+            }
+        }
+
         return [
             'items_count' => $items->sum('quantity'),
             'subtotal'    => round($subtotal, 2),
@@ -429,6 +441,8 @@ class CartService
             'payment_adj' => round($paymentAdjustment, 2),
             'total'       => round($total, 2),
             'coupon'      => $coupon,
+            'cod_advance' => round($codAdvance, 2),
+            'cod_due'     => round($codDue, 2),
         ];
     }
 

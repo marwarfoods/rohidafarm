@@ -26,35 +26,6 @@
                     <div class="bg-white p-4 rounded-4 shadow-sm border mb-4" style="border-color: var(--border-color) !important;">
                         <h4 class="font-heading fw-bold text-dark border-bottom pb-2 mb-3">Shipping Address</h4>
                         
-                        <!-- Saved Addresses Picker -->
-                        @if($addresses->isNotEmpty())
-                            <div class="mb-4">
-                                <h6 class="fw-bold text-muted text-uppercase mb-2" style="font-size: 0.75rem; letter-spacing: 0.5px;">Select Saved Address:</h6>
-                                <div class="row g-2">
-                                    @foreach($addresses as $addr)
-                                        <div class="col-md-6">
-                                            <div class="card p-3 rounded-3 border address-card cursor-pointer {{ $addr->is_default ? 'border-success bg-success-subtle' : '' }}" 
-                                                data-name="{{ $addr->name }}"
-                                                data-phone="{{ $addr->phone }}"
-                                                data-line1="{{ $addr->address_line1 }}"
-                                                data-line2="{{ $addr->address_line2 }}"
-                                                data-city="{{ $addr->city }}"
-                                                data-state="{{ $addr->state }}"
-                                                data-zip="{{ $addr->postal_code }}"
-                                                style="font-size: 0.85rem; cursor: pointer;">
-                                                <div class="d-flex justify-content-between mb-1">
-                                                    <strong>{{ $addr->name }}</strong>
-                                                    <span class="badge text-uppercase bg-secondary" style="font-size: 0.6rem;">{{ $addr->type }}</span>
-                                                </div>
-                                                <p class="text-muted m-0 text-truncate">{{ $addr->address_line1 }}</p>
-                                                <p class="text-muted m-0">{{ $addr->city }}, {{ $addr->state }} - {{ $addr->postal_code }}</p>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endif
-
                         <!-- Manual Form -->
                         <div class="row g-3">
                             <div class="col-md-6">
@@ -118,12 +89,10 @@
                         </div>
 
                         <!-- Save Address flag -->
-                        @auth
-                            <div class="form-check mt-3">
-                                <input class="form-check-input" type="checkbox" name="save_address" id="save_address" value="1" checked>
-                                <label class="form-check-label text-muted" for="save_address" style="font-size: 0.85rem;">Save this address to my profile</label>
-                            </div>
-                        @endauth
+                        <div class="form-check mt-3">
+                            <input class="form-check-input" type="checkbox" name="save_address" id="save_address" value="1" checked>
+                            <label class="form-check-label text-muted" for="save_address" style="font-size: 0.85rem;">Save this address to my profile</label>
+                        </div>
                     </div>
 
                     <!-- Payment Gateways Section -->
@@ -277,6 +246,18 @@
                             <span class="fs-4 fw-bold text-success font-heading" id="summaryTotal">₹{{ number_format($totals['total'], 2) }}</span>
                         </div>
 
+                        <div id="codAdvanceBlock" class="p-3 mb-4 rounded-3 border" style="background-color: #fff9e6; {{ (isset($totals['cod_advance']) && $totals['cod_advance'] > 0) ? '' : 'display:none !important;' }}">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-bold text-dark" style="font-size: 0.9rem;"><i class="bi bi-wallet2 me-1"></i> Advance to Pay Now</span>
+                                <span class="fw-bold text-primary" id="summaryCodAdvance" style="font-size: 1rem;">₹{{ number_format($totals['cod_advance'] ?? 0, 2) }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="fw-bold text-dark" style="font-size: 0.9rem;"><i class="bi bi-cash-coin me-1"></i> Amount Due on Delivery</span>
+                                <span class="fw-bold text-danger" id="summaryCodDue" style="font-size: 1rem;">₹{{ number_format($totals['cod_due'] ?? 0, 2) }}</span>
+                            </div>
+                            <small class="d-block text-muted mt-2" style="font-size: 0.75rem; line-height: 1.2;">Note: For COD orders, a small advance payment is required to confirm the order. The balance will be collected upon delivery.</small>
+                        </div>
+
                         <button type="button" id="placeOrderBtn" class="btn btn-premium w-100 py-3 rounded-pill text-uppercase font-heading" style="font-size: 0.85rem; letter-spacing: 0.5px;">Place Order Now</button>
                     </div>
                 </div>
@@ -289,27 +270,6 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Toggle active styling on saved address click
-        const addressCards = document.querySelectorAll('.address-card');
-        
-        addressCards.forEach(card => {
-            card.addEventListener('click', function () {
-                addressCards.forEach(c => {
-                    c.classList.remove('border-success', 'bg-success-subtle');
-                });
-                this.classList.add('border-success', 'bg-success-subtle');
-
-                // Autoload values into the form fields
-                document.getElementById('shippingName').value = this.getAttribute('data-name');
-                document.getElementById('shippingPhone').value = this.getAttribute('data-phone');
-                document.getElementById('shippingLine1').value = this.getAttribute('data-line1');
-                document.getElementById('shippingLine2').value = this.getAttribute('data-line2') || '';
-                document.getElementById('shippingCity').value = this.getAttribute('data-city');
-                document.getElementById('shippingState').value = this.getAttribute('data-state');
-                document.getElementById('shippingZip').value = this.getAttribute('data-zip');
-            });
-        });
-
         // Format Currency Helper
         const formatCurrency = (val) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(val).replace('₹', '₹');
 
@@ -336,6 +296,15 @@
                 document.getElementById('summaryPaymentAdj').textContent = totals.payment_adj > 0 ? '+' + formatCurrency(totals.payment_adj) : '-' + formatCurrency(Math.abs(totals.payment_adj));
             } else {
                 paymentAdjBlock.style.setProperty('display', 'none', 'important');
+            }
+
+            const codAdvanceBlock = document.getElementById('codAdvanceBlock');
+            if (totals.cod_advance && totals.cod_advance > 0) {
+                codAdvanceBlock.style.setProperty('display', 'block', 'important');
+                document.getElementById('summaryCodAdvance').textContent = formatCurrency(totals.cod_advance);
+                document.getElementById('summaryCodDue').textContent = formatCurrency(totals.cod_due);
+            } else {
+                codAdvanceBlock.style.setProperty('display', 'none', 'important');
             }
         }
 

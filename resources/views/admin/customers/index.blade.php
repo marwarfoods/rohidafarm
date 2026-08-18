@@ -12,11 +12,24 @@
             Manage all registered customers, view their orders and details.
         </p>
     </div>
-    @if(auth()->user()->hasPermission('customers-create'))
-    <a href="{{ route('admin.customers.create') }}" class="btn btn-success rounded-3 px-4 py-2 fw-semibold">
-        <i class="bi bi-person-plus-fill me-2"></i>Add Customer
-    </a>
-    @endif
+    <div class="d-flex align-items-center gap-2">
+        <a href="{{ route('admin.customers.trash') }}" class="btn btn-outline-danger rounded-3 px-3 py-2 fw-semibold position-relative" title="View Trashed / Deactivated Customers">
+            <i class="bi bi-trash3 me-1"></i> Trash Bin
+            @php
+                $trashedCount = \App\Models\User::onlyTrashed()->where('role', 'customer')->count();
+            @endphp
+            @if($trashedCount > 0)
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm">
+                    {{ $trashedCount }}
+                </span>
+            @endif
+        </a>
+        @if(auth()->user()->hasPermission('customers-create'))
+        <a href="{{ route('admin.customers.create') }}" class="btn btn-success rounded-3 px-4 py-2 fw-semibold">
+            <i class="bi bi-person-plus-fill me-2"></i>Add Customer
+        </a>
+        @endif
+    </div>
 </div>
 
 {{-- Stats Row --}}
@@ -237,15 +250,15 @@
         <div class="modal-content rounded-4 border-0">
             <div class="modal-header border-0 pb-0">
                 <h5 class="modal-title fw-bold text-danger">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Delete Customer?
+                    <i class="bi bi-trash3-fill me-2"></i>Move Customer to Trash?
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body py-3">
                 <p class="mb-0 text-muted">
-                    Are you sure you want to permanently delete
-                    <strong id="deleteCustomerName" class="text-dark"></strong>?
-                    This action <strong class="text-danger">cannot be undone</strong>.
+                    Are you sure you want to deactivate and move
+                    <strong id="deleteCustomerName" class="text-dark"></strong> to the <strong>Trash Bin</strong>?
+                    <br><small class="text-secondary mt-1 d-block">The customer will no longer be able to log in. You can restore them or permanently purge them at any time from the Trash Bin.</small>
                 </p>
             </div>
             <div class="modal-footer border-0 pt-0">
@@ -254,7 +267,7 @@
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger rounded-3 px-4">
-                        <i class="bi bi-trash me-1"></i>Yes, Delete
+                        <i class="bi bi-trash3 me-1"></i>Move to Trash
                     </button>
                 </form>
             </div>

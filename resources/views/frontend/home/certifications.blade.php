@@ -6,7 +6,7 @@
         <div class="text-center mb-4" data-aos="fade-up">
             <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill font-heading fw-bold text-uppercase mb-3"
                  style="font-size: 0.78rem; letter-spacing: 2px; color: #5C3D2E; background: rgba(196, 154, 69, 0.15); border: 1px solid rgba(196, 154, 69, 0.35);">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                     <path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" stroke="#C49A45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
                 100% Quality Guarantee
@@ -33,7 +33,7 @@
                             @if($cert->logo_path)
                                 <img src="{{ asset($cert->logo_path) }}" alt="{{ $cert->name }} logo" loading="lazy">
                             @else
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
                                     <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#C49A45" stroke-width="2" stroke-linecap="round"/>
                                 </svg>
                             @endif
@@ -52,7 +52,7 @@
                 ] as $pill)
                     <div class="cert-pill-item">
                         <div class="cert-pill-logo">
-                            <i class="bi {{ $pill['icon'] }}" style="color: #C49A45; font-size: 1.1rem;"></i>
+                            <i class="bi {{ $pill['icon'] }}" style="color: #C49A45; font-size: 1.6rem;"></i>
                         </div>
                         <span class="cert-pill-text">{{ $pill['name'] }}</span>
                     </div>
@@ -124,7 +124,11 @@
         const pageInfo = document.getElementById('certPageInfo');
         const navRow = document.getElementById('certNavRow');
         const openBtn = document.getElementById('certOpenFullBtn');
-        const url = '/' + _certImages[_certPage];
+        const imgPath = _certImages[_certPage];
+        // Ensure we handle absolute URLs correctly, otherwise prepend slash for relative paths
+        const url = (imgPath.startsWith('http://') || imgPath.startsWith('https://') || imgPath.startsWith('/')) 
+            ? imgPath 
+            : '/' + imgPath;
 
         img.src = url;
         img.alt = 'Certificate page ' + (_certPage + 1);

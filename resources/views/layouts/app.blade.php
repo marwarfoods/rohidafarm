@@ -304,8 +304,22 @@
     </script>
 
     {{-- Floating WhatsApp Widget (PC Only) --}}
-    @php $waNumber = \App\Models\Setting::get('contact_mobile_1'); @endphp
+    @php $waNumber = '+919664223314'; @endphp
     @if($waNumber)
+    <style>
+        @keyframes pulse-wa {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+        }
+        .wa-float-btn {
+            animation: pulse-wa 2s infinite;
+        }
+        .wa-float-btn:hover {
+            animation: none;
+            transform: scale(1.1) !important;
+        }
+    </style>
     <div class="d-none d-md-block position-fixed" style="bottom: 30px; right: 30px; z-index: 1035;">
         <!-- Chat Box -->
         <div id="wa-chat-box" class="bg-white rounded-4 shadow-lg mb-3 d-none overflow-hidden" style="width: 320px; transition: all 0.3s; border: 1px solid var(--border-color);">
@@ -333,9 +347,8 @@
             </div>
         </div>
         <!-- Floating Button -->
-        <button type="button" class="btn rounded-circle shadow p-0 d-flex align-items-center justify-content-center ms-auto" 
+        <button type="button" class="btn rounded-circle shadow p-0 d-flex align-items-center justify-content-center ms-auto wa-float-btn" 
                 style="width: 60px; height: 60px; background-color: #25D366; color: white; transition: transform 0.3s;"
-                onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"
                 onclick="document.getElementById('wa-chat-box').classList.toggle('d-none')">
             <i class="bi bi-whatsapp" style="font-size: 32px;"></i>
         </button>

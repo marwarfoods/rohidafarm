@@ -35,6 +35,8 @@
                             <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
                         </div>
 
+                        <x-turnstile />
+
                         <button type="submit" class="btn btn-success w-100 py-2 fw-bold rounded-3">Reset Password</button>
                     </form>
                 </div>

@@ -123,6 +123,36 @@ class AppServiceProvider extends ServiceProvider
 
                 $view->with('coupons', $coupons);
             });
+
+            // Share dynamic unread / new order & customer counts to the admin sidebar
+            view()->composer(['components.admin.sidebar', 'layouts.admin'], function ($view) {
+                $user = auth()->user();
+                $newOrdersCount = 0;
+                $newCustomersCount = 0;
+
+                if ($user) {
+                    if (!$user->last_seen_orders_at) {
+                        $user->last_seen_orders_at = now();
+                        $user->saveQuietly();
+                    }
+                    if (!$user->last_seen_customers_at) {
+                        $user->last_seen_customers_at = now();
+                        $user->saveQuietly();
+                    }
+
+                    $newOrdersCount = \App\Models\Order::where('created_at', '>', $user->last_seen_orders_at)->count();
+                    $newCustomersCount = \App\Models\User::where('role', 'customer')
+                        ->where('created_at', '>', $user->last_seen_customers_at)
+                        ->count();
+                    $newContactInquiriesCount = \App\Models\ContactInquiry::where('status', 'unread')->count();
+                }
+
+                $view->with([
+                    'newOrdersCount' => $newOrdersCount,
+                    'newCustomersCount' => $newCustomersCount,
+                    'newContactInquiriesCount' => $newContactInquiriesCount ?? 0,
+                ]);
+            });
         } catch (\Exception $e) {
             // Silently catch exceptions if database is not migrated yet
         }

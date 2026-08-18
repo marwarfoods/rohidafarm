@@ -48,6 +48,8 @@
                     <input type="password" name="password_confirmation" class="form-control bg-light border p-2.5" placeholder="Repeat Password" required>
                 </div>
 
+                <x-turnstile />
+
                 <button type="submit" class="btn btn-premium w-100 py-3 rounded-pill text-uppercase font-heading fw-bold shadow-sm" style="font-size: 0.85rem; letter-spacing: 0.5px;">Register Account</button>
             </form>
 

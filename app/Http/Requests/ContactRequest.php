@@ -19,6 +19,7 @@ class ContactRequest extends FormRequest
             'phone' => ['required', 'string', 'regex:/^[0-9]{10}$/'],
             'subject' => ['required', 'string', 'max:255'],
             'message' => ['required', 'string', 'min:10'],
+            'cf-turnstile-response' => [new \App\Rules\Turnstile()],
         ];
     }
 }

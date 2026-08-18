@@ -28,7 +28,15 @@ class PasswordResetController extends Controller
      */
     public function sendResetLinkEmail(Request $request)
     {
-        $request->validate(['email' => 'required|email']);
+        $request->validate([
+            'email' => 'required|email',
+            'cf-turnstile-response' => [new \App\Rules\Turnstile()],
+        ]);
+
+        $trashedUser = User::withTrashed()->where('email', $request->email)->first();
+        if ($trashedUser && $trashedUser->trashed()) {
+            return back()->withErrors(['email' => 'Your account has been deactivated. Please contact administration.']);
+        }
 
         $user = User::where('email', $request->email)->first();
 
@@ -77,6 +85,7 @@ class PasswordResetController extends Controller
             'token' => 'required',
             'email' => 'required|email',
             'password' => 'required|min:8|confirmed',
+            'cf-turnstile-response' => [new \App\Rules\Turnstile()],
         ]);
 
         $record = DB::table('password_reset_tokens')->where('email', $request->email)->first();

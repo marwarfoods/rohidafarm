@@ -54,7 +54,42 @@ class PageController extends Controller
     public function contactSubmit(ContactRequest $request)
     {
         $payload = $request->validated();
+
+        $inquiry = \App\Models\ContactInquiry::create([
+            'name' => $payload['name'],
+            'email' => $payload['email'],
+            'phone' => $payload['phone'] ?? null,
+            'subject' => $payload['subject'] ?? null,
+            'message' => $payload['message'],
+            'status' => 'unread',
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+
         self::logActivity('contact_inquiry', "Received contact message from {$payload['email']}", $payload);
+
+        // 1. Send confirmation email to Customer
+        try {
+            \Illuminate\Support\Facades\Mail::to($inquiry->email)->send(new \App\Mail\ContactInquiryConfirmation($inquiry));
+        } catch (\Exception $e) {
+            logger()->error('Failed to send ContactInquiryConfirmation email: ' . $e->getMessage());
+        }
+
+        // 2. Send notification email to Admin (Primary email from settings + Admin users)
+        try {
+            $adminEmails = \App\Models\User::where('role', 'admin')->pluck('email')->toArray();
+            $primarySettingEmail = \App\Models\Setting::get('contact_email_1') ?: \App\Models\Setting::get('contact_email');
+            if ($primarySettingEmail && !in_array($primarySettingEmail, $adminEmails)) {
+                $adminEmails[] = $primarySettingEmail;
+            }
+
+            if (!empty($adminEmails)) {
+                \Illuminate\Support\Facades\Mail::to($adminEmails)->send(new \App\Mail\ContactInquiryReceived($inquiry));
+            }
+        } catch (\Exception $e) {
+            logger()->error('Failed to send ContactInquiryReceived email: ' . $e->getMessage());
+        }
+
         return back()->with('success', 'Thank you for reaching out! Our wellness experts will contact you shortly.');
     }
 

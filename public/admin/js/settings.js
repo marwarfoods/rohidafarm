@@ -27,11 +27,13 @@ document.addEventListener('DOMContentLoaded', function () {
         const targetPane = document.querySelector(hash);
         const targetSidebar = document.getElementById(`sidebar-${hash.replace('#', '')}`);
 
-        if (targetLink && targetPane && targetSidebar) {
+        if (targetLink && targetPane) {
             targetLink.classList.add('active');
             targetLink.setAttribute('aria-selected', 'true');
             targetPane.classList.add('show', 'active');
-            targetSidebar.classList.add('active');
+            if (targetSidebar) {
+                targetSidebar.classList.add('active');
+            }
         }
     }
 

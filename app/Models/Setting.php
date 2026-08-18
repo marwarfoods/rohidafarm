@@ -28,8 +28,8 @@ class Setting extends Model
 
         return match ($data['type']) {
             'boolean' => filter_var($data['value'], FILTER_VALIDATE_BOOLEAN),
-            'json' => json_decode($data['value'], true),
-            default => $data['value'],
+            'json' => !empty($data['value']) ? json_decode($data['value'], true) : $default,
+            default => $data['value'] ?? $default,
         };
     }
 

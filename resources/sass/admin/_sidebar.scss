@@ -180,14 +180,36 @@
 
   .sidebar-badge {
     margin-left: auto;
-    font-size: 0.62rem;
-    background: rgba(36,132,67,0.25);
-    color: #5cce82;
-    padding: 0.15rem 0.5rem;
+    font-size: 0.68rem;
+    padding: 0.15rem 0.52rem;
     border-radius: 999px;
     font-weight: 700;
+    line-height: 1.2;
     flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
     transition: opacity var(--transition-base);
+
+    &.badge-order-count {
+      background: #f59e0b;
+      color: #1a1a1a;
+      font-weight: 800;
+    }
+
+    &.badge-customer-count {
+      background: #0ea5e9;
+      color: #ffffff;
+      font-weight: 800;
+    }
+
+    &.badge-contact-count {
+      background: #f59e0b;
+      color: #ffffff;
+      font-weight: 800;
+    }
   }
 
   &:hover {

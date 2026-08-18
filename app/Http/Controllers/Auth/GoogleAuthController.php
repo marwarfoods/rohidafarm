@@ -63,28 +63,51 @@ class GoogleAuthController extends Controller
 
         try {
             $googleUser = Socialite::driver('google')->user();
+            $email = trim(strtolower($googleUser->getEmail()));
+            $googleId = $googleUser->getId();
 
-            $user = User::where('google_id', $googleUser->getId())
-                ->orWhere('email', $googleUser->getEmail())
+            $user = User::withTrashed()
+                ->where(function ($query) use ($googleId, $email) {
+                    $query->where('google_id', $googleId)
+                          ->orWhere('email', $email);
+                })
                 ->first();
 
-            if (!$user) {
+            if ($user) {
+                // If the account has been deactivated / soft-deleted, block login
+                if ($user->trashed()) {
+                    return redirect()->route('login')->with('error', 'Your account has been deactivated. Please contact administration.');
+                }
+
+                $updates = [];
+                if (!$user->google_id) {
+                    $updates['google_id'] = $googleId;
+                }
+                if (!$user->avatar && $googleUser->getAvatar()) {
+                    $updates['avatar'] = $googleUser->getAvatar();
+                }
+                if (!$user->email_verified_at) {
+                    $updates['email_verified_at'] = now();
+                }
+
+                if (!empty($updates)) {
+                    $user->update($updates);
+                }
+            } else {
                 $user = User::create([
                     'uuid' => (string) Str::uuid(),
                     'name' => $googleUser->getName() ?? $googleUser->getNickname() ?? 'Google User',
-                    'email' => $googleUser->getEmail(),
-                    'google_id' => $googleUser->getId(),
+                    'email' => $email,
+                    'google_id' => $googleId,
                     'avatar' => $googleUser->getAvatar(),
                     'password' => bcrypt(Str::random(24)),
                     'email_verified_at' => now(),
                     'role' => 'customer',
                 ]);
-            } else {
-                if (!$user->google_id) {
-                    $user->update([
-                        'google_id' => $googleUser->getId(),
-                        'avatar' => $user->avatar ?: $googleUser->getAvatar(),
-                    ]);
+
+                $role = \App\Models\Role::where('name', 'customer')->first();
+                if ($role) {
+                    $user->roles()->attach($role);
                 }
             }
 

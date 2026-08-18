@@ -59,6 +59,14 @@ class LoginController extends Controller
             return $this->redirectUser();
         }
 
+        // Check if user exists but has been deactivated / soft-deleted
+        $trashedUser = User::withTrashed()->where($fieldType, $loginValue)->first();
+        if ($trashedUser && $trashedUser->trashed()) {
+            return back()->withErrors([
+                'login' => 'Your account has been deactivated. Please contact administration.',
+            ])->withInput($request->only('login', 'remember'));
+        }
+
         return back()->withErrors([
             'login' => 'The provided credentials do not match our records.',
         ])->withInput($request->only('login', 'remember'));

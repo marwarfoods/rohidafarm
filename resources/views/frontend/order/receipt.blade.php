@@ -187,6 +187,16 @@
                         <strong class="font-heading text-dark fs-5">Invoice Total:</strong>
                         <strong class="font-heading text-success-dark fs-4">₹{{ number_format($order->total, 2) }}</strong>
                     </div>
+                    @if($order->payment_method === 'cod' && $order->advance_amount > 0)
+                        <div class="d-flex justify-content-between pt-2 mt-2 border-top">
+                            <span class="text-dark fw-bold" style="font-size: 0.85rem;">Advance Paid Online:</span>
+                            <span class="text-success-dark fw-bold">₹{{ number_format($order->advance_amount, 2) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-dark fw-bold" style="font-size: 0.85rem;">Amount Due on Delivery:</span>
+                            <span class="text-danger fw-bold">₹{{ number_format($order->cod_due_amount, 2) }}</span>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

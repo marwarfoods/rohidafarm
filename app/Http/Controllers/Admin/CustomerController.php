@@ -16,6 +16,10 @@ class CustomerController extends Controller
      */
     public function index(Request $request)
     {
+        if (auth()->check()) {
+            auth()->user()->update(['last_seen_customers_at' => now()]);
+        }
+
         $query = User::where('role', 'customer')
             ->withCount('orders')
             ->with(['orders', 'roles']);
@@ -128,6 +132,10 @@ class CustomerController extends Controller
      */
     public function show($id)
     {
+        if (auth()->check()) {
+            auth()->user()->update(['last_seen_customers_at' => now()]);
+        }
+
         $customer = User::where('role', 'customer')
             ->with(['orders.items.product', 'addresses'])
             ->findOrFail($id);
@@ -230,16 +238,123 @@ class CustomerController extends Controller
     }
 
     /**
-     * Permanently delete a customer.
+     * Move customer to trash (Soft delete).
      */
     public function destroy($id)
     {
         $customer = User::findOrFail($id);
         $name = $customer->name;
-        $customer->roles()->detach();
         $customer->delete();
 
         return redirect()->route('admin.customers.index')
-            ->with('success', "Customer \"{$name}\" has been deleted.");
+            ->with('success', "Customer \"{$name}\" has been moved to Trash.");
+    }
+
+    /**
+     * Display trashed / deactivated customers.
+     */
+    public function trash(Request $request)
+    {
+        $query = User::onlyTrashed()
+            ->where('role', 'customer')
+            ->withCount('orders')
+            ->with(['orders', 'roles']);
+
+        // Search by name, email or phone
+        if ($request->filled('search')) {
+            $s = $request->input('search');
+            $query->where(function ($q) use ($s) {
+                $q->where('name', 'like', "%{$s}%")
+                  ->orWhere('email', 'like', "%{$s}%")
+                  ->orWhere('phone', 'like', "%{$s}%");
+            });
+        }
+
+        $perPage = $request->input('per_page', 20);
+        if ($perPage === 'all') {
+            $perPage = $query->count() > 0 ? $query->count() : 1;
+        } else {
+            $perPage = (int)$perPage > 0 ? (int)$perPage : 20;
+        }
+
+        $customers = $query->orderBy('deleted_at', 'desc')->paginate($perPage)->withQueryString();
+
+        return view('admin.customers.trash', compact('customers'));
+    }
+
+    /**
+     * Restore a trashed customer.
+     */
+    public function restore($id)
+    {
+        $customer = User::onlyTrashed()->findOrFail($id);
+        $customer->restore();
+
+        return redirect()->route('admin.customers.trash')
+            ->with('success', "Customer \"{$customer->name}\" has been successfully restored.");
+    }
+
+    /**
+     * Permanently delete customer with chosen cascade/preserve mode.
+     */
+    public function forceDelete(Request $request, $id)
+    {
+        $customer = User::withTrashed()->findOrFail($id);
+        $name = $customer->name;
+        $wipeMode = $request->input('wipe_mode', 'preserve');
+
+        if ($wipeMode === 'cascade') {
+            // Option 2: Complete Wipeout / Cascade Delete
+            // Delete order items and orders
+            $orders = Order::withTrashed()->where('user_id', $customer->id)->get();
+            foreach ($orders as $order) {
+                $order->items()->delete();
+                $order->forceDelete();
+            }
+
+            // Delete addresses
+            $customer->addresses()->delete();
+
+            // Delete reviews
+            \App\Models\ProductReview::where('user_id', $customer->id)->delete();
+
+            // Delete wishlists and cart items
+            \App\Models\Wishlist::where('user_id', $customer->id)->delete();
+            \App\Models\Cart::where('user_id', $customer->id)->delete();
+
+            // Delete wheel entries
+            if (!empty($customer->phone)) {
+                \App\Models\WheelEntry::where('mobile_number', $customer->phone)->delete();
+            }
+
+            // Detach roles
+            $customer->roles()->detach();
+
+            // Permanently force delete the customer
+            $customer->forceDelete();
+
+            return redirect()->route('admin.customers.trash')
+                ->with('success', "Customer \"{$name}\" and all associated order & history records have been permanently wiped out.");
+        } else {
+            // Option 1: Detach & Anonymize (Preserve Sales & Financial History)
+            Order::withTrashed()->where('user_id', $customer->id)->update([
+                'user_id' => null,
+            ]);
+
+            \App\Models\ProductReview::where('user_id', $customer->id)->update([
+                'user_id' => null,
+            ]);
+
+            // Clean up personal session data
+            \App\Models\Wishlist::where('user_id', $customer->id)->delete();
+            \App\Models\Cart::where('user_id', $customer->id)->delete();
+
+            $customer->addresses()->delete();
+            $customer->roles()->detach();
+            $customer->forceDelete();
+
+            return redirect()->route('admin.customers.trash')
+                ->with('success', "Customer \"{$name}\" has been permanently deleted. Sales & order history have been preserved.");
+        }
     }
 }

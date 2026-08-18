@@ -97,6 +97,17 @@
                     <span class="fs-5 fw-bold font-heading text-dark">Grand Total</span>
                     <strong class="fs-4 fw-bold font-heading text-success">₹{{ number_format($order->total, 2) }}</strong>
                 </div>
+                
+                @if($order->payment_method === 'cod' && $order->advance_amount > 0)
+                    <div class="d-flex justify-content-between pt-2 mt-2 border-top">
+                        <span class="fw-bold text-dark" style="font-size: 0.9rem;">Advance Paid (Online)</span>
+                        <strong class="fw-bold text-success" style="font-size: 0.9rem;">₹{{ number_format($order->advance_amount, 2) }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between pt-1">
+                        <span class="fw-bold text-dark" style="font-size: 0.9rem;">Amount Due on Delivery</span>
+                        <strong class="fw-bold text-danger" style="font-size: 0.9rem;">₹{{ number_format($order->cod_due_amount, 2) }}</strong>
+                    </div>
+                @endif
             </div>
         </div>
 

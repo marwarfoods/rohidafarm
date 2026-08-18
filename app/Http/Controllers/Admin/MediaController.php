@@ -224,13 +224,23 @@ class MediaController extends Controller
             $originalName = $file->getClientOriginalName();
             $extension = strtolower($file->getClientOriginalExtension());
             
-            $fileType = in_array($extension, ['mp4', 'mov', 'avi', 'webm', 'mkv']) ? 'video' : 'image';
+            if (in_array($extension, ['mp4', 'mov', 'avi', 'webm', 'mkv'])) {
+                $fileType = 'video';
+            } elseif (in_array($extension, ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'zip', 'rar', 'csv', 'txt'])) {
+                $fileType = 'document';
+            } else {
+                $fileType = 'image';
+            }
             
-            $filename = time() . '_' . Str::slug(pathinfo($originalName, PATHINFO_FILENAME)) . '.' . $extension;
+            $sluggedName = Str::slug(pathinfo($originalName, PATHINFO_FILENAME));
+            $sluggedName = Str::limit($sluggedName, 50, ''); // limit to 50 chars to avoid OS/DB max length
+            $filename = time() . '_' . $sluggedName . '.' . $extension;
             
             $targetFolder = $request->input('target_folder');
             if ($fileType === 'video') {
                 $folder = 'uploads/videos';
+            } elseif ($fileType === 'document') {
+                $folder = 'uploads/documents';
             } else {
                 if ($targetFolder === 'sliders') {
                     $folder = 'uploads/sliders';

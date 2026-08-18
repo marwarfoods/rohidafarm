@@ -34,12 +34,6 @@
     {{-- Action Icons --}}
     <div class="topbar-actions">
 
-        {{-- Notifications (placeholder) --}}
-        <button class="topbar-action-btn" title="Notifications">
-            <i class="bi bi-bell"></i>
-            <span class="topbar-badge"></span>
-        </button>
-
         {{-- View Site --}}
         <a href="{{ route('home') }}" target="_blank" class="topbar-action-btn" title="View Site">
             <i class="bi bi-box-arrow-up-right"></i>

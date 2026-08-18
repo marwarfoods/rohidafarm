@@ -43,6 +43,9 @@
                    class="sidebar-nav-link {{ Route::is('admin.orders.*') ? 'active' : '' }}">
                     <i class="bi bi-cart-check sidebar-icon"></i>
                     <span class="sidebar-label">Orders</span>
+                    @if(!empty($newOrdersCount) && $newOrdersCount > 0)
+                        <span class="sidebar-badge badge-order-count">{{ $newOrdersCount }}</span>
+                    @endif
                 </a>
             </li>
             @endif
@@ -52,13 +55,16 @@
                    class="sidebar-nav-link {{ Route::is('admin.customers.*') ? 'active' : '' }}">
                     <i class="bi bi-people sidebar-icon"></i>
                     <span class="sidebar-label">Customers</span>
+                    @if(!empty($newCustomersCount) && $newCustomersCount > 0)
+                        <span class="sidebar-badge badge-customer-count">{{ $newCustomersCount }}</span>
+                    @endif
                 </a>
             </li>
             @endif
         </ul>
 
         {{-- Catalog --}}
-        @if(auth()->user()->hasPermission('products-view') || auth()->user()->hasPermission('categories-view') || auth()->user()->hasPermission('coupons-view') || auth()->user()->hasPermission('stock-view') || auth()->user()->hasPermission('wheel-entries-view'))
+        @if(auth()->user()->hasPermission('products-view') || auth()->user()->hasPermission('categories-view') || auth()->user()->hasPermission('coupons-view') || auth()->user()->hasPermission('stock-view') || auth()->user()->hasPermission('wheel-entries-view') || auth()->user()->hasPermission('contact-inquiries-view'))
         <p class="sidebar-section-title">Catalog</p>
         <ul class="sidebar-nav">
             @if(auth()->user()->hasPermission('products-view'))
@@ -103,6 +109,18 @@
                    class="sidebar-nav-link {{ Route::is('admin.wheel-entries.*') ? 'active' : '' }}">
                     <i class="bi bi-life-preserver sidebar-icon"></i>
                     <span class="sidebar-label">Wheel Popup Entries</span>
+                </a>
+            </li>
+            @endif
+            @if(auth()->user()->hasPermission('contact-inquiries-view'))
+            <li>
+                <a href="{{ route('admin.contact-inquiries.index') }}"
+                   class="sidebar-nav-link {{ Route::is('admin.contact-inquiries.*') ? 'active' : '' }}">
+                    <i class="bi bi-envelope-paper sidebar-icon"></i>
+                    <span class="sidebar-label">Contact Form Entries</span>
+                    @if(!empty($newContactInquiriesCount) && $newContactInquiriesCount > 0)
+                        <span class="sidebar-badge badge-contact-count">{{ $newContactInquiriesCount }}</span>
+                    @endif
                 </a>
             </li>
             @endif

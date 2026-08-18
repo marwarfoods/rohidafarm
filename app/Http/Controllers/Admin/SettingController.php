@@ -97,7 +97,12 @@ class SettingController extends Controller
 
         self::logActivity('settings_update', 'Updated dynamic system configuration options.');
 
-        return back()->with('success', 'Site settings updated successfully.');
+        $activeTab = $request->input('active_tab', '#site');
+        if (!str_starts_with($activeTab, '#')) {
+            $activeTab = '#' . $activeTab;
+        }
+
+        return redirect()->to(route('admin.settings.index') . $activeTab)->with('success', 'Site settings updated successfully.');
     }
 
     /**
@@ -152,5 +157,66 @@ class SettingController extends Controller
             'status' => 'success',
             'message' => 'Google OAuth configuration format valid! Redirect URL: ' . route('auth.google.callback')
         ]);
+    }
+
+    /**
+     * Test Cloudflare Turnstile credentials.
+     */
+    public function testTurnstile(Request $request)
+    {
+        $siteKey = trim($request->input('turnstile_site_key') ?: Setting::get('turnstile_site_key', ''));
+        $secretKey = trim($request->input('turnstile_secret_key') ?: Setting::get('turnstile_secret_key', ''));
+
+        if (empty($siteKey) || empty($secretKey)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Please provide both Turnstile Site Key and Secret Key before testing.'
+            ], 400);
+        }
+
+        if (strlen($siteKey) < 10) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid Turnstile Site Key format. Standard Cloudflare keys usually start with 0x4AAAA...'
+            ], 400);
+        }
+
+        if (strlen($secretKey) < 10) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid Turnstile Secret Key format. Standard Cloudflare secrets usually start with 0x4AAAA...'
+            ], 400);
+        }
+
+        try {
+            // Verify against Cloudflare Turnstile verification API
+            $response = \Illuminate\Support\Facades\Http::asForm()->timeout(8)->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+                'secret' => $secretKey,
+                'response' => 'test_dummy_verification_token',
+                'remoteip' => $request->ip(),
+            ]);
+
+            $result = $response->json();
+            $errorCodes = $result['error-codes'] ?? [];
+
+            // If Cloudflare returns 'invalid-input-secret', the secret key is wrong
+            if (in_array('invalid-input-secret', $errorCodes)) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Cloudflare rejected this Secret Key (invalid-input-secret). Please check the Secret Key from your Cloudflare Dashboard.'
+                ], 422);
+            }
+
+            // If secret is accepted by Cloudflare
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Cloudflare Turnstile credentials successfully verified! Secret Key is valid and recognized by Cloudflare.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Could not connect to Cloudflare Turnstile API: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

@@ -33,7 +33,8 @@ class SanitizeInput
             'benefits',
             'ingredients',
             'nutrition_facts',
-            'how_to_use'
+            'how_to_use',
+            'content', // Allowed for Page Content, etc.
         ];
 
         foreach ($data as $key => $value) {

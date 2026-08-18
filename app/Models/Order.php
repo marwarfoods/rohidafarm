@@ -39,6 +39,8 @@ class Order extends Model
         'tracking_carrier',
         'estimated_delivery',
         'shipment_status',
+        'advance_amount',
+        'cod_due_amount',
     ];
 
     protected $casts = [
@@ -47,6 +49,8 @@ class Order extends Model
         'shipping_charges' => 'decimal:2',
         'discount_amount' => 'decimal:2',
         'total' => 'decimal:2',
+        'advance_amount' => 'decimal:2',
+        'cod_due_amount' => 'decimal:2',
         'estimated_delivery' => 'datetime',
     ];
 
@@ -55,7 +59,7 @@ class Order extends Model
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withTrashed();
     }
 
     /**

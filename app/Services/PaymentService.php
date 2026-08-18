@@ -13,9 +13,9 @@ class PaymentService
     /**
      * Process order payment.
      */
-    public function process(Order $order, string $paymentMethod, ?string $gatewayId = null): Payment
+    public function process(Order $order, string $paymentMethod, ?string $gatewayId = null, ?float $amount = null): Payment
     {
-        return DB::transaction(function () use ($order, $paymentMethod, $gatewayId) {
+        return DB::transaction(function () use ($order, $paymentMethod, $gatewayId, $amount) {
             $transactionId = $gatewayId ?: 'TXN-' . strtoupper(Str::random(12));
             
             $status = 'pending';
@@ -26,11 +26,13 @@ class PaymentService
                 $status = 'successful';
             }
 
+            $paymentAmount = $amount ?? $order->total;
+
             $payment = Payment::create([
                 'order_id' => $order->id,
                 'payment_method' => $paymentMethod,
                 'transaction_id' => $transactionId,
-                'amount' => $order->total,
+                'amount' => $paymentAmount,
                 'status' => $status,
                 'payload' => [
                     'gateway' => $paymentMethod,
@@ -43,9 +45,12 @@ class PaymentService
 
             // Update order payment status
             if ($status === 'successful') {
-                $order->update([
-                    'payment_status' => 'paid'
-                ]);
+                // If amount is provided and is less than total, and order is COD, it's a partial payment
+                if ($amount && $amount < $order->total && $order->payment_method === 'cod') {
+                    $order->update(['payment_status' => 'partial']);
+                } else {
+                    $order->update(['payment_status' => 'paid']);
+                }
             }
 
             return $payment;

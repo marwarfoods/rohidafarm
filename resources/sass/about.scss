@@ -85,7 +85,7 @@
 
 /* 1. Hero Section */
 .about-hero-section {
-    background: linear-gradient(135deg, #FAF5EA 0%, #F5EFE6 100%);
+    background: #faf8f4;
     padding: 2rem 0 1.75rem;
     border-bottom: 1px solid #EBE4D8;
     position: relative;
@@ -224,6 +224,7 @@
         opacity: 0.35;
         pointer-events: none;
         user-select: none;
+        mix-blend-mode: multiply;
 
         @media (min-width: 992px) {
             width: 105%;

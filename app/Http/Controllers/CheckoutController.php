@@ -159,24 +159,26 @@ class CheckoutController extends Controller
                 $request->input('payment_method')
             );
 
-            // Handle Razorpay Payment Flow
-            if ($request->input('payment_method') === 'razorpay') {
+            // Handle Razorpay Payment Flow (or COD advance flow)
+            if ($request->input('payment_method') === 'razorpay' || ($request->input('payment_method') === 'cod' && $order->advance_amount > 0)) {
                 try {
                     $keyId = \App\Models\Setting::get('razorpay_key_id') ?: env('RAZORPAY_KEY', 'rzp_test_dummy');
                     $keySecret = \App\Models\Setting::get('razorpay_secret_key') ?: env('RAZORPAY_SECRET', 'dummy_secret');
                     
                     $api = new \Razorpay\Api\Api($keyId, $keySecret);
                     
+                    $amountToPay = $request->input('payment_method') === 'cod' ? $order->advance_amount : $order->total;
+
                     $razorpayOrder = $api->order->create([
                         'receipt'  => $order->order_number,
-                        'amount'   => (int)round($order->total * 100), // convert to paise
+                        'amount'   => (int)round($amountToPay * 100), // convert to paise
                         'currency' => 'INR',
                     ]);
 
                     return response()->view('frontend.checkout.razorpay', [
                         'order' => $order,
                         'razorpayOrderId' => $razorpayOrder['id'],
-                        'amount' => (int)round($order->total * 100),
+                        'amount' => (int)round($amountToPay * 100),
                         'key' => $keyId,
                         'user' => Auth::user() ?? (object)['name' => $shippingData['name'], 'email' => $request->input('email'), 'phone' => $shippingData['phone']]
                     ])->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
@@ -187,7 +189,7 @@ class CheckoutController extends Controller
                 }
             }
 
-            // 3. Process payment for Cash On Delivery
+            // 3. Process payment for Cash On Delivery (without advance) or Wallet
             $this->paymentService->process($order, $request->input('payment_method'));
 
             // Clear cart ONLY for COD / successful upfront flows (not Razorpay which happens later)
@@ -203,6 +205,11 @@ class CheckoutController extends Controller
             // Send Admin Notification Mail
             try {
                 $adminEmails = \App\Models\User::where('role', 'admin')->pluck('email')->toArray();
+                $primarySettingEmail = \App\Models\Setting::get('contact_email_1') ?: \App\Models\Setting::get('contact_email');
+                if ($primarySettingEmail && !in_array($primarySettingEmail, $adminEmails)) {
+                    $adminEmails[] = $primarySettingEmail;
+                }
+
                 if (!empty($adminEmails)) {
                     \Illuminate\Support\Facades\Mail::to($adminEmails)->send(new \App\Mail\AdminNewOrderMail($order));
                 }
@@ -358,7 +365,12 @@ class CheckoutController extends Controller
             $order = Order::where('uuid', $uuid)->firstOrFail();
             
             // Process payment as successful
-            $this->paymentService->process($order, 'razorpay', $paymentId);
+            $paymentAmount = $order->payment_method === 'cod' ? $order->advance_amount : null;
+            $this->paymentService->process($order, 'razorpay', $paymentId, $paymentAmount);
+
+            if ($order->payment_method === 'cod') {
+                $order->update(['payment_status' => 'partial']);
+            }
 
             // Clear the cart here upon successful Razorpay payment
             $this->cartService->clear();
@@ -373,6 +385,11 @@ class CheckoutController extends Controller
             // Send Admin Notification Mail
             try {
                 $adminEmails = \App\Models\User::where('role', 'admin')->pluck('email')->toArray();
+                $primarySettingEmail = \App\Models\Setting::get('contact_email_1') ?: \App\Models\Setting::get('contact_email');
+                if ($primarySettingEmail && !in_array($primarySettingEmail, $adminEmails)) {
+                    $adminEmails[] = $primarySettingEmail;
+                }
+
                 if (!empty($adminEmails)) {
                     \Illuminate\Support\Facades\Mail::to($adminEmails)->send(new \App\Mail\AdminNewOrderMail($order));
                 }

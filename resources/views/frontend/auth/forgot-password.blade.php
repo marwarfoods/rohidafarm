@@ -26,6 +26,8 @@
                             @enderror
                         </div>
 
+                        <x-turnstile />
+
                         <button type="submit" class="btn btn-success w-100 py-2 fw-bold rounded-3">Send Reset Link</button>
                     </form>
                     

@@ -30,6 +30,7 @@ use App\Http\Controllers\Admin\StockController;
 use App\Http\Controllers\Admin\RoleController as AdminRoleController;
 use App\Http\Controllers\Admin\CertificationController as AdminCertificationController;
 use App\Http\Controllers\Admin\WheelEntryController as AdminWheelEntryController;
+use App\Http\Controllers\Admin\ContactInquiryController as AdminContactInquiryController;
 use App\Http\Controllers\WheelEntryController;
 use Illuminate\Support\Facades\Route;
 
@@ -261,6 +262,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::delete('/wheel-entries/{id}/delete', [AdminWheelEntryController::class, 'destroy'])->name('wheel-entries.delete');
     });
 
+    // Contact Form Entries
+    Route::middleware('permission:contact-inquiries')->group(function () {
+        Route::get('/contact-inquiries', [AdminContactInquiryController::class, 'index'])->name('contact-inquiries.index');
+        Route::post('/contact-inquiries/{id}/read', [AdminContactInquiryController::class, 'markAsRead'])->name('contact-inquiries.read');
+        Route::delete('/contact-inquiries/{id}/delete', [AdminContactInquiryController::class, 'destroy'])->name('contact-inquiries.delete');
+    });
+
     // Stock
     Route::middleware('permission:stock')->group(function () {
         Route::get('/stock', [StockController::class, 'index'])->name('stock.index');
@@ -274,6 +282,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/settings/save', [AdminSettingController::class, 'store'])->name('settings.save');
         Route::post('/settings/smtp/test', [AdminSettingController::class, 'testSmtp'])->name('settings.smtp.test');
         Route::post('/settings/google-oauth/test', [AdminSettingController::class, 'testGoogleOAuth'])->name('settings.google.test');
+        Route::post('/settings/turnstile/test', [AdminSettingController::class, 'testTurnstile'])->name('settings.turnstile.test');
     });
 
     // Audit Logs
@@ -307,6 +316,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Customers
     Route::middleware('permission:customers')->group(function () {
         Route::get('/customers', [AdminCustomerController::class, 'index'])->name('customers.index');
+        Route::get('/customers/trash', [AdminCustomerController::class, 'trash'])->name('customers.trash');
         Route::get('/customers/create', [AdminCustomerController::class, 'create'])->name('customers.create');
         Route::post('/customers/store', [AdminCustomerController::class, 'store'])->name('customers.store');
         Route::post('/customers/export/csv', [AdminCustomerController::class, 'exportCsv'])->name('customers.export.csv');
@@ -315,6 +325,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('/customers/{id}/edit', [AdminCustomerController::class, 'edit'])->name('customers.edit');
         Route::put('/customers/{id}/update', [AdminCustomerController::class, 'update'])->name('customers.update');
         Route::delete('/customers/{id}/delete', [AdminCustomerController::class, 'destroy'])->name('customers.delete');
+        Route::post('/customers/{id}/restore', [AdminCustomerController::class, 'restore'])->name('customers.restore');
+        Route::delete('/customers/{id}/force-delete', [AdminCustomerController::class, 'forceDelete'])->name('customers.force-delete');
     });
 
     // Roles & Staff Permissions

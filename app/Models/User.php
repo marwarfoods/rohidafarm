@@ -33,6 +33,8 @@ class User extends Authenticatable
         'otp_code',
         'otp_expires_at',
         'wallet_balance',
+        'last_seen_orders_at',
+        'last_seen_customers_at',
     ];
 
     /**
@@ -58,6 +60,8 @@ class User extends Authenticatable
             'password' => 'hashed',
             'otp_expires_at' => 'datetime',
             'wallet_balance' => 'decimal:2',
+            'last_seen_orders_at' => 'datetime',
+            'last_seen_customers_at' => 'datetime',
         ];
     }
 

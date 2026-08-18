@@ -64,11 +64,11 @@
                 <span class="text-decoration-line-through text-muted small">₹{{ number_format($prod->mrp, 0) }}</span>
                 <span class="fw-bold text-success ms-1">₹{{ number_format($prod->sale_price, 0) }}</span>
             </td>
-            <td class="px-4 py-3">
+            <td class="px-4 py-3" style="min-width: 140px;">
                 @if(auth()->user()->hasPermission('products-edit'))
-                <div class="input-group input-group-sm" style="max-width: 100px;">
-                    <input type="number" class="form-control text-center stock-inp" data-id="{{ $prod->id }}" value="{{ $prod->stock }}" min="0">
-                    <button type="button" class="btn btn-success btn-update-stock" data-id="{{ $prod->id }}"><i class="bi bi-check-lg"></i></button>
+                <div class="input-group input-group-sm" style="width: 130px;">
+                    <input type="number" class="form-control text-center stock-inp bg-light border fw-bold" data-id="{{ $prod->id }}" value="{{ $prod->stock }}" min="0" placeholder="Qty">
+                    <button type="button" class="btn btn-success btn-update-stock" data-id="{{ $prod->id }}" title="Update Stock Quantity"><i class="bi bi-check-lg"></i></button>
                 </div>
                 @else
                 <span class="fw-bold">{{ $prod->stock }}</span>
@@ -105,6 +105,24 @@
 </x-admin-table>
 @endsection
 
+@push('admin_styles')
+<style>
+/* Remove number spinner up/down arrows */
+input.stock-inp::-webkit-outer-spin-button,
+input.stock-inp::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input.stock-inp[type=number] {
+    -moz-appearance: textfield;
+}
+.stock-inp {
+    font-size: 0.9rem !important;
+    letter-spacing: 0.5px;
+}
+</style>
+@endpush
+
 @push('admin_scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -113,7 +131,12 @@
         stockButtons.forEach(btn => {
             btn.addEventListener('click', function () {
                 const id = this.getAttribute('data-id');
-                const qty = document.querySelector(`.stock-inp[data-id="${id}"]`).value;
+                const inp = document.querySelector(`.stock-inp[data-id="${id}"]`);
+                const qty = inp.value;
+
+                const origHtml = this.innerHTML;
+                this.disabled = true;
+                this.innerHTML = '<span class="spinner-border spinner-border-sm" style="width: 12px; height: 12px;"></span>';
 
                 fetch(`/admin/products/${id}/stock`, {
                     method: 'POST',
@@ -125,11 +148,19 @@
                 })
                 .then(res => res.json())
                 .then(data => {
+                    this.disabled = false;
+                    this.innerHTML = origHtml;
                     if (data.status === 'success') {
-                        alert(data.message);
+                        inp.classList.add('is-valid');
+                        setTimeout(() => inp.classList.remove('is-valid'), 2000);
                     } else {
-                        alert('Failed to update stock quantity.');
+                        alert('Failed to update stock quantity: ' + (data.message || 'Error'));
                     }
+                })
+                .catch(err => {
+                    this.disabled = false;
+                    this.innerHTML = origHtml;
+                    alert('Network error while updating stock.');
                 });
             });
         });

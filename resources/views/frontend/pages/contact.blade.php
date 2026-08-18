@@ -40,13 +40,21 @@
                 </p>
 
                 <!-- Contact Rows -->
+                @php
+                    $address = \App\Models\Setting::get('contact_address') ?: \App\Models\Setting::get('company_address', 'RohidaFarm Pastures, Ward No. 3, Sheoganj, Sirohi, Rajasthan, India - 307027');
+                    $mobile1 = \App\Models\Setting::get('contact_mobile_1') ?: \App\Models\Setting::get('contact_phone', '+91 98765 43210');
+                    $mobile2 = \App\Models\Setting::get('contact_mobile_2');
+                    $email1 = \App\Models\Setting::get('contact_email_1') ?: \App\Models\Setting::get('contact_email', 'care@rohidafarm.com');
+                    $email2 = \App\Models\Setting::get('contact_email_2');
+                @endphp
+
                 <div class="d-flex align-items-start mb-4">
                     <div class="bg-success text-white p-3 rounded-circle fs-4 d-flex align-items-center justify-content-center me-3" style="width: 54px; height: 54px; flex-shrink: 0;">
                         <i class="bi bi-geo-alt"></i>
                     </div>
                     <div>
                         <h5 class="fw-bold font-heading text-dark m-0 fs-6">Our Farm Address</h5>
-                        <p class="text-muted m-0 mt-1" style="font-size: 0.92rem;">RohidaFarm Pastures, Ward No. 3, Sheoganj, Sirohi, Rajasthan, India - 307027</p>
+                        <p class="text-muted m-0 mt-1" style="font-size: 0.92rem;">{{ $address }}</p>
                     </div>
                 </div>
 
@@ -56,7 +64,14 @@
                     </div>
                     <div>
                         <h5 class="fw-bold font-heading text-dark m-0 fs-6">Phone Hotline</h5>
-                        <p class="text-muted m-0 mt-1" style="font-size: 0.92rem;">+91 98765 43210 (Mon-Sat, 9:00 AM - 6:00 PM)</p>
+                        <div class="mt-1">
+                            @if($mobile1)
+                                <div><a href="tel:{{ $mobile1 }}" class="text-decoration-none text-muted" style="font-size: 0.92rem;">{{ $mobile1 }}</a></div>
+                            @endif
+                            @if($mobile2)
+                                <div><a href="tel:{{ $mobile2 }}" class="text-decoration-none text-muted" style="font-size: 0.92rem;">{{ $mobile2 }}</a></div>
+                            @endif
+                        </div>
                     </div>
                 </div>
 
@@ -66,7 +81,14 @@
                     </div>
                     <div>
                         <h5 class="fw-bold font-heading text-dark m-0 fs-6">Email Support</h5>
-                        <p class="text-muted m-0 mt-1" style="font-size: 0.92rem;">support@rohidafarm.com</p>
+                        <div class="mt-1">
+                            @if($email1)
+                                <div><a href="mailto:{{ $email1 }}" class="text-decoration-none text-muted" style="font-size: 0.92rem;">{{ $email1 }}</a></div>
+                            @endif
+                            @if($email2)
+                                <div><a href="mailto:{{ $email2 }}" class="text-decoration-none text-muted" style="font-size: 0.92rem;">{{ $email2 }}</a></div>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
@@ -120,7 +142,11 @@
                                 @enderror
                             </div>
 
-                            <div class="col-md-12 mt-4 text-end">
+                            <div class="col-md-12">
+                                <x-turnstile />
+                            </div>
+
+                            <div class="col-md-12 mt-3 text-end">
                                 <button type="submit" class="btn btn-premium px-5 py-2.5 rounded-pill text-uppercase font-heading" style="font-size: 0.82rem;"><i class="bi bi-send me-2"></i>Send Message</button>
                             </div>
                         </div>
@@ -136,7 +162,7 @@
 <section class="p-0 border-top" data-aos="fade-up">
     <div class="w-100" style="height: 400px; filter: grayscale(1) contrast(1.1) invert(0);">
         <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14392.204558509378!2d72.98634839999999!3d25.1001476!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39420b991a0c8b67%3A0xe54e6ec56e29780e!2sSheoganj%2C%20Rajasthan%20307027!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin" 
+            src="https://maps.google.com/maps?q={{ urlencode($address) }}&t=&z=14&ie=UTF8&iwloc=&output=embed" 
             width="100%" 
             height="100%" 
             style="border:0;" 

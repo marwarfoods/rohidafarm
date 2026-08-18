@@ -24,6 +24,10 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
+        if (auth()->check()) {
+            auth()->user()->update(['last_seen_orders_at' => now()]);
+        }
+
         $query = Order::with(['user', 'shipment']);
 
         if ($request->has('status') && $request->input('status') !== 'all') {
@@ -40,6 +44,10 @@ class OrderController extends Controller
      */
     public function show($id)
     {
+        if (auth()->check()) {
+            auth()->user()->update(['last_seen_orders_at' => now()]);
+        }
+
         $order = Order::with(['items.product', 'payments', 'trackingUpdates', 'shipment'])->findOrFail($id);
         return view('admin.orders.show', compact('order'));
     }

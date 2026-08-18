@@ -16,7 +16,7 @@
                         <div style="z-index: 2; max-width: 55%;">
                             <h4 class="fw-bold font-heading text-dark mb-1 fs-5">Pure Cow Ghee</h4>
                             <p class="text-muted mb-3" style="font-size: 0.8rem; line-height: 1.3;">Made the Traditional Bilona Way</p>
-                            <a href="/shop?category=ghee" class="btn btn-premium btn-sm px-4 py-2 rounded-pill text-uppercase font-heading" style="font-size: 0.7rem; letter-spacing: 0.5px;">Shop Now <i class="bi bi-arrow-right ms-1"></i></a>
+                            <a href="/shop" class="btn btn-premium btn-sm px-4 py-2 rounded-pill text-uppercase font-heading" style="font-size: 0.7rem; letter-spacing: 0.5px;">Shop Now <i class="bi bi-arrow-right ms-1"></i></a>
                         </div>
                         <img src="{{ url('uploads/products/1784099286_cow-ghee-1.png') }}" alt="Cow Ghee Product" width="150" height="150" loading="lazy" decoding="async" class="position-absolute end-0 bottom-0" style="height: 150px; object-fit: contain; transform: translateY(10px) translateX(10px); z-index: 1; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">
                     </div>
@@ -28,21 +28,21 @@
                         <div style="z-index: 2; max-width: 55%;">
                             <h4 class="fw-bold font-heading text-dark mb-1 fs-5">Cold Pressed Oils</h4>
                             <p class="text-muted mb-3" style="font-size: 0.8rem; line-height: 1.3;">100% Pure, Wood-Pressed & Natural</p>
-                            <a href="/shop?category=cold-pressed-oil" class="btn btn-premium btn-sm px-4 py-2 rounded-pill text-uppercase font-heading" style="font-size: 0.7rem; letter-spacing: 0.5px;">Shop Now <i class="bi bi-arrow-right ms-1"></i></a>
+                            <a href="/shop" class="btn btn-premium btn-sm px-4 py-2 rounded-pill text-uppercase font-heading" style="font-size: 0.7rem; letter-spacing: 0.5px;">Shop Now <i class="bi bi-arrow-right ms-1"></i></a>
                         </div>
                         <img src="{{ url('uploads/products/1784100896_oil-2.png') }}" alt="Cold Pressed Oil Product" width="150" height="150" loading="lazy" decoding="async" class="position-absolute end-0 bottom-0" style="height: 150px; object-fit: contain; transform: translateY(10px) translateX(10px); z-index: 1; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">
                     </div>
                 </div>
 
-                <!-- Banner 3: Wild Honey -->
+                <!-- Banner 3: Combo Pack -->
                 <div class="swiper-slide h-auto">
                     <div class="p-4 rounded-4 h-100 d-flex align-items-center justify-content-between position-relative overflow-hidden shadow-sm" style="background-color: #FFFDF9; border: 1px solid #ECE7DD; min-height: 190px;">
                         <div style="z-index: 2; max-width: 55%;">
-                            <h4 class="fw-bold font-heading text-dark mb-1 fs-5">Raw Wild Honey</h4>
-                            <p class="text-muted mb-3" style="font-size: 0.8rem; line-height: 1.3;">Naturally Sourced & Unprocessed</p>
-                            <a href="/shop?category=honey" class="btn btn-premium btn-sm px-4 py-2 rounded-pill text-uppercase font-heading" style="font-size: 0.7rem; letter-spacing: 0.5px;">Shop Now <i class="bi bi-arrow-right ms-1"></i></a>
+                            <h4 class="fw-bold font-heading text-dark mb-1 fs-5">Combo Pack</h4>
+                            <p class="text-muted mb-3" style="font-size: 0.8rem; line-height: 1.3;">Ghee & Cold Pressed Oil</p>
+                            <a href="/shop" class="btn btn-premium btn-sm px-4 py-2 rounded-pill text-uppercase font-heading" style="font-size: 0.7rem; letter-spacing: 0.5px;">Shop Now <i class="bi bi-arrow-right ms-1"></i></a>
                         </div>
-                        <img src="{{ url('uploads/products/1784105805_hony-1.png') }}" alt="Raw Wild Honey Product" width="150" height="150" loading="lazy" decoding="async" class="position-absolute end-0 bottom-0" style="height: 150px; object-fit: contain; transform: translateY(10px) translateX(10px); z-index: 1; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">
+                        <img src="{{ asset('images/combo.png') }}" alt="Combo Pack" width="150" height="150" loading="lazy" decoding="async" class="position-absolute end-0 bottom-0" style="height: 150px; object-fit: contain; transform: translateY(10px) translateX(10px); z-index: 1; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">
                     </div>
                 </div>
             </div>
