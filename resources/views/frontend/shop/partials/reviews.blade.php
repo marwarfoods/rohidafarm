@@ -93,15 +93,6 @@
                     @endfor
                 </div>
 
-                <div class="d-flex align-items-center gap-2 mb-1">
-                    <div class="rounded-circle bg-success-subtle text-success d-flex align-items-center justify-content-center fw-bold flex-shrink-0" style="width: 32px; height: 32px; font-size: 0.85rem;">
-                        {{ strtoupper(substr($rev->user->name ?? $rev->customer_name ?? 'A', 0, 1)) }}
-                    </div>
-                    <span class="fw-bold text-dark" style="font-size: 0.92rem;">{{ $rev->user->name ?? $rev->customer_name ?? 'Anonymous' }}</span>
-                    @if($rev->user_id)
-                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill" style="font-size: 0.68rem;"><i class="bi bi-patch-check-fill me-1"></i>Verified</span>
-                    @endif
-                </div>
                 <div class="text-muted mb-2" style="font-size: 0.75rem;">{{ $rev->created_at->format('d/m/Y') }}</div>
 
                 @if($rev->title)

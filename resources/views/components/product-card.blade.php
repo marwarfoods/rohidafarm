@@ -93,11 +93,10 @@
                     <i class="bi bi-star-fill"></i>
                 </div>
                 <span class="text-dark fw-bold" style="font-size: 0.75rem;">{{ number_format($product->rating, 1) }}</span>
-                <span class="text-muted ms-1" style="font-size: 0.7rem;">({{ $product->reviews_count ?? 0 }} reviews)</span>
             </div>
  
             <!-- Title -->
-            <h6 class="card-title text-dark font-heading mb-2" style="font-size: 0.95rem; line-height: 1.35; min-height: 2.6rem; font-weight: 500 !important;">
+            <h6 class="card-title text-dark font-heading mb-2" style="font-size: 1.05rem; line-height: 1.35; min-height: 2.6rem; font-weight: 500 !important;">
                 <a href="{{ route('shop.show', $product->slug) }}" class="text-dark text-decoration-none hover-gold product-card-title">{{ $product->name }}</a>
             </h6>
  

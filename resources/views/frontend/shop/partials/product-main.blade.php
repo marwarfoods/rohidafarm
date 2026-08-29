@@ -138,7 +138,7 @@
                     <div class="text-warning me-2" style="font-size:0.95rem;">
                         <i class="bi bi-star-fill"></i>
                     </div>
-                    <span class="text-muted fw-semibold">({{ $product->reviews_count ?? 0 }} verified reviews)</span>
+                    <span class="text-muted fw-semibold">{{ number_format($product->rating ?? 5.0, 1) }}</span>
                 </div>
 
                 <!-- Pricing -->

@@ -139,6 +139,30 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // "Hot Choices – Selling Right Now" auto-sliding cart add-ons carousel
+    // (present in both the empty and active cart drawer states). Guards
+    // against double-init since this also runs after every AJAX cart reload.
+    function initCartAddonsSliders() {
+        document.querySelectorAll('.cart-addons-slider').forEach(function (el) {
+            if (el.swiper || typeof Swiper === 'undefined') return;
+            new Swiper(el, {
+                slidesPerView: 'auto',
+                spaceBetween: 12,
+                loop: el.querySelectorAll('.swiper-slide').length > 2,
+                autoplay: {
+                    delay: 2500,
+                    disableOnInteraction: false,
+                    pauseOnMouseEnter: true,
+                },
+                pagination: {
+                    el: el.querySelector('.swiper-pagination'),
+                    clickable: true,
+                },
+            });
+        });
+    }
+    initCartAddonsSliders();
+
     window.reloadCartDrawer = function(callback) {
         const cacheBuster = new Date().getTime();
         RohidaDebug.log('🔄', 'Cart Drawer', `Fetching fresh real-time cart drawer HTML (t=${cacheBuster})...`);
@@ -197,6 +221,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 RohidaDebug.log('🏷️', 'Cart Badges', `Updated ${currentBadges.length} cart badge elements across DOM -> Badge Count: ${countText}`);
                 RohidaDebug.log('✅', 'Cart Drawer', `Cart Drawer successfully reloaded & synchronized in real-time!`);
+
+                // The innerHTML swap above tears down any previously-initialized
+                // "Hot Choices" Swiper instances along with their DOM, so re-init
+                // on the freshly inserted sliders.
+                initCartAddonsSliders();
 
                 // If on checkout page and cart is now empty, redirect to home
                 if (window.location.pathname === '/checkout' || window.location.pathname.startsWith('/checkout/')) {
@@ -352,6 +381,58 @@ document.addEventListener('DOMContentLoaded', function () {
             form.submit();
         });
     });
+
+    // "Added to Cart!" Add-Ons Modal — confirm button was previously wired to
+    // nothing, so checking add-ons and clicking "Add to Cart" silently did
+    // nothing. Also: whether the user confirms, skips, or just closes the
+    // modal, open the cart drawer afterwards so there's visible confirmation
+    // of what actually ended up in the cart instead of the modal just vanishing.
+    const addonsModalEl = document.getElementById('addToCartAddonsModal');
+    if (addonsModalEl) {
+        addonsModalEl.addEventListener('hidden.bs.modal', function () {
+            const cartOffcanvasEl = document.getElementById('cartOffcanvas');
+            if (cartOffcanvasEl) {
+                bootstrap.Offcanvas.getOrCreateInstance(cartOffcanvasEl).show();
+            }
+        });
+
+        const confirmAddonsBtn = document.getElementById('btnConfirmAddons');
+        if (confirmAddonsBtn) {
+            confirmAddonsBtn.addEventListener('click', function () {
+                const checked = Array.from(addonsModalEl.querySelectorAll('.addon-checkbox:checked'));
+                const modalInstance = bootstrap.Modal.getOrCreateInstance(addonsModalEl);
+
+                if (checked.length === 0) {
+                    modalInstance.hide();
+                    return;
+                }
+
+                const originalText = confirmAddonsBtn.innerHTML;
+                confirmAddonsBtn.disabled = true;
+                confirmAddonsBtn.innerHTML = 'Adding...';
+
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+                const requests = checked.map(function (checkbox) {
+                    const body = new FormData();
+                    body.append('product_id', checkbox.value);
+                    body.append('variant_id', checkbox.getAttribute('data-variant-id') || '');
+                    body.append('quantity', 1);
+                    return fetch('/cart/add', {
+                        method: 'POST',
+                        body: body,
+                        headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
+                    });
+                });
+
+                Promise.all(requests).finally(function () {
+                    reloadCartDrawer();
+                    confirmAddonsBtn.disabled = false;
+                    confirmAddonsBtn.innerHTML = originalText;
+                    modalInstance.hide();
+                });
+            });
+        }
+    }
 
     // Dynamic Variant Selector Price and Hidden Inputs Update with Shimmer Loader
     // Delegated on document (not bound per-select) because Swiper's loop mode

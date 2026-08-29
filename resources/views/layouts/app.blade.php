@@ -65,11 +65,11 @@
     {{-- -- Font Awesome & Bootstrap Icons -- --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    {{-- -- Google Fonts - Outfit (Headings & Badges) + Inter (Body & UI) -- --}}
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    {{-- -- Google Fonts - Fraunces (Headings & Badges) + Inter (Body & UI) -- --}}
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     {{-- -- Preload Primary Font -- --}}
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700&family=Inter:wght@400;600&display=swap">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;600&display=swap">
 
     {{-- -- 3rd-party scripts - deferred -- --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
@@ -104,7 +104,7 @@
             --border-color: #E8DCC4;
             --shadow-soft: 0 10px 30px rgba(139, 90, 43, 0.08);
             --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            --font-heading: 'Outfit', system-ui, -apple-system, sans-serif;
+            --font-heading: 'Fraunces', Georgia, serif;
             --font-body: 'Inter', system-ui, -apple-system, sans-serif;
             --section-padding-desktop: 4.5rem 0;
             --section-padding-mobile: 2.5rem 0;

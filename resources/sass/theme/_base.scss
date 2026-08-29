@@ -10,7 +10,7 @@
     --border-color: #E8DCC4;
     --shadow-soft: 0 10px 30px rgba(139, 90, 43, 0.08);
     --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    --font-heading: 'Outfit', system-ui, -apple-system, sans-serif;
+    --font-heading: 'Fraunces', Georgia, serif;
     --font-body: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
@@ -33,6 +33,17 @@ body {
 body.offcanvas-active {
     overflow: hidden !important;
     touch-action: none;
+
+    // touch-action: none on body is meant to stop the page behind an open
+    // offcanvas/modal from scrolling — but the property intersects down the
+    // ancestor chain, so left alone it also kills touch scrolling/swiping
+    // *inside* the offcanvas itself (e.g. the cart drawer's horizontal
+    // "Hot Choices" product slider). Reset it back to auto on fixed
+    // overlay panels so their own content scrolls normally again.
+    .offcanvas,
+    .modal {
+        touch-action: auto;
+    }
 }
 
 // Hide native number input spin (up/down) arrows site-wide — quantity inputs

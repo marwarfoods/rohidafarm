@@ -178,6 +178,35 @@
     }
 }
 
+#productTabs.nav-pills > .nav-item {
+    flex-shrink: 0;
+}
+
+// Cart drawer "Hot Choices" add-ons carousel
+.cart-addons-slider {
+    .swiper-pagination-bullet-active {
+        background: #174C38;
+    }
+}
+
+// Category Page Banner — full width on all sizes; shorter + lighter overlay on mobile
+.category-banner {
+    height: 160px;
+    border-radius: 0 0 0.75rem 0.75rem;
+
+    .category-banner-overlay {
+        background: rgba(0, 0, 0, 0.08);
+    }
+
+    @media (min-width: 768px) {
+        height: 400px;
+
+        .category-banner-overlay {
+            background: rgba(0, 0, 0, 0.15);
+        }
+    }
+}
+
 // Capsule tab styling matching user upload
 .capsule-tab {
     display: flex !important;
@@ -189,7 +218,9 @@
     color: #4a5c3e !important;
     transition: $transition-smooth;
     margin: 4px;
-    
+    flex-shrink: 0;
+    white-space: nowrap;
+
     .icon-circle {
         background-color: #ffffff;
         border-radius: 50%;

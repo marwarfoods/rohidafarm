@@ -1,0 +1,195 @@
+{
+  "_icon-picker-DJOTarD_.js": {
+    "file": "assets/icon-picker-DJOTarD_.js",
+    "name": "icon-picker"
+  },
+  "node_modules/apexcharts/dist/apexcharts.esm.js": {
+    "file": "assets/apexcharts.esm-CsSldHzy.js",
+    "name": "apexcharts.esm",
+    "src": "node_modules/apexcharts/dist/apexcharts.esm.js",
+    "isDynamicEntry": true
+  },
+  "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff": {
+    "file": "assets/bootstrap-icons-BeopsB42.woff",
+    "src": "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff"
+  },
+  "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2": {
+    "file": "assets/bootstrap-icons-mSm7cUeB.woff2",
+    "src": "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2"
+  },
+  "resources/js/about.js": {
+    "file": "assets/about-DHrZbr5C.js",
+    "name": "about",
+    "src": "resources/js/about.js",
+    "isEntry": true
+  },
+  "resources/js/admin.js": {
+    "file": "assets/admin-a9BgZtvI.js",
+    "name": "admin",
+    "src": "resources/js/admin.js",
+    "isEntry": true,
+    "imports": [
+      "_icon-picker-DJOTarD_.js"
+    ],
+    "dynamicImports": [
+      "node_modules/apexcharts/dist/apexcharts.esm.js"
+    ]
+  },
+  "resources/js/admin/products.js": {
+    "file": "assets/products-Dm1p3deW.js",
+    "name": "products",
+    "src": "resources/js/admin/products.js",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-BkjztGtF.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "imports": [
+      "_icon-picker-DJOTarD_.js",
+      "resources/js/header.js",
+      "resources/js/header.js"
+    ]
+  },
+  "resources/js/header.js": {
+    "file": "assets/header-CMts4k4k.js",
+    "name": "header",
+    "src": "resources/js/header.js",
+    "isEntry": true
+  },
+  "resources/js/home.js": {
+    "file": "assets/home-nUZ3NtoH.js",
+    "name": "home",
+    "src": "resources/js/home.js",
+    "isEntry": true
+  },
+  "resources/js/lucky-wheel.js": {
+    "file": "assets/lucky-wheel-DSxXr3Rs.js",
+    "name": "lucky-wheel",
+    "src": "resources/js/lucky-wheel.js",
+    "isEntry": true
+  },
+  "resources/js/mail.js": {
+    "file": "assets/mail-B7acMwGO.js",
+    "name": "mail",
+    "src": "resources/js/mail.js",
+    "isEntry": true
+  },
+  "resources/js/product-detail.js": {
+    "file": "assets/product-detail-DSkPUTHB.js",
+    "name": "product-detail",
+    "src": "resources/js/product-detail.js",
+    "isEntry": true
+  },
+  "resources/js/shop.js": {
+    "file": "assets/shop-BvRk9kiK.js",
+    "name": "shop",
+    "src": "resources/js/shop.js",
+    "isEntry": true
+  },
+  "resources/js/specialties.js": {
+    "file": "assets/specialties-BXZVwhbq.js",
+    "name": "specialties",
+    "src": "resources/js/specialties.js",
+    "isEntry": true
+  },
+  "resources/sass/about.scss": {
+    "file": "assets/about-BCtwADJI.css",
+    "name": "about",
+    "names": [
+      "about.css"
+    ],
+    "src": "resources/sass/about.scss",
+    "isEntry": true
+  },
+  "resources/sass/admin.scss": {
+    "file": "assets/admin-CKPOH20V.css",
+    "name": "admin",
+    "names": [
+      "admin.css"
+    ],
+    "src": "resources/sass/admin.scss",
+    "isEntry": true,
+    "assets": [
+      "assets/bootstrap-icons-mSm7cUeB.woff2",
+      "assets/bootstrap-icons-BeopsB42.woff"
+    ]
+  },
+  "resources/sass/admin/products.scss": {
+    "file": "assets/products-CrD8_pkc.css",
+    "name": "products",
+    "names": [
+      "products.css"
+    ],
+    "src": "resources/sass/admin/products.scss",
+    "isEntry": true
+  },
+  "resources/sass/app.scss": {
+    "file": "assets/app-CS0Fb__M.css",
+    "name": "app",
+    "names": [
+      "app.css"
+    ],
+    "src": "resources/sass/app.scss",
+    "isEntry": true,
+    "assets": [
+      "assets/bootstrap-icons-mSm7cUeB.woff2",
+      "assets/bootstrap-icons-BeopsB42.woff"
+    ]
+  },
+  "resources/sass/header.scss": {
+    "file": "assets/header-DN1PSsMe.css",
+    "name": "header",
+    "names": [
+      "header.css"
+    ],
+    "src": "resources/sass/header.scss",
+    "isEntry": true
+  },
+  "resources/sass/lucky-wheel.scss": {
+    "file": "assets/lucky-wheel-CTZ6_-s2.css",
+    "name": "lucky-wheel",
+    "names": [
+      "lucky-wheel.css"
+    ],
+    "src": "resources/sass/lucky-wheel.scss",
+    "isEntry": true
+  },
+  "resources/sass/mail.scss": {
+    "file": "assets/mail-Dt9Q4yY_.css",
+    "name": "mail",
+    "names": [
+      "mail.css"
+    ],
+    "src": "resources/sass/mail.scss",
+    "isEntry": true
+  },
+  "resources/sass/product-detail.scss": {
+    "file": "assets/product-detail-BYwevh-A.css",
+    "name": "product-detail",
+    "names": [
+      "product-detail.css"
+    ],
+    "src": "resources/sass/product-detail.scss",
+    "isEntry": true
+  },
+  "resources/sass/shop.scss": {
+    "file": "assets/shop-rlNnMFaK.css",
+    "name": "shop",
+    "names": [
+      "shop.css"
+    ],
+    "src": "resources/sass/shop.scss",
+    "isEntry": true
+  },
+  "resources/sass/specialties.scss": {
+    "file": "assets/specialties-oXvd_831.css",
+    "name": "specialties",
+    "names": [
+      "specialties.css"
+    ],
+    "src": "resources/sass/specialties.scss",
+    "isEntry": true
+  }
+}

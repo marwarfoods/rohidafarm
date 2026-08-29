@@ -407,31 +407,23 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Dynamic tab skeleton loader switcher
+    // Re-measure product sliders once their tab pane becomes visible — a Swiper
+    // initialized while its pane was still display:none (inactive tab) computes
+    // zero-width slides, so it must be updated after the pane is actually shown.
     const tabElList = document.querySelectorAll('button[data-bs-toggle="tab"]');
     tabElList.forEach(tabEl => {
-        tabEl.addEventListener('show.bs.tab', event => {
+        tabEl.addEventListener('shown.bs.tab', event => {
             const targetId = event.target.getAttribute('data-bs-target');
             const targetPane = document.querySelector(targetId);
-            
-            const loader = targetPane.querySelector('.skeleton-loader-container');
-            const content = targetPane.querySelector('.tab-pane-content-wrapper');
-            
-            if (loader && content) {
-                loader.classList.remove('d-none');
-                content.classList.add('d-none');
-                
-                setTimeout(() => {
-                    loader.classList.add('d-none');
-                    content.classList.remove('d-none');
-                    
-                    // Update Swiper inside tab pane to prevent pagination glitches
-                    const sliders = targetPane.querySelectorAll('.products-slider');
-                    sliders.forEach(s => {
-                        if (s.swiper) s.swiper.update();
-                    });
-                }, 400);
-            }
+            if (!targetPane) return;
+
+            const sliders = targetPane.querySelectorAll('.products-slider');
+            sliders.forEach(s => {
+                if (s.swiper) {
+                    s.swiper.update();
+                    s.swiper.slideTo(0, 0);
+                }
+            });
         });
     });
 

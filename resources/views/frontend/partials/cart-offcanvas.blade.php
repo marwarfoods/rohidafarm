@@ -16,6 +16,12 @@
         $cartTotals = $cartService->getTotals();
         $isEmpty = $cartItems->isEmpty();
         $totalItemCount = $cartItems->sum('quantity');
+
+        $cartAddons = \App\Models\Product::with(['primaryImage', 'variants'])
+            ->where('is_active', true)
+            ->where('stock', '>', 0)
+            ->take(6)
+            ->get();
     @endphp
 
     <!-- ── Header Bar (Matching Anveshan Layout) ── -->
@@ -40,11 +46,59 @@
         @include('frontend.partials.cart-skeleton')
 
         <!-- Empty Cart Container -->
-        <div id="cartEmptyContent" class="text-center my-auto py-5 w-100 {{ !$isEmpty ? 'd-none' : '' }}">
-            <img src="{{ asset('images/emtycart.png') }}" alt="Empty Cart" class="mb-3 img-fluid" style="max-width: 150px;">
-            <h4 class="font-heading fw-bold mt-2" style="color: #174C38;">Your Cart is Empty</h4>
-            <p class="text-muted mb-4" style="font-size: 0.85rem;">Discover our pure A2 Bilona ghee, cold-pressed oils, and organic wild honey.</p>
-            <a href="{{ route('shop.index') }}" class="btn rounded-pill px-4 py-2.5 text-white fw-bold font-heading text-uppercase shadow-sm" style="background-color: #174C38; font-size: 0.8rem; color: #ffffff !important;">Explore Catalog</a>
+        <div id="cartEmptyContent" class="w-100 overflow-y-auto {{ !$isEmpty ? 'd-none' : '' }}">
+            <div class="text-center py-4 w-100">
+                <img src="{{ asset('images/emtycart.png') }}" alt="Empty Cart" class="mb-3 img-fluid" style="max-width: 150px;">
+                <h4 class="font-heading fw-bold mt-2" style="color: #174C38;">Your Cart is Empty</h4>
+                <p class="text-muted mb-4" style="font-size: 0.85rem;">Discover our pure A2 Bilona ghee, cold-pressed oils, and organic wild honey.</p>
+                <a href="{{ route('shop.index') }}" class="btn rounded-pill px-4 py-2.5 text-white fw-bold font-heading text-uppercase shadow-sm" style="background-color: #174C38; font-size: 0.8rem; color: #ffffff !important;">Explore Catalog</a>
+            </div>
+
+            <!-- Recommended Products (Hot Choices — Selling Right Now: IN STOCK ONLY) -->
+            @if($cartAddons->isNotEmpty())
+                <div class="pt-2 pb-3 text-start">
+                    <h6 class="font-heading fw-bold text-dark m-0 mb-3" style="font-size: 0.92rem; color: #174C38 !important;">
+                        Hot Choices – Selling Right Now <i class="bi bi-graph-up-arrow text-danger ms-1" style="font-size: 0.85rem;"></i>
+                    </h6>
+
+                    <div class="swiper cart-addons-slider" style="touch-action: pan-x; overscroll-behavior-x: contain; padding-bottom: 28px;">
+                        <div class="swiper-wrapper">
+                            @foreach($cartAddons as $addon)
+                                @php
+                                    $addonPrice = $addon->sale_price;
+                                    $addonImg = $addon->primaryImage ? asset($addon->primaryImage->image_path) : asset('/assets/images/products/placeholder.jpg');
+                                @endphp
+                                <div class="swiper-slide" style="width: 290px;">
+                                    <div class="bg-white p-3 rounded-3 border d-flex align-items-center justify-content-between shadow-2xs h-100" style="border-color: #E8E5DF !important;">
+                                        <div class="d-flex align-items-center gap-3 flex-grow-1 overflow-hidden pe-2">
+                                            <img src="{{ $addonImg }}" onerror="this.onerror=null;this.src='/assets/images/products/placeholder.jpg';" width="54" height="54" class="rounded-2 object-fit-cover border bg-light flex-shrink-0">
+                                            <div class="overflow-hidden">
+                                                <h6 class="fw-semibold text-dark m-0 mb-1" style="font-family: var(--font-body); font-size: 0.82rem; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                                    {{ $addon->name }}
+                                                </h6>
+                                                <div class="fw-bold" style="font-size: 0.88rem; color: #174C38;">
+                                                    ₹{{ number_format($addonPrice, 0) }}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <form action="{{ route('cart.add') }}" method="POST" class="add-to-cart-form m-0 flex-shrink-0">
+                                            @csrf
+                                            <input type="hidden" name="product_id" value="{{ $addon->id }}">
+                                            <input type="hidden" name="variant_id" value="{{ $addon->variants->first()?->id }}">
+                                            <input type="hidden" name="quantity" value="1">
+                                            <button type="submit" class="btn btn-sm rounded-pill px-3 py-1.5 text-white fw-bold shadow-2xs" style="font-size: 0.8rem; background-color: #174C38; border-color: #174C38; color: #ffffff !important; min-width: 60px;">
+                                                + Add
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        <div class="swiper-pagination"></div>
+                    </div>
+                </div>
+            @endif
         </div>
 
         <!-- Active Cart Content -->
@@ -127,13 +181,6 @@
                 </div>
 
                 <!-- Recommended Add-Ons (Hot Choices — Selling Right Now: IN STOCK ONLY) -->
-                @php
-                    $cartAddons = \App\Models\Product::with(['primaryImage', 'variants'])
-                        ->where('is_active', true)
-                        ->where('stock', '>', 0)
-                        ->take(6)
-                        ->get();
-                @endphp
                 @if($cartAddons->isNotEmpty())
                     <div class="pt-2 mb-3">
                         <div class="d-flex align-items-center justify-content-between mb-3">
@@ -142,41 +189,46 @@
                             </h6>
                         </div>
 
-                        <!-- Horizontal Slider Cards with Proper Gap, Padding & No Star Badges -->
-                        <div class="d-flex flex-nowrap overflow-x-auto gap-3 pb-3 pt-1" style="-webkit-overflow-scrolling: touch; scrollbar-width: none;">
-                            @foreach($cartAddons as $addon)
-                                @php
-                                    $addonPrice = $addon->sale_price;
-                                    $addonImg = $addon->primaryImage ? asset($addon->primaryImage->image_path) : asset('/assets/images/products/placeholder.jpg');
-                                @endphp
-                                <div class="bg-white p-3 rounded-3 border d-flex align-items-center justify-content-between shadow-2xs" style="min-width: 290px; width: 290px; flex-shrink: 0; border-color: #E8E5DF !important;">
-                                    
-                                    <!-- Left Column: Image, Title & Price -->
-                                    <div class="d-flex align-items-center gap-3 flex-grow-1 overflow-hidden pe-2">
-                                        <img src="{{ $addonImg }}" onerror="this.onerror=null;this.src='/assets/images/products/placeholder.jpg';" width="54" height="54" class="rounded-2 object-fit-cover border bg-light flex-shrink-0">
-                                        <div class="overflow-hidden">
-                                            <h6 class="fw-semibold text-dark m-0 mb-1" style="font-family: var(--font-body); font-size: 0.82rem; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                                                {{ $addon->name }}
-                                            </h6>
-                                            <div class="fw-bold" style="font-size: 0.88rem; color: #174C38;">
-                                                ₹{{ number_format($addonPrice, 0) }}
+                        <!-- Auto-sliding Swiper with Dots -->
+                        <div class="swiper cart-addons-slider" style="touch-action: pan-x; overscroll-behavior-x: contain; padding-bottom: 28px;">
+                            <div class="swiper-wrapper">
+                                @foreach($cartAddons as $addon)
+                                    @php
+                                        $addonPrice = $addon->sale_price;
+                                        $addonImg = $addon->primaryImage ? asset($addon->primaryImage->image_path) : asset('/assets/images/products/placeholder.jpg');
+                                    @endphp
+                                    <div class="swiper-slide" style="width: 290px;">
+                                        <div class="bg-white p-3 rounded-3 border d-flex align-items-center justify-content-between shadow-2xs h-100" style="border-color: #E8E5DF !important;">
+
+                                            <!-- Left Column: Image, Title & Price -->
+                                            <div class="d-flex align-items-center gap-3 flex-grow-1 overflow-hidden pe-2">
+                                                <img src="{{ $addonImg }}" onerror="this.onerror=null;this.src='/assets/images/products/placeholder.jpg';" width="54" height="54" class="rounded-2 object-fit-cover border bg-light flex-shrink-0">
+                                                <div class="overflow-hidden">
+                                                    <h6 class="fw-semibold text-dark m-0 mb-1" style="font-family: var(--font-body); font-size: 0.82rem; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                                        {{ $addon->name }}
+                                                    </h6>
+                                                    <div class="fw-bold" style="font-size: 0.88rem; color: #174C38;">
+                                                        ₹{{ number_format($addonPrice, 0) }}
+                                                    </div>
+                                                </div>
                                             </div>
+
+                                            <!-- Right Column: Add Button -->
+                                            <form action="{{ route('cart.add') }}" method="POST" class="add-to-cart-form m-0 flex-shrink-0">
+                                                @csrf
+                                                <input type="hidden" name="product_id" value="{{ $addon->id }}">
+                                                <input type="hidden" name="variant_id" value="{{ $addon->variants->first()?->id }}">
+                                                <input type="hidden" name="quantity" value="1">
+                                                <button type="submit" class="btn btn-sm rounded-pill px-3 py-1.5 text-white fw-bold shadow-2xs" style="font-size: 0.8rem; background-color: #174C38; border-color: #174C38; color: #ffffff !important; min-width: 60px;">
+                                                    + Add
+                                                </button>
+                                            </form>
+
                                         </div>
                                     </div>
-
-                                    <!-- Right Column: Add Button -->
-                                    <form action="{{ route('cart.add') }}" method="POST" class="add-to-cart-form m-0 flex-shrink-0">
-                                        @csrf
-                                        <input type="hidden" name="product_id" value="{{ $addon->id }}">
-                                        <input type="hidden" name="variant_id" value="{{ $addon->variants->first()?->id }}">
-                                        <input type="hidden" name="quantity" value="1">
-                                        <button type="submit" class="btn btn-sm rounded-pill px-3 py-1.5 text-white fw-bold shadow-2xs" style="font-size: 0.8rem; background-color: #174C38; border-color: #174C38; color: #ffffff !important; min-width: 60px;">
-                                            + Add
-                                        </button>
-                                    </form>
-
-                                </div>
-                            @endforeach
+                                @endforeach
+                            </div>
+                            <div class="swiper-pagination"></div>
                         </div>
                     </div>
                 @endif

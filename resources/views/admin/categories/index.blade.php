@@ -54,6 +54,17 @@
                     </div>
                 </div>
 
+                <!-- Category Banner (Full Width Image for Shop Category Page) -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Category Banner (Full Width)</label>
+                    <input type="text" name="banner_image" id="categoryBannerInput" class="form-control bg-light border p-2 media-picker-input mb-2"
+                           placeholder="Choose from media gallery...">
+                    <div id="categoryBannerPreview" class="border rounded-3 p-1 bg-light text-center d-flex align-items-center justify-content-center overflow-hidden" style="height: 90px;">
+                        <span class="text-muted" style="font-size: 0.75rem;">No banner selected</span>
+                    </div>
+                    <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">Shown at 100% width × 400px height (cropped to fit) on the category page — recommended size 1600×400px.</small>
+                </div>
+
                 <div class="mb-3">
                     <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Description</label>
                     <textarea name="description" class="form-control bg-light border p-2" rows="3" placeholder="Brief details..."></textarea>
@@ -97,6 +108,7 @@
                                             data-description="{{ $cat->description }}" 
                                             data-icon="{{ $cat->icon ?? 'bi-tags' }}"
                                             data-image="{{ $cat->image }}"
+                                            data-banner-image="{{ $cat->banner_image }}"
                                             title="Edit Category">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
@@ -212,6 +224,17 @@
                         </div>
                     </div>
 
+                    <!-- Category Banner (Full Width Image for Shop Category Page) -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Category Banner (Full Width)</label>
+                        <input type="text" name="banner_image" id="editCatBannerInput" class="form-control bg-light border p-2 media-picker-input mb-2"
+                               placeholder="Choose from media gallery...">
+                        <div id="editCatBannerPreview" class="border rounded-3 p-1 bg-light text-center d-flex align-items-center justify-content-center overflow-hidden" style="height: 90px;">
+                            <span class="text-muted" style="font-size: 0.75rem;">No banner selected</span>
+                        </div>
+                        <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">Shown at 100% width × 400px height (cropped to fit) on the category page — recommended size 1600×400px.</small>
+                    </div>
+
                     <div class="mb-3">
                         <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Description</label>
                         <textarea name="description" id="editCatDescription" class="form-control bg-light border p-2" rows="3"></textarea>
@@ -290,6 +313,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (window.initMediaPicker) {
         window.initMediaPicker('#categoryImageInput', '#categoryImagePreview', 'image');
         window.initMediaPicker('#editCatImageInput', '#editCatImagePreview', 'image');
+        window.initMediaPicker('#categoryBannerInput', '#categoryBannerPreview', 'image');
+        window.initMediaPicker('#editCatBannerInput', '#editCatBannerPreview', 'image');
     }
 
     // ── Create category logic ──
@@ -315,6 +340,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const editSelectedIconDisplay = document.getElementById('editSelectedIconDisplay');
     const editCatImageInput = document.getElementById('editCatImageInput');
     const editCatImagePreview = document.getElementById('editCatImagePreview');
+    const editCatBannerInput = document.getElementById('editCatBannerInput');
+    const editCatBannerPreview = document.getElementById('editCatBannerPreview');
     const editCatModal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
 
     editCatButtons.forEach(btn => {
@@ -324,6 +351,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const desc = this.getAttribute('data-description');
             const icon = this.getAttribute('data-icon') || 'bi-tags';
             const image = this.getAttribute('data-image') || '';
+            const bannerImage = this.getAttribute('data-banner-image') || '';
 
             editCatForm.action = `/admin/categories/${id}/update`;
             editCatName.value = name;
@@ -338,6 +366,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 editCatImagePreview.innerHTML = `<img src="${previewSrc}" class="rounded-3 img-fluid border" style="max-height: 40px; object-fit: cover;">`;
             } else {
                 editCatImagePreview.innerHTML = `<span class="text-muted" style="font-size: 0.68rem;">No image</span>`;
+            }
+
+            editCatBannerInput.value = bannerImage;
+            if (bannerImage) {
+                const bannerPreviewSrc = bannerImage.startsWith('http') ? bannerImage : (window.location.origin + '/' + bannerImage.replace(/^\//, ''));
+                editCatBannerPreview.innerHTML = `<img src="${bannerPreviewSrc}" class="img-fluid" style="max-height: 88px; object-fit: cover;">`;
+            } else {
+                editCatBannerPreview.innerHTML = `<span class="text-muted" style="font-size: 0.75rem;">No banner selected</span>`;
             }
 
             editCatModal.show();

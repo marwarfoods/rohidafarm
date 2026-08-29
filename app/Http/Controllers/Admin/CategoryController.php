@@ -54,6 +54,7 @@ class CategoryController extends Controller
             'description' => 'nullable|string',
             'icon' => 'nullable|string|max:255',
             'image' => 'nullable|string|max:500',
+            'banner_image' => 'nullable|string|max:500',
         ]);
 
         $category = Category::create([
@@ -62,6 +63,7 @@ class CategoryController extends Controller
             'description' => $request->input('description'),
             'icon' => $request->input('icon', 'bi-tags'),
             'image' => $request->input('image'),
+            'banner_image' => $request->input('banner_image'),
             'is_active' => true
         ]);
 
@@ -120,6 +122,7 @@ class CategoryController extends Controller
             'description' => 'nullable|string',
             'icon' => 'nullable|string|max:255',
             'image' => 'nullable|string|max:500',
+            'banner_image' => 'nullable|string|max:500',
         ]);
 
         $category->update([
@@ -128,6 +131,7 @@ class CategoryController extends Controller
             'description' => $request->input('description'),
             'icon' => $request->input('icon', 'bi-tags'),
             'image' => $request->input('image'),
+            'banner_image' => $request->input('banner_image'),
         ]);
 
         self::logActivity('category_update', "Updated category {$category->name}");

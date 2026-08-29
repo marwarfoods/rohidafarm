@@ -86,7 +86,6 @@ export function initReviews() {
             const rating = this.getAttribute('data-rating');
             const title  = this.getAttribute('data-title');
             const review = this.getAttribute('data-review');
-            const user   = this.getAttribute('data-user');
             const date   = this.getAttribute('data-date');
             let images   = [];
             try { images = JSON.parse(this.getAttribute('data-images') || '[]'); } catch (err) {}
@@ -103,12 +102,8 @@ export function initReviews() {
             if (titleEl) titleEl.textContent = title;
             const textEl = document.getElementById('modalReviewText');
             if (textEl) textEl.textContent = review;
-            const userEl = document.getElementById('modalReviewUser');
-            if (userEl) userEl.textContent = user;
             const dateEl = document.getElementById('modalReviewDate');
             if (dateEl) dateEl.textContent = date;
-            const avatarEl = document.getElementById('modalReviewAvatar');
-            if (avatarEl) avatarEl.textContent = (user || 'A').charAt(0).toUpperCase();
 
             // Populate / toggle photo column
             _images = images;

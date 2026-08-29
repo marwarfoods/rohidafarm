@@ -1,0 +1,1 @@
+console.log(`Mail JS loaded`);

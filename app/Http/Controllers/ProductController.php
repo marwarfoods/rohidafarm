@@ -51,13 +51,20 @@ class ProductController extends Controller
         $products = $this->productRepo->filterAndPaginate($filters, 10);
         $categories = $this->categoryRepo->getWithSubcategories();
 
+        $activeCategory = null;
+        if ($category) {
+            $activeCategory = $this->categoryRepo->findBySlug($category);
+        }
+
         $seo = $this->seoService->generateTags([
-            'title' => 'Shop Organic Farm Products',
-            'description' => 'Explore the finest selection of A2 Cow Ghee, wood pressed oils, wild honey, and natural spices.',
+            'title' => $activeCategory ? ($activeCategory->name . ' | RohidaFarm') : 'Shop Organic Farm Products',
+            'description' => $activeCategory
+                ? ($activeCategory->description ?: ('Explore ' . $activeCategory->name . ' at RohidaFarm.'))
+                : 'Explore the finest selection of A2 Cow Ghee, wood pressed oils, wild honey, and natural spices.',
             'keywords' => 'ghee shop, purchase organic ghee online, raw forest honey store'
         ]);
 
-        return view('frontend.shop.index', compact('products', 'categories', 'filters', 'seo'));
+        return view('frontend.shop.index', compact('products', 'categories', 'filters', 'seo', 'activeCategory'));
     }
 
     /**

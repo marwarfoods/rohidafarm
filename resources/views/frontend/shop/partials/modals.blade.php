@@ -46,10 +46,6 @@
                 <div class="col-md-6 p-4 p-md-5" id="modalReviewTextCol">
                     <div class="text-warning mb-3" id="modalReviewStars" style="font-size: 1rem;"></div>
 
-                    <div class="d-flex align-items-center gap-2 mb-1">
-                        <div class="rounded-circle bg-success-subtle text-success d-flex align-items-center justify-content-center fw-bold flex-shrink-0" style="width: 36px; height: 36px; font-size: 0.9rem;" id="modalReviewAvatar"></div>
-                        <span class="fw-bold text-dark" id="modalReviewUser" style="font-size: 1rem;">User</span>
-                    </div>
                     <div class="text-muted mb-3" id="modalReviewDate" style="font-size: 0.8rem;">Date</div>
 
                     <h5 class="fw-bold font-heading text-dark mb-2" id="modalReviewTitle" style="font-size: 1.05rem;">Headline</h5>

@@ -223,15 +223,26 @@ class MediaController extends Controller
             $file = $request->file('file');
             $originalName = $file->getClientOriginalName();
             $extension = strtolower($file->getClientOriginalExtension());
-            
-            if (in_array($extension, ['mp4', 'mov', 'avi', 'webm', 'mkv'])) {
+
+            $imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'svg'];
+            $videoExts = ['mp4', 'mov', 'avi', 'webm', 'mkv'];
+            $documentExts = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'zip', 'rar', 'csv', 'txt'];
+
+            if (in_array($extension, $videoExts)) {
                 $fileType = 'video';
-            } elseif (in_array($extension, ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'zip', 'rar', 'csv', 'txt'])) {
+            } elseif (in_array($extension, $documentExts)) {
                 $fileType = 'document';
-            } else {
+            } elseif (in_array($extension, $imageExts)) {
                 $fileType = 'image';
+            } else {
+                // Anything outside these allowlists (including .php/.phtml/.htaccess
+                // and other server-executable extensions) is rejected outright —
+                // this endpoint saves files straight into a web-accessible public/
+                // directory using the client-supplied extension, so an unrestricted
+                // upload here is a direct path to remote code execution.
+                throw new \Exception("Unsupported file type: .{$extension}");
             }
-            
+
             $sluggedName = Str::slug(pathinfo($originalName, PATHINFO_FILENAME));
             $sluggedName = Str::limit($sluggedName, 50, ''); // limit to 50 chars to avoid OS/DB max length
             $filename = time() . '_' . $sluggedName . '.' . $extension;

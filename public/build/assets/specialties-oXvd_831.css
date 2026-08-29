@@ -1,0 +1,1 @@
+.feature-card-minimal{transition:transform .4s cubic-bezier(.16,1,.3,1),box-shadow .4s cubic-bezier(.16,1,.3,1)}.feature-card-minimal:hover{transform:translateY(-10px)}.feature-card-minimal .icon-wrapper{transition:all .4s}.feature-card-minimal:hover .icon-wrapper{transform:scale(1.1);background-color:var(--primary-green)!important;color:#fff!important}
