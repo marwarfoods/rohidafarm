@@ -143,17 +143,7 @@
 
     </div>
 
-    <!-- Follow Button CTA -->
-    <div class="text-center mt-4 mt-md-5" data-aos="fade-up">
-        <a href="{{ $instaUrl }}" 
-           target="_blank" rel="noopener noreferrer" 
-           class="btn btn-lg rounded-pill px-5 py-3 font-heading fw-bold shadow-sm d-inline-flex align-items-center justify-content-center text-white" 
-           style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); border: none; font-size: 0.95rem; letter-spacing: 0.5px; transition: transform 0.3s ease, box-shadow 0.3s ease;"
-           onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(220,39,67,0.35)';"
-           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
-            <i class="bi bi-instagram me-2 fs-5"></i> Join @marwar_foods On Instagram
-        </a>
-    </div>
+
 </section>
 
 <style>

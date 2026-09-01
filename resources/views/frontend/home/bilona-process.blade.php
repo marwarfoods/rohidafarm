@@ -3,14 +3,14 @@
 <section class="py-3 py-md-4 bilona-kasutam-section position-relative overflow-hidden" id="bilona-process"
     style="background: url('{{ asset('images/vectors/full-tree.png') }}') left bottom / cover no-repeat; min-height: 480px;">
 
-    {{-- Full-width overlay — image shows through uniformly on both left & right --}}
-    <div class="position-absolute top-0 start-0 w-100 h-100"
-         style="background: rgba(250, 247, 238, 0.82); z-index: 0; pointer-events: none;"></div>
+    {{-- Dynamic gradient overlay: crystal clear on left on PC, smooth soft cream on right for readable cards --}}
+    <div class="position-absolute top-0 start-0 w-100 h-100 bilona-split-overlay"
+         style="z-index: 0; pointer-events: none;"></div>
 
     <div class="container-fluid px-0 py-md-2 position-relative" style="z-index: 1;">
         <div class="row g-0 align-items-stretch" style="min-height: 460px;">
 
-            {{-- LEFT COLUMN — empty, shows BG image (40%) --}}
+            {{-- LEFT COLUMN — crystal clear view of the background cow & farm illustration (40%) --}}
             <div class="col-lg-5 d-none d-lg-block"></div>
 
             {{-- RIGHT COLUMN — heading + all 5 steps (60%) --}}
@@ -60,4 +60,22 @@
         </div>
     </div>
 </section>
+
+<style>
+    .bilona-split-overlay {
+        background: rgba(250, 247, 238, 0.92);
+    }
+    @media (min-width: 992px) {
+        .bilona-split-overlay {
+            background: linear-gradient(
+                to right,
+                rgba(250, 247, 238, 0) 0%,
+                rgba(250, 247, 238, 0) 38%,
+                rgba(250, 247, 238, 0.6) 48%,
+                rgba(250, 247, 238, 0.92) 58%,
+                rgba(250, 247, 238, 0.96) 100%
+            ) !important;
+        }
+    }
+</style>
 @endif
