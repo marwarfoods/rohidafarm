@@ -16,7 +16,7 @@ class Typewriter {
         const current = this.wordIndex % this.words.length;
         const fullTxt = this.words[current];
 
-        if(this.isDeleting) {
+        if (this.isDeleting) {
             this.txt = fullTxt.substring(0, this.txt.length - 1);
         } else {
             this.txt = fullTxt.substring(0, this.txt.length + 1);
@@ -26,14 +26,14 @@ class Typewriter {
 
         let typeSpeed = 120;
 
-        if(this.isDeleting) {
+        if (this.isDeleting) {
             typeSpeed /= 2;
         }
 
-        if(!this.isDeleting && this.txt === fullTxt) {
+        if (!this.isDeleting && this.txt === fullTxt) {
             typeSpeed = this.wait;
             this.isDeleting = true;
-        } else if(this.isDeleting && this.txt === '') {
+        } else if (this.isDeleting && this.txt === '') {
             this.isDeleting = false;
             this.wordIndex++;
             typeSpeed = 400;
@@ -50,15 +50,15 @@ document.addEventListener('DOMContentLoaded', function () {
         const slidesCount = heroSlider.querySelectorAll('.swiper-slide').length;
         new Swiper('.hero-slider', {
             loop: slidesCount > 1,
-        autoplay: {
-            delay: 5000,
-            disableOnInteraction: false,
-            pauseOnMouseEnter: true,
-        },
-        pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-        }
+            autoplay: {
+                delay: 5000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            }
         });
     }
 
@@ -173,27 +173,27 @@ document.addEventListener('DOMContentLoaded', function () {
         const slidesCount = nativeSlider.querySelectorAll('.swiper-slide').length;
         new Swiper('.native-ingredients-slider', {
             loop: slidesCount > 4,
-        autoplay: {
-            delay: 3500,
-            disableOnInteraction: false,
-            pauseOnMouseEnter: true,
-        },
-        slidesPerView: 1.2,
-        spaceBetween: 16,
-        grabCursor: true,
-        pagination: {
-            el: '.native-ingredients-slider .swiper-pagination',
-            clickable: true,
-        },
-        breakpoints: {
-            576: { slidesPerView: 2.2, spaceBetween: 16 },
-            768: { slidesPerView: 3, spaceBetween: 20 },
-            992: {
-                slidesPerView: 4,
-                spaceBetween: 24,
-                allowTouchMove: false,
+            autoplay: {
+                delay: 3500,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+            },
+            slidesPerView: 1.2,
+            spaceBetween: 16,
+            grabCursor: true,
+            pagination: {
+                el: '.native-ingredients-slider .swiper-pagination',
+                clickable: true,
+            },
+            breakpoints: {
+                576: { slidesPerView: 2.2, spaceBetween: 16 },
+                768: { slidesPerView: 3, spaceBetween: 20 },
+                992: {
+                    slidesPerView: 4,
+                    spaceBetween: 24,
+                    allowTouchMove: false,
+                }
             }
-        }
         });
     }
 
@@ -203,33 +203,33 @@ document.addEventListener('DOMContentLoaded', function () {
         const slidesCount = videoSlider.querySelectorAll('.swiper-slide').length;
         new Swiper('.video-reviews-slider', {
             loop: slidesCount > 6,
-        autoplay: {
-            delay: 4000,
-            disableOnInteraction: false,
-            pauseOnMouseEnter: true,
-        },
-        slidesPerView: 1.5, // 1.5 columns on mobile base
-        spaceBetween: 16,
-        grabCursor: true,
-        navigation: {
-            nextEl: '.video-reviews-next',
-            prevEl: '.video-reviews-prev',
-        },
-        breakpoints: {
-            576: {
-                slidesPerView: 2.5,
+            autoplay: {
+                delay: 4000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
             },
-            768: {
-                slidesPerView: 3.5,
+            slidesPerView: 1.5, // 1.5 columns on mobile base
+            spaceBetween: 16,
+            grabCursor: true,
+            navigation: {
+                nextEl: '.video-reviews-next',
+                prevEl: '.video-reviews-prev',
             },
-            992: {
-                slidesPerView: 4.5,
-            },
-            1200: {
-                slidesPerView: 5.5, // 5.5 columns on desktop
-                spaceBetween: 20
+            breakpoints: {
+                576: {
+                    slidesPerView: 2.5,
+                },
+                768: {
+                    slidesPerView: 3.5,
+                },
+                992: {
+                    slidesPerView: 4.5,
+                },
+                1200: {
+                    slidesPerView: 5.5, // 5.5 columns on desktop
+                    spaceBetween: 20
+                }
             }
-        }
         });
     }
 
@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const lightboxReviewer = document.getElementById('lightboxReviewer');
     const lightboxProduct = document.getElementById('lightboxProduct');
     const lightboxBuyBtn = document.getElementById('lightboxBuyBtn');
-    
+
     if (lightbox) {
         let currentVideoIndex = 0;
         let videoDataList = [];
@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (playPromise !== undefined) {
                         playPromise.then(() => {
                             if (playBtn) playBtn.style.opacity = '0';
-                        }).catch(() => {});
+                        }).catch(() => { });
                     }
                 });
 
@@ -287,7 +287,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 product: card.getAttribute('data-product'),
                 buyUrl: card.getAttribute('data-buy-url')
             });
-            
+
             // Add click listener
             card.addEventListener('click', (e) => {
                 if (e.target.closest('.btn-video-buy')) return; // let product redirect work
@@ -344,7 +344,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Close actions
         const closeBtn = lightbox.querySelector('.lightbox-close');
         if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
-        
+
         // Close on clicking backdrop or empty overlay area
         lightbox.addEventListener('click', (e) => {
             if (e.target === lightbox || e.target.classList.contains('lightbox-backdrop')) {
@@ -367,7 +367,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const arrowRight = lightbox.querySelector('.arrow-right');
         if (arrowLeft) arrowLeft.addEventListener('click', playPrev);
         if (arrowRight) arrowRight.addEventListener('click', playNext);
-        
+
         // Mobile Navigation Controls
         const btnPrev = lightbox.querySelector('.btn-prev');
         const btnNext = lightbox.querySelector('.btn-next');

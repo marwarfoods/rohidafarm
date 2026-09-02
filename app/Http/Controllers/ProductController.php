@@ -56,6 +56,23 @@ class ProductController extends Controller
             $activeCategory = $this->categoryRepo->findBySlug($category);
         }
 
+        $globalFaqs = \App\Models\Faq::where('is_active', true)->orderBy('sort_order')->get();
+        $videoReviews = \App\Models\VideoReview::with('product.primaryImage')->where('is_active', true)->orderBy('sort_order')->get();
+
+        $exploreQuery = \App\Models\Product::with(['category:id,name,slug', 'images', 'primaryImage', 'variants'])
+            ->where('is_active', true);
+        if ($activeCategory) {
+            $exploreQuery->where('category_id', '!=', $activeCategory->id);
+        }
+        $exploreProducts = $exploreQuery->inRandomOrder()->limit(8)->get();
+        if ($exploreProducts->isEmpty()) {
+            $exploreProducts = \App\Models\Product::with(['category:id,name,slug', 'images', 'primaryImage', 'variants'])
+                ->where('is_active', true)
+                ->inRandomOrder()
+                ->limit(8)
+                ->get();
+        }
+
         $seo = $this->seoService->generateTags([
             'title' => $activeCategory ? ($activeCategory->name . ' | RohidaFarm') : 'Shop Organic Farm Products',
             'description' => $activeCategory
@@ -64,7 +81,9 @@ class ProductController extends Controller
             'keywords' => 'ghee shop, purchase organic ghee online, raw forest honey store'
         ]);
 
-        return view('frontend.shop.index', compact('products', 'categories', 'filters', 'seo', 'activeCategory'));
+        return view('frontend.shop.index', compact(
+            'products', 'categories', 'filters', 'seo', 'activeCategory', 'globalFaqs', 'videoReviews', 'exploreProducts'
+        ));
     }
 
     /**

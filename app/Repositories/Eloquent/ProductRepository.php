@@ -93,7 +93,7 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function filterAndPaginate(array $filters, int $perPage = 12)
     {
-        $query = $this->model->with(['category', 'images'])->where('is_active', true);
+        $query = $this->model->with(['category', 'images', 'primaryImage', 'variants'])->where('is_active', true);
 
         // Filter by Category
         if (!empty($filters['category'])) {

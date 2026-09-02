@@ -82,13 +82,70 @@
             </div>
             </div>
         </div>
+
+        {{-- ── 1. Global FAQs Section ── --}}
+        @if(isset($globalFaqs) && $globalFaqs->isNotEmpty())
+            <div class="my-5">
+                <div class="bg-white p-4 p-md-5 rounded-4 shadow-sm border" style="border-color:#f6f3eb !important;">
+                    <div class="text-center mb-4">
+                        <span class="text-uppercase fw-bold text-success" style="font-size: 0.75rem; letter-spacing: 2px;">Have Questions?</span>
+                        <h3 class="font-heading fw-bold mt-1 text-dark display-6">Frequently Asked Questions</h3>
+                    </div>
+
+                    <div class="accordion mx-auto" id="shopFaqAccordion" style="max-width: 820px;">
+                        @foreach($globalFaqs as $index => $faq)
+                            <div class="accordion-item border-0 border-bottom" style="border-color:#f6f3eb !important;">
+                                <h2 class="accordion-header" id="shopFaqHeading{{ $faq->id ?? $index }}">
+                                    <button class="accordion-button collapsed fw-bold text-dark bg-transparent shadow-none px-2 py-3" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#shopFaqCollapse{{ $faq->id ?? $index }}"
+                                            aria-expanded="false" aria-controls="shopFaqCollapse{{ $faq->id ?? $index }}" style="font-size: 0.95rem;">
+                                        {{ $faq->question }}
+                                    </button>
+                                </h2>
+                                <div id="shopFaqCollapse{{ $faq->id ?? $index }}" class="accordion-collapse collapse" aria-labelledby="shopFaqHeading{{ $faq->id ?? $index }}" data-bs-parent="#shopFaqAccordion">
+                                    <div class="accordion-body text-muted px-2 pb-3 pt-0" style="font-size: 0.88rem; line-height: 1.75;">
+                                        {{ $faq->answer }}
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        {{-- ── 2. Featured Video Reviews (Homepage Component) ── --}}
+        @if(isset($videoReviews) && $videoReviews->isNotEmpty())
+            <div class="my-5 rounded-4 overflow-hidden shadow-sm">
+                @include('frontend.home.videos')
+            </div>
+        @endif
+
+        {{-- ── 3. Explore More Products (Shown only on Category pages) ── --}}
+        @if($activeCategory && isset($exploreProducts) && $exploreProducts->isNotEmpty())
+            <div class="my-5">
+                <div class="text-center mb-4">
+                    <span class="text-uppercase fw-bold text-success" style="font-size: 0.75rem; letter-spacing: 2px;">More from Rohida Farm</span>
+                    <h2 class="display-6 font-heading fw-bold mt-1 mb-0">Explore More Products</h2>
+                </div>
+                
+                <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-4 g-3 g-md-4">
+                    @foreach($exploreProducts as $prod)
+                        <div class="col">
+                            <x-product-card :product="$prod" />
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
     </div>
 </section>
 
 @endsection
 
 @push('scripts')
-    @vite(['resources/js/shop.js'])
+    @vite(['resources/js/shop.js', 'resources/js/home.js'])
     <script>
         // Event delegation is required here: the Category Capsule / mobile filter AJAX
         // (shop.js) replaces #product-grid-area's innerHTML, which would detach a
