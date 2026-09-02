@@ -312,7 +312,7 @@
                 <form action="{{ route('cart.add') }}" method="POST" id="mainAddToCartForm" class="flex-grow-1 m-0 {{ !$isInStock ? 'd-none' : '' }}">
                     @csrf
                     <input type="hidden" name="product_id" value="{{ $product->id }}">
-                    <input type="hidden" name="variant_id" id="hiddenVariantId" value="{{ $product->variants->first()?->id }}">
+                    <input type="hidden" name="variant_id" id="hiddenVariantId" value="{{ $defaultVariant?->id ?? '' }}">
                     <input type="hidden" name="quantity" id="hiddenQuantity" value="1">
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-premium-outline btn-lg w-100 rounded-pill py-3 text-uppercase font-heading" style="font-size:0.85rem;height:52px;font-weight:bold;border-width:2px;">

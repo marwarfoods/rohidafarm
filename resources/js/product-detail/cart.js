@@ -88,42 +88,95 @@ export function initCart() {
     });
 
     // ── Direct Buy Now (Desktop & Mobile) ────────────────────────────
-    const handleDirectBuy = function (e) {
+    const handleDirectBuy = async function (e) {
         e.preventDefault();
-        const form = document.getElementById('mainAddToCartForm') || document.getElementById('mobileAddToCartForm');
-        if (!form) return;
-
-        if (typeof window.RohidaDebug === 'object') {
-            window.RohidaDebug.log('🚀', 'Direct Buy', 'Buy Now button clicked! Adding item to cart and redirecting to /checkout...');
-        }
+        e.stopPropagation();
 
         const btn = e.currentTarget;
+        const originalHtml = btn.innerHTML;
+
+        // Determine which form to use based on clicked button or viewport
+        const isMobileBtn = btn.id === 'mobileBtnBuyNowDirect' || window.innerWidth < 768;
+        const form = isMobileBtn
+            ? (document.getElementById('mobileAddToCartForm') || document.getElementById('mainAddToCartForm'))
+            : (document.getElementById('mainAddToCartForm') || document.getElementById('mobileAddToCartForm'));
+
+        if (!form) return;
+
+        // Resolve current active variant ID
+        const activeVariantCard = document.querySelector('.variant-card.active');
+        let activeVariantId = activeVariantCard 
+            ? activeVariantCard.getAttribute('data-id')
+            : (document.getElementById('hiddenVariantId')?.value || document.getElementById('mobileHiddenVariantId')?.value || '');
+
+        // Resolve current selected quantity
+        const qtyVal = parseInt(document.getElementById('purchaseQuantity')?.value || document.getElementById('mobilePurchaseQuantity')?.value || '1') || 1;
+
+        // Sync hidden fields across forms
+        const hiddenVar = document.getElementById('hiddenVariantId');
+        const mobileVar = document.getElementById('mobileHiddenVariantId');
+        const hiddenQty = document.getElementById('hiddenQuantity');
+        const mobileQty = document.getElementById('mobileHiddenQuantity');
+
+        if (hiddenVar) hiddenVar.value = activeVariantId;
+        if (mobileVar) mobileVar.value = activeVariantId;
+        if (hiddenQty) hiddenQty.value = qtyVal;
+        if (mobileQty) mobileQty.value = qtyVal;
+
+        if (typeof window.RohidaDebug === 'object') {
+            window.RohidaDebug.log('🚀', 'Direct Buy', `Buy Now clicked! Product Variant: ${activeVariantId}, Qty: ${qtyVal} -> Redirecting to /checkout...`);
+        }
+
         btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Redirecting to Checkout...';
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Checkout...';
 
         const formData = new FormData(form);
-        fetch('/cart/add', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json'
+        formData.set('variant_id', activeVariantId);
+        formData.set('quantity', qtyVal);
+
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || formData.get('_token') || '';
+            const res = await fetch('/cart/add', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                }
+            });
+
+            const data = await res.json();
+
+            if (!res.ok || data.status === 'error') {
+                throw new Error(data.message || 'Could not add product to cart.');
             }
-        })
-        .then(res => res.json())
-        .then(data => {
+
             if (typeof window.RohidaDebug === 'object') {
-                window.RohidaDebug.log('✅', 'Direct Buy', 'Item added successfully -> Redirecting to /checkout now!');
+                window.RohidaDebug.log('✅', 'Direct Buy', 'Item added to cart successfully -> Redirecting to /checkout now!');
             }
+
+            // Prevent cart offcanvas drawer from opening on page load
+            sessionStorage.removeItem('open_cart_drawer');
+
             window.location.href = '/checkout';
-        })
-        .catch(err => {
-            window.location.href = '/checkout';
-        });
+        } catch (err) {
+            console.error('Direct Buy Error:', err);
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+            alert(err.message || 'Unable to proceed to checkout. Please try again.');
+        }
     };
 
     document.getElementById('btnBuyNowDirect')?.addEventListener('click', handleDirectBuy);
     document.getElementById('mobileBtnBuyNowDirect')?.addEventListener('click', handleDirectBuy);
+
+    // Also delegate click in case button is dynamically replaced/rendered
+    document.addEventListener('click', function (e) {
+        const buyBtn = e.target.closest('#btnBuyNowDirect, #mobileBtnBuyNowDirect');
+        if (buyBtn && !buyBtn.disabled && buyBtn !== e.currentTarget) {
+            // Handled by direct event listener above, but fallback ensures execution
+        }
+    });
 
     // ── Short Description Read More / Read Less ───────
     const descText   = document.getElementById('shortDescText');

@@ -9,7 +9,7 @@
     <form action="{{ route('cart.add') }}" method="POST" id="mobileAddToCartForm" class="m-0 w-100 {{ !$isInStock ? 'd-none' : '' }}">
         @csrf
         <input type="hidden" name="product_id" value="{{ $product->id }}">
-        <input type="hidden" name="variant_id" id="mobileHiddenVariantId" value="{{ $product->variants->first()?->id }}">
+        <input type="hidden" name="variant_id" id="mobileHiddenVariantId" value="{{ $defaultVariant?->id ?? '' }}">
         <input type="hidden" name="quantity" id="mobileHiddenQuantity" value="1">
 
         <div class="d-flex align-items-center justify-content-between gap-2">

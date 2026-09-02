@@ -48,14 +48,6 @@
             
             <!-- Left Main Column: Blog Content -->
             <div class="col-lg-8" data-aos="fade-right">
-                <nav aria-label="breadcrumb" class="mb-4">
-                    <ol class="breadcrumb" style="font-size: 0.85rem;">
-                        <li class="breadcrumb-item"><a href="/" class="text-success text-decoration-none">Home</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('blogs.index') }}" class="text-success text-decoration-none">Blogs</a></li>
-                        <li class="breadcrumb-item active text-muted" aria-current="page">Article</li>
-                    </ol>
-                </nav>
-
                 <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill mb-3 py-1.5 px-3" style="font-size: 0.72rem; letter-spacing: 0.5px;">{{ $blog->category->name }}</span>
                 <h1 class="font-heading display-5 fw-bold text-dark mb-3" style="line-height: 1.25;">{{ $blog->title }}</h1>
                 

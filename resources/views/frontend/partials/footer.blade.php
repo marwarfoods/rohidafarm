@@ -28,9 +28,13 @@
                     @if(\App\Models\Setting::get('social_facebook'))
                         <a href="{{ \App\Models\Setting::get('social_facebook') }}" target="_blank" rel="noopener noreferrer" class="footer-social-icon" aria-label="Follow us on Facebook"><i class="bi bi-facebook" aria-hidden="true"></i></a>
                     @endif
-                    @if(\App\Models\Setting::get('social_instagram'))
-                        <a href="{{ \App\Models\Setting::get('social_instagram') }}" target="_blank" rel="noopener noreferrer" class="footer-social-icon" aria-label="Follow us on Instagram"><i class="bi bi-instagram" aria-hidden="true"></i></a>
-                    @endif
+                    @php
+                        $footerInstaUrl = \App\Models\Setting::get('social_instagram') ?: 'https://www.instagram.com/rohidafarm/';
+                        if (Str::contains($footerInstaUrl, 'marwar_foods')) {
+                            $footerInstaUrl = 'https://www.instagram.com/rohidafarm/';
+                        }
+                    @endphp
+                    <a href="{{ $footerInstaUrl }}" target="_blank" rel="noopener noreferrer" class="footer-social-icon" aria-label="Follow us on Instagram"><i class="bi bi-instagram" aria-hidden="true"></i></a>
                     @if(\App\Models\Setting::get('social_youtube'))
                         <a href="{{ \App\Models\Setting::get('social_youtube') }}" target="_blank" rel="noopener noreferrer" class="footer-social-icon" aria-label="Follow us on YouTube"><i class="bi bi-youtube" aria-hidden="true"></i></a>
                     @endif
@@ -57,7 +61,6 @@
                     <ul class="list-unstyled d-flex flex-column gap-3 mt-3" style="font-size:0.88rem;">
                         <li><a href="{{ route('about') }}" class="footer-link">Our Story</a></li>
                         <li><a href="{{ url('/#bilona-process') }}" class="footer-link">Bilona Process</a></li>
-                        <li><a href="#" data-bs-toggle="modal" data-bs-target="#labReportsModal" class="footer-link">Lab Reports</a></li>
                         <li><a href="{{ route('blogs.index') }}" class="footer-link">Healthy Blogs</a></li>
                         <li><a href="{{ route('contact') }}" class="footer-link">Contact Us</a></li>
                     </ul>

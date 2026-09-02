@@ -40,15 +40,15 @@
             <div class="swiper-wrapper">
                 @foreach($blogs as $blog)
                     <div class="swiper-slide h-auto py-2">
-                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden bg-white" style="border: 1px solid var(--border-color) !important;">
-                            <div class="bg-light" style="aspect-ratio: 16/10; overflow:hidden;">
+                        <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden bg-white" style="border: 1px solid var(--border-color) !important; border-radius: 12px !important;">
+                            <div class="bg-light" style="aspect-ratio: 16/10; overflow:hidden; border-radius: 12px 12px 0 0;">
                                 <a href="{{ route('blogs.show', $blog->slug) }}" class="d-block w-100 h-100">
                                     @if($blog->featured_image)
                                         <img src="{{ asset($blog->featured_image) }}" class="w-100 h-100 object-fit-cover" width="400" height="250" style="transition: transform 0.5s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" alt="{{ $blog->title }}" loading="lazy" decoding="async">
                                     @else
                                         <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-success text-white font-heading fs-5" style="background-color: var(--primary-green) !important;">
                                             RohidaFarm Journal
-                                        </div>
+                                         </div>
                                     @endif
                                 </a>
                             </div>
