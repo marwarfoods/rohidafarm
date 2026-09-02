@@ -10,7 +10,6 @@ document.addEventListener(`DOMContentLoaded`,function(){let e=document.getElemen
                                         <i class="bi bi-x"></i>
                                     </button>
                                 `,n.querySelector(`button`).addEventListener(`click`,function(){let e=this.closest(`.variant-gallery-chips-container`);n.remove(),e&&!e.querySelectorAll(`.variant-gallery-chip`).length&&e.querySelector(`.empty-variant-gallery-msg`)?.classList.remove(`d-none`)});let i=u.querySelector(`.empty-variant-gallery-msg`);i&&i.classList.add(`d-none`),u.appendChild(n)})}})}),e.querySelectorAll(`.variant-gallery-chip button`).forEach(e=>{e.addEventListener(`click`,function(){let e=this.closest(`.variant-gallery-chip`),t=this.closest(`.variant-gallery-chips-container`);e&&e.remove(),t&&!t.querySelectorAll(`.variant-gallery-chip`).length&&t.querySelector(`.empty-variant-gallery-msg`)?.classList.remove(`d-none`)})});let f=e.querySelector(`.btn-remove-variant`);f&&f.addEventListener(`click`,function(t){if(t.stopPropagation(),e.remove(),d&&!d.querySelectorAll(`.variant-item`).length){let e=document.createElement(`div`);e.id=`emptyVariantRow`,e.className=`text-center py-4 text-muted`,e.style.fontSize=`0.85rem`,e.innerHTML=`<i class="bi bi-plus-circle me-1"></i> Click "Add Variant" to configure size/weight options and custom images.`,d.appendChild(e)}})}d&&(d.querySelectorAll(`.variant-item`).forEach((e,t)=>{p(e,parseInt(e.dataset.index||t))}),u?.addEventListener(`click`,()=>{document.getElementById(`emptyVariantRow`)?.remove();let e=n,t=document.createElement(`div`);t.className=`variant-item card border rounded-3 mb-3 bg-white shadow-sm overflow-hidden`,t.dataset.index=e,t.innerHTML=`
-                {{-- Accordion Header --}}
                 <div class="card-header bg-light px-3 py-2.5 d-flex justify-content-between align-items-center variant-header" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#variantCollapse_${e}" aria-expanded="true">
                     <div class="d-flex align-items-center gap-2">
                         <i class="bi bi-chevron-down variant-toggle-icon text-muted" style="transition: transform 0.2s;"></i>
@@ -25,7 +24,6 @@ document.addEventListener(`DOMContentLoaded`,function(){let e=document.getElemen
                     </div>
                 </div>
 
-                {{-- Accordion Body --}}
                 <div id="variantCollapse_${e}" class="collapse show">
                     <div class="card-body p-3">
                         <div class="row g-3 mb-3">

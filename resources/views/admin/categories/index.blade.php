@@ -88,7 +88,8 @@
                                 <!-- Left: Icon, Name & Product Count -->
                                 <div class="d-flex align-items-center gap-2 flex-grow-1 text-start">
                                     @if($cat->image)
-                                        <img src="{{ asset($cat->image) }}" alt="{{ $cat->name }}" class="rounded-3 border me-2" style="width: 38px; height: 38px; object-fit: cover; flex-shrink: 0;">
+                                        <img src="{{ asset($cat->image) }}" alt="{{ $cat->name }}" class="rounded-3 border me-2" style="width: 38px; height: 38px; object-fit: cover; flex-shrink: 0;" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.classList.remove('d-none');">
+                                        <i class="bi {{ $cat->icon ?? 'bi-tags' }} text-success fs-4 me-2 d-none"></i>
                                     @else
                                         <i class="bi {{ $cat->icon ?? 'bi-tags' }} text-success fs-4 me-2"></i>
                                     @endif

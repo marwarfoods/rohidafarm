@@ -277,7 +277,6 @@ document.addEventListener('DOMContentLoaded', function() {
             item.className = 'variant-item card border rounded-3 mb-3 bg-white shadow-sm overflow-hidden';
             item.dataset.index = currIdx;
             item.innerHTML = `
-                {{-- Accordion Header --}}
                 <div class="card-header bg-light px-3 py-2.5 d-flex justify-content-between align-items-center variant-header" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#variantCollapse_${currIdx}" aria-expanded="true">
                     <div class="d-flex align-items-center gap-2">
                         <i class="bi bi-chevron-down variant-toggle-icon text-muted" style="transition: transform 0.2s;"></i>
@@ -292,7 +291,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
 
-                {{-- Accordion Body --}}
                 <div id="variantCollapse_${currIdx}" class="collapse show">
                     <div class="card-body p-3">
                         <div class="row g-3 mb-3">
