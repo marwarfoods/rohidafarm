@@ -22,8 +22,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 2. Initialize Media Picker
     if (window.initMediaPicker) {
-        initMediaPicker('#productImageInput', '#imagePreviewContainer', 'image');
-        initMediaPicker('#gallerySelectorInput', null, 'image');
+        initMediaPicker('#productImageInput', '#imagePreviewContainer', 'image', false);
+        initMediaPicker('#gallerySelectorInput', null, 'image', true);
     }
 
     // 3. Initialize CKEditor
@@ -163,16 +163,55 @@ document.addEventListener('DOMContentLoaded', function() {
         if (btnAddGal && galContainer) {
             btnAddGal.addEventListener('click', function(e) {
                 e.preventDefault();
-                activeVariantGalleryTarget = galContainer;
-                activeVariantIndex = card.dataset.index || idx;
+                const variantIndexValue = card.dataset.index || idx;
                 
-                const group = variantGalleryPickerInput?.closest('.media-picker-group');
-                const chooseBtn = group ? group.querySelector('button') : null;
-                if (chooseBtn) {
-                    chooseBtn.click();
+                if (window.openMediaPicker) {
+                    window.openMediaPicker({
+                        type: 'image',
+                        isMultiSelect: true,
+                        onSelect: function(selectedItems) {
+                            if (!selectedItems || !selectedItems.length) return;
+                            selectedItems.forEach(item => {
+                                const fp = item.path;
+                                const chip = document.createElement('div');
+                                chip.className = 'position-relative variant-gallery-chip';
+                                chip.innerHTML = `
+                                    <input type="hidden" name="variants[${variantIndexValue}][gallery_images][]" value="${fp}">
+                                    <img src="${fp.startsWith('http') || fp.startsWith('/') ? fp : '/' + fp}" class="rounded border" style="width: 48px; height: 48px; object-fit: cover;">
+                                    <button type="button" class="btn btn-danger btn-sm rounded-circle position-absolute top-0 end-0 p-0 d-flex align-items-center justify-content-center" style="width: 18px; height: 18px; font-size: 10px; transform: translate(30%, -30%);">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                `;
+                                chip.querySelector('button').addEventListener('click', function() {
+                                    const container = this.closest('.variant-gallery-chips-container');
+                                    chip.remove();
+                                    if (container && !container.querySelectorAll('.variant-gallery-chip').length) {
+                                        container.querySelector('.empty-variant-gallery-msg')?.classList.remove('d-none');
+                                    }
+                                });
+
+                                const emptyMsg = galContainer.querySelector('.empty-variant-gallery-msg');
+                                if (emptyMsg) emptyMsg.classList.add('d-none');
+
+                                galContainer.appendChild(chip);
+                            });
+                        }
+                    });
                 }
             });
         }
+
+        // Wire existing chips delete button
+        card.querySelectorAll('.variant-gallery-chip button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const chip = this.closest('.variant-gallery-chip');
+                const container = this.closest('.variant-gallery-chips-container');
+                if (chip) chip.remove();
+                if (container && !container.querySelectorAll('.variant-gallery-chip').length) {
+                    container.querySelector('.empty-variant-gallery-msg')?.classList.remove('d-none');
+                }
+            });
+        });
 
         const removeBtn = card.querySelector('.btn-remove-variant');
         if (removeBtn) {
@@ -323,19 +362,33 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (gallerySelector) {
         gallerySelector.addEventListener('change', function() {
-            const fp = this.value;
-            if (!fp) return;
-            appendGalleryItem(fp);
+            const val = this.value;
+            if (!val) return;
+            const paths = val.split(',');
+            paths.forEach(fp => {
+                if (fp && fp.trim()) appendGalleryItem(fp.trim());
+            });
             this.value = '';
         });
     }
 
     if (btnOpenPicker) {
         btnOpenPicker.addEventListener('click', () => {
-            const input = document.getElementById('gallerySelectorInput');
-            const wrapper = input?.closest('.media-picker-group');
-            if (wrapper) {
-                const btn = wrapper.querySelector('button');
+            if (window.openMediaPicker) {
+                window.openMediaPicker({
+                    type: 'image',
+                    isMultiSelect: true,
+                    onSelect: function(selectedItems) {
+                        if (!selectedItems || !selectedItems.length) return;
+                        selectedItems.forEach(item => {
+                            if (item.path) appendGalleryItem(item.path);
+                        });
+                    }
+                });
+            } else {
+                const input = document.getElementById('gallerySelectorInput');
+                const wrapper = input?.closest('.media-picker-group');
+                const btn = wrapper?.querySelector('button');
                 if (btn) btn.click();
             }
         });

@@ -146,6 +146,26 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Selection Action Footer (WordPress-style Multi-Select Action Bar) -->
+            <div class="modal-footer border-top bg-white px-4 py-2.5 d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <span id="mediaPickerSelectionInfo" class="text-muted small" style="font-size: 0.84rem;">
+                        <span id="mediaPickerSelectedCount" class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 me-1">0</span> item(s) selected
+                    </span>
+                    <button type="button" class="btn btn-link btn-sm text-danger text-decoration-none p-0 ms-2 d-none" id="mediaPickerClearSelectionBtn" style="font-size: 0.78rem;">
+                        <i class="bi bi-x-circle me-1"></i>Clear
+                    </button>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-3 py-1.5" data-bs-dismiss="modal" style="font-size: 0.85rem;">
+                        Cancel
+                    </button>
+                    <button type="button" class="btn btn-success rounded-pill px-4 py-1.5 font-heading fw-semibold shadow-sm d-flex align-items-center gap-1.5" id="mediaPickerConfirmBtn" disabled style="font-size: 0.85rem;">
+                        <i class="bi bi-check2-circle fs-6"></i> <span id="mediaPickerConfirmBtnText">Select Item</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </div>

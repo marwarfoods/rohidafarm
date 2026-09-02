@@ -1,6 +1,9 @@
 (function() {
     let activeTargetInput = null;
     let activePreviewContainer = null;
+    let activeCustomCallback = null;
+    let isMultiSelect = false;
+    let selectedMediaItems = []; // [{ path, fullUrl, filename }]
     let nextMediaPageUrl = null;
     let currentMediaTypeFilter = 'image'; // default filter
     let currentFolder = 'all';
@@ -8,9 +11,18 @@
     let searchDebounceTimer = null;
 
     // Define function globally immediately so page inline scripts don't hit race conditions
-    window.initMediaPicker = function(inputSelector, previewSelector = null, type = 'image') {
-        const inputs = document.querySelectorAll(inputSelector);
+    window.initMediaPicker = function(inputSelector, previewSelector = null, type = 'image', multiple = null) {
+        let inputs = [];
+        if (typeof inputSelector === 'string') {
+            inputs = Array.from(document.querySelectorAll(inputSelector));
+        } else if (inputSelector instanceof Element) {
+            inputs = [inputSelector];
+        } else if (inputSelector instanceof NodeList || Array.isArray(inputSelector)) {
+            inputs = Array.from(inputSelector);
+        }
+
         inputs.forEach(input => {
+            if (!input || !input.parentNode) return;
             // Ensure double binding wrapper doesn't exist
             if (input.parentNode.classList.contains('media-picker-group')) return;
 
@@ -26,28 +38,171 @@
             btn.type = 'button';
             btn.innerHTML = '<i class="bi bi-folder2-open"></i> Choose';
             btn.addEventListener('click', () => {
-                activeTargetInput = input;
-                activePreviewContainer = previewSelector ? document.querySelector(previewSelector) : null;
-                currentMediaTypeFilter = type;
-                currentFolder = 'all';
-                currentSearch = '';
-
-                const searchInput = document.getElementById('mediaPickerSearchInput');
-                if (searchInput) searchInput.value = '';
-
-                // The Videos folder only makes sense when the picker isn't locked to images
-                const videoFolderLi = document.querySelector('.media-picker-folder-video-only');
-                if (videoFolderLi) videoFolderLi.style.display = (type === 'video') ? '' : 'none';
-
-                setActiveFolderUI('all');
-                resetAndLoadGallery();
-
-                const modal = new bootstrap.Modal(document.getElementById('mediaPickerModal'));
-                modal.show();
+                const isMulti = (multiple !== null) ? !!multiple : (input.hasAttribute('multiple') || input.dataset.multiple === 'true');
+                openPickerModal({
+                    targetInput: input,
+                    previewSelector: previewSelector,
+                    type: type,
+                    isMultiSelect: isMulti
+                });
             });
             wrapper.appendChild(btn);
         });
     };
+
+    // Programmatic picker opener
+    window.openMediaPicker = function(options = {}) {
+        openPickerModal(options);
+    };
+
+    function openPickerModal(options = {}) {
+        activeTargetInput = options.targetInput || null;
+        activePreviewContainer = options.previewSelector 
+            ? (typeof options.previewSelector === 'string' ? document.querySelector(options.previewSelector) : options.previewSelector) 
+            : null;
+        activeCustomCallback = (typeof options.onSelect === 'function') ? options.onSelect : null;
+        
+        isMultiSelect = !!options.isMultiSelect;
+        selectedMediaItems = [];
+        updateFooterSelectionUI();
+
+        currentMediaTypeFilter = options.type || 'image';
+        currentFolder = 'all';
+        currentSearch = '';
+
+        const searchInput = document.getElementById('mediaPickerSearchInput');
+        if (searchInput) searchInput.value = '';
+
+        const videoFolderLi = document.querySelector('.media-picker-folder-video-only');
+        if (videoFolderLi) videoFolderLi.style.display = (currentMediaTypeFilter === 'video') ? '' : 'none';
+
+        setActiveFolderUI('all');
+        resetAndLoadGallery();
+
+        // Switch to gallery tab by default when opening
+        const galleryTabBtn = document.getElementById('gallery-tab');
+        if (galleryTabBtn && typeof bootstrap !== 'undefined') {
+            const tab = bootstrap.Tab.getOrCreateInstance(galleryTabBtn);
+            tab.show();
+        }
+
+        const modalEl = document.getElementById('mediaPickerModal');
+        if (modalEl) {
+            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.show();
+        }
+    }
+
+    function updateFooterSelectionUI() {
+        const count = selectedMediaItems.length;
+        const countBadge = document.getElementById('mediaPickerSelectedCount');
+        const clearBtn = document.getElementById('mediaPickerClearSelectionBtn');
+        const confirmBtn = document.getElementById('mediaPickerConfirmBtn');
+        const confirmBtnText = document.getElementById('mediaPickerConfirmBtnText');
+
+        if (countBadge) countBadge.textContent = count;
+        if (clearBtn) {
+            clearBtn.classList.toggle('d-none', count === 0);
+        }
+
+        if (confirmBtn) {
+            confirmBtn.disabled = (count === 0);
+        }
+
+        if (confirmBtnText) {
+            if (isMultiSelect) {
+                confirmBtnText.textContent = count > 0 ? `Insert Selected (${count})` : 'Insert Selected';
+            } else {
+                confirmBtnText.textContent = count > 0 ? 'Use Selected Image' : 'Select Item';
+            }
+        }
+    }
+
+    function toggleItemSelection(item, cardEl) {
+        const normPath = item.path.startsWith('http') || item.path.startsWith('/')
+            ? item.path
+            : '/' + item.path;
+
+        const existingIdx = selectedMediaItems.findIndex(i => i.path === normPath);
+
+        if (isMultiSelect) {
+            if (existingIdx > -1) {
+                // Deselect
+                selectedMediaItems.splice(existingIdx, 1);
+                cardEl.classList.remove('selected');
+            } else {
+                // Select
+                selectedMediaItems.push({
+                    path: normPath,
+                    fullUrl: item.fullUrl,
+                    filename: item.filename
+                });
+                cardEl.classList.add('selected');
+            }
+        } else {
+            // Single Select
+            selectedMediaItems = [{
+                path: normPath,
+                fullUrl: item.fullUrl,
+                filename: item.filename
+            }];
+            document.querySelectorAll('#galleryGridContainer .gallery-picker-item').forEach(el => el.classList.remove('selected'));
+            cardEl.classList.add('selected');
+        }
+
+        updateFooterSelectionUI();
+    }
+
+    function confirmAndApplySelection() {
+        if (!selectedMediaItems.length) return;
+
+        // 1. If custom onSelect callback provided
+        if (activeCustomCallback) {
+            activeCustomCallback(selectedMediaItems);
+        }
+
+        // 2. If target input exists
+        if (activeTargetInput) {
+            if (isMultiSelect) {
+                activeTargetInput.value = selectedMediaItems.map(i => i.path).join(',');
+            } else {
+                activeTargetInput.value = selectedMediaItems[0].path;
+            }
+
+            // Dispatch custom event with full array payload
+            activeTargetInput.dispatchEvent(new CustomEvent('media-picker:selected', {
+                bubbles: true,
+                detail: {
+                    items: selectedMediaItems,
+                    paths: selectedMediaItems.map(i => i.path),
+                    isMulti: isMultiSelect
+                }
+            }));
+
+            // Dispatch standard change event for backward compatibility
+            activeTargetInput.dispatchEvent(new Event('change', { bubbles: true }));
+
+            // Update single preview container if present
+            if (activePreviewContainer && selectedMediaItems.length > 0) {
+                const previewSrc = selectedMediaItems[0].fullUrl || (selectedMediaItems[0].path.startsWith('http') ? selectedMediaItems[0].path : window.location.origin + selectedMediaItems[0].path);
+                if (activePreviewContainer.tagName === 'IMG') {
+                    activePreviewContainer.src = previewSrc;
+                    activePreviewContainer.style.display = 'block';
+                } else if (currentMediaTypeFilter === 'video') {
+                    activePreviewContainer.innerHTML = `<video src="${previewSrc}" class="w-100 rounded-3 mt-2" style="max-height: 150px;" controls></video>`;
+                } else {
+                    activePreviewContainer.innerHTML = `<img src="${previewSrc}" class="rounded-3 mt-2 img-fluid border" style="max-height: 120px; object-fit: cover;">`;
+                }
+            }
+        }
+
+        // Close modal
+        const modalEl = document.getElementById('mediaPickerModal');
+        if (modalEl) {
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+        }
+    }
 
     // Shows a toast if the shared AdminToast helper (resources/js/admin/tables.js) is
     // loaded on this page; falls back to a plain alert otherwise so feedback is never silent.
@@ -117,18 +272,39 @@
                         if (item.file_type === 'video') {
                             previewHtml = `<div class="bg-dark rounded-3 d-flex align-items-center justify-content-center text-white" style="height: 100px;"><i class="bi bi-play-btn fs-2"></i></div>`;
                         } else {
-                            previewHtml = `<img src="${item.full_url}" class="rounded-3 img-fluid object-fit-cover w-100" style="height: 100px; border: 1px solid #ECE7DD;">`;
+                            previewHtml = `<img src="${item.full_url}" class="rounded-3 img-fluid object-fit-cover w-100" style="height: 100px; border: 1px solid #ECE7DD;" loading="lazy">`;
                         }
 
+                        const normPath = item.file_path.startsWith('http') || item.file_path.startsWith('/')
+                            ? item.file_path
+                            : '/' + item.file_path;
+
+                        const isAlreadySelected = selectedMediaItems.some(i => i.path === normPath);
+
                         col.innerHTML = `
-                            <div class="gallery-picker-item cursor-pointer p-1 rounded-3 position-relative" data-path="${item.file_path}" data-full-url="${item.full_url}" style="transition: all 0.2s ease;">
+                            <div class="gallery-picker-item cursor-pointer p-1 rounded-3 position-relative ${isAlreadySelected ? 'selected' : ''}" data-path="${item.file_path}" data-full-url="${item.full_url}" data-filename="${item.filename}">
+                                <div class="selection-check-badge">
+                                    <i class="bi bi-check-lg"></i>
+                                </div>
                                 ${previewHtml}
                                 <div class="small text-truncate mt-1 text-muted text-center" style="font-size: 0.7rem;">${item.filename}</div>
                             </div>
                         `;
 
-                        col.querySelector('.gallery-picker-item').addEventListener('click', function() {
-                            selectMedia(this.getAttribute('data-path'), this.getAttribute('data-full-url'));
+                        const card = col.querySelector('.gallery-picker-item');
+                        card.addEventListener('click', function() {
+                            toggleItemSelection({
+                                path: this.getAttribute('data-path'),
+                                fullUrl: this.getAttribute('data-full-url'),
+                                filename: this.getAttribute('data-filename')
+                            }, this);
+                        });
+
+                        // Double click shortcut for instant single selection
+                        card.addEventListener('dblclick', function() {
+                            if (!isMultiSelect) {
+                                confirmAndApplySelection();
+                            }
                         });
 
                         container.appendChild(col);
@@ -137,52 +313,28 @@
             });
     }
 
-    // Selection Action — filePath is relative (stored in DB), fullUrl is absolute (for img src preview)
-    function selectMedia(filePath, fullUrl) {
-        // DB records are inconsistent — some have a leading slash, some don't. Normalize
-        // to root-relative ("/uploads/...") so any consumer of the input's raw value
-        // (including pages' own duplicate preview listeners) resolves it against the
-        // domain root instead of the current admin page path (which was producing
-        // broken "/admin/uploads/..." 404s).
-        const normalizedPath = filePath.startsWith('http') || filePath.startsWith('/')
-            ? filePath
-            : '/' + filePath;
-
-        // Fallback: if no fullUrl given, construct an absolute URL from the origin.
-        const previewSrc = fullUrl || (normalizedPath.startsWith('http') ? normalizedPath : window.location.origin + normalizedPath);
-
-        if (activeTargetInput) {
-            activeTargetInput.value = normalizedPath;
-
-            // Trigger change event dynamically (some pages listen for this to run their own preview/validation)
-            activeTargetInput.dispatchEvent(new Event('change'));
-
-            // Set our own preview LAST so it wins over any page-level 'change' listener
-            // that might set a broken relative src.
-            if (activePreviewContainer) {
-                if (activePreviewContainer.tagName === 'IMG') {
-                    activePreviewContainer.src = previewSrc;
-                    activePreviewContainer.style.display = 'block';
-                } else if (currentMediaTypeFilter === 'video') {
-                    activePreviewContainer.innerHTML = `<video src="${previewSrc}" class="w-100 rounded-3 mt-2" style="max-height: 150px;" controls></video>`;
-                } else {
-                    activePreviewContainer.innerHTML = `<img src="${previewSrc}" class="rounded-3 mt-2 img-fluid border" style="max-height: 120px; object-fit: cover;">`;
-                }
-            }
-        }
-        const modalEl = document.getElementById('mediaPickerModal');
-        if (modalEl) {
-            const modal = bootstrap.Modal.getInstance(modalEl);
-            if (modal) modal.hide();
-        }
-    }
-
     // Attach listeners on DOM ready
     document.addEventListener('DOMContentLoaded', function() {
         const loadMore = document.getElementById('btnLoadMoreMedia');
         if (loadMore) {
             loadMore.addEventListener('click', () => {
                 loadGallery(true);
+            });
+        }
+
+        // Confirm button
+        const confirmBtn = document.getElementById('mediaPickerConfirmBtn');
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', confirmAndApplySelection);
+        }
+
+        // Clear selection button
+        const clearBtn = document.getElementById('mediaPickerClearSelectionBtn');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                selectedMediaItems = [];
+                document.querySelectorAll('#galleryGridContainer .gallery-picker-item').forEach(el => el.classList.remove('selected'));
+                updateFooterSelectionUI();
             });
         }
 
@@ -210,6 +362,7 @@
             });
         }
 
+        // URL Import
         const importBtn = document.getElementById('btnImportFromUrl');
         const urlInput = document.getElementById('pickerUrlInput');
         const urlPreviewContainer = document.getElementById('urlPreviewContainer');
@@ -253,12 +406,17 @@
 
                     if (data.status === 'success') {
                         urlInput.value = '';
-                        // Build full_url from relative file_path
                         const fullUrl = data.media.url && data.media.url.startsWith('http')
                             ? data.media.url
                             : window.location.origin + '/' + data.media.file_path.replace(/^\//, '');
                         notify('success', 'Image imported successfully.');
-                        selectMedia(data.media.file_path, fullUrl);
+                        
+                        selectedMediaItems = [{
+                            path: data.media.file_path,
+                            fullUrl: fullUrl,
+                            filename: data.media.file_name || 'Imported Asset'
+                        }];
+                        confirmAndApplySelection();
                     } else {
                         notify('error', data.message || 'Import failed.');
                     }
@@ -271,6 +429,7 @@
             });
         }
 
+        // Local Upload
         const localFileInput = document.getElementById('pickerLocalFileInput');
         if (localFileInput) {
             localFileInput.addEventListener('change', function() {
@@ -305,14 +464,18 @@
                         if (response.status === 'success') {
                             const fullUrl = window.location.origin + '/' + response.media.file_path.replace(/^\//, '');
                             notify('success', 'Image uploaded successfully.');
-                            selectMedia(response.media.file_path, fullUrl);
+                            selectedMediaItems = [{
+                                path: response.media.file_path,
+                                fullUrl: fullUrl,
+                                filename: response.media.file_name || 'Uploaded Asset'
+                            }];
+                            confirmAndApplySelection();
                         } else {
                             notify('error', response.message || 'Upload failed.');
                         }
                     } else {
                         notify('error', 'Upload failed. Check file type and size.');
                     }
-                    // Reset the file input so choosing the same file again re-triggers 'change'
                     localFileInput.value = '';
                 };
 
