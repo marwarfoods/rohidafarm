@@ -468,10 +468,28 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 7b. Product FAQs — Add / Remove / Drag-to-Reorder (SortableJS)
-    let faqIndex = parseInt(form.dataset.faqCount || '0');
+    // 7b. Product FAQs — Toggle Global vs Custom + Drag-to-Reorder (SortableJS)
+    const useGlobalFaqsToggle = document.getElementById('useGlobalFaqsToggle');
+    const globalFaqNotice = document.getElementById('globalFaqNotice');
+    const customFaqsSection = document.getElementById('customFaqsSection');
     const btnAddFaq = document.getElementById('btnAddFaq');
     const faqsContainer = document.getElementById('faqsContainer');
+    let faqIndex = parseInt(form.dataset.faqCount || '0');
+
+    if (useGlobalFaqsToggle) {
+        useGlobalFaqsToggle.addEventListener('change', function() {
+            const isUsingGlobal = this.checked;
+            if (isUsingGlobal) {
+                globalFaqNotice?.classList.remove('d-none');
+                customFaqsSection?.classList.add('d-none');
+                btnAddFaq?.classList.add('d-none');
+            } else {
+                globalFaqNotice?.classList.add('d-none');
+                customFaqsSection?.classList.remove('d-none');
+                btnAddFaq?.classList.remove('d-none');
+            }
+        });
+    }
 
     function refreshFaqSortOrders() {
         if (!faqsContainer) return;

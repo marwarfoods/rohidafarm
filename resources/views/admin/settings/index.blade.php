@@ -52,6 +52,11 @@
                     </a>
                 </li>
                 <li class="nav-item" role="presentation">
+                    <a class="nav-link settings-tab-link" id="faqs-tab" data-bs-toggle="pill" href="#faqs" role="tab" aria-controls="faqs" aria-selected="false">
+                        <i class="bi bi-question-circle me-2"></i>Global FAQs
+                    </a>
+                </li>
+                <li class="nav-item" role="presentation">
                     <a class="nav-link settings-tab-link" id="auth-tab" data-bs-toggle="pill" href="#auth" role="tab" aria-controls="auth" aria-selected="false">
                         <i class="bi bi-shield-lock me-2"></i>Authentication & Google OAuth
                     </a>
@@ -76,6 +81,7 @@
                     @include('admin.settings.partials.payments')
                     @include('admin.settings.partials.shipping')
                     @include('admin.settings.partials.integrations')
+                    @include('admin.settings.partials.faqs')
                     @include('admin.settings.partials.auth')
                 </div>
 
@@ -314,6 +320,80 @@
                         resultDiv.className = 'mt-3 alert alert-danger fw-bold';
                         resultDiv.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i> Connection test failed.';
                     });
+                });
+            }
+
+            // Global FAQs Repeater
+            const btnAddGlobalFaq = document.getElementById('btnAddGlobalFaq');
+            const globalFaqsContainer = document.getElementById('globalFaqsContainer');
+            let globalFaqIndex = {{ count($globalFaqs ?? []) }};
+
+            function refreshGlobalFaqIndexes() {
+                if (!globalFaqsContainer) return;
+                const cards = globalFaqsContainer.querySelectorAll('.global-faq-item-card');
+                cards.forEach((card, i) => {
+                    const q = card.querySelector('.global-faq-q');
+                    const a = card.querySelector('.global-faq-a');
+                    const s = card.querySelector('.global-faq-sort');
+                    if (q) q.name = `global_faqs[${i}][question]`;
+                    if (a) a.name = `global_faqs[${i}][answer]`;
+                    if (s) { s.name = `global_faqs[${i}][sort_order]`; s.value = i; }
+                });
+            }
+
+            function appendGlobalFaq(question = '', answer = '') {
+                if (!globalFaqsContainer) return;
+                document.getElementById('globalFaqsEmpty')?.remove();
+
+                const card = document.createElement('div');
+                card.className = 'global-faq-item-card card border rounded-3 p-3 bg-light shadow-sm';
+                card.innerHTML = `
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="global-faq-drag-handle text-muted pt-2" style="cursor: grab;" title="Drag to reorder">
+                            <i class="bi bi-grip-vertical fs-5"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="mb-2">
+                                <label class="form-label text-dark fw-semibold mb-1" style="font-size: 0.8rem;">Question</label>
+                                <input type="text" name="global_faqs[${globalFaqIndex}][question]" class="form-control form-control-sm border bg-white global-faq-q" required value="${question}" placeholder="e.g. How is Rohida Farm A2 Ghee made?">
+                            </div>
+                            <div>
+                                <label class="form-label text-dark fw-semibold mb-1" style="font-size: 0.8rem;">Answer</label>
+                                <textarea name="global_faqs[${globalFaqIndex}][answer]" class="form-control form-control-sm border bg-white global-faq-a" rows="2" required placeholder="Detailed answer...">${answer}</textarea>
+                            </div>
+                            <input type="hidden" class="global-faq-sort" name="global_faqs[${globalFaqIndex}][sort_order]" value="${globalFaqIndex}">
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-sm btn-outline-danger rounded-circle p-0 d-flex align-items-center justify-content-center btn-remove-global-faq" style="width: 28px; height: 28px;" title="Delete FAQ">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                globalFaqsContainer.appendChild(card);
+                globalFaqIndex++;
+                card.querySelector('.btn-remove-global-faq').addEventListener('click', () => {
+                    card.remove();
+                    refreshGlobalFaqIndexes();
+                });
+            }
+
+            btnAddGlobalFaq?.addEventListener('click', () => appendGlobalFaq());
+
+            globalFaqsContainer?.querySelectorAll('.btn-remove-global-faq').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.closest('.global-faq-item-card').remove();
+                    refreshGlobalFaqIndexes();
+                });
+            });
+
+            if (globalFaqsContainer && typeof Sortable !== 'undefined') {
+                Sortable.create(globalFaqsContainer, {
+                    animation: 180,
+                    ghostClass: 'sortable-ghost',
+                    chosenClass: 'sortable-chosen',
+                    handle: '.global-faq-drag-handle',
+                    onEnd: refreshGlobalFaqIndexes
                 });
             }
         });

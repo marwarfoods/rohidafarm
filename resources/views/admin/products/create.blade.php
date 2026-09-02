@@ -136,17 +136,43 @@
                     <div>
                         <h6 class="fw-bold text-dark m-0"><i class="bi bi-question-circle text-success me-2"></i>Product FAQs</h6>
                         <p class="text-muted m-0 mt-1" style="font-size:0.78rem;">
-                            <i class="bi bi-grip-vertical me-1"></i>Drag the handle on the left to reorder · Order is saved on submit.
+                            Choose whether to use global FAQs from settings or define custom FAQs for this product.
                         </p>
                     </div>
-                    <button type="button" class="btn btn-success btn-sm rounded-pill px-3" id="btnAddFaq">
+                    <button type="button" class="btn btn-success btn-sm rounded-pill px-3 d-none" id="btnAddFaq">
                         <i class="bi bi-plus-lg me-1"></i> Add FAQ
                     </button>
                 </div>
                 <div class="card-body p-4">
-                    <div id="faqsContainer" class="d-flex flex-column gap-3">
-                        <div class="text-center py-3 text-muted" id="faqsEmpty" style="font-size:0.85rem;">
-                            <i class="bi bi-question-circle me-1"></i> No FAQs added yet.
+                    {{-- Global FAQ Checkbox Toggle --}}
+                    <div class="p-3 bg-light rounded-3 border mb-3">
+                        <div class="form-check form-switch d-flex align-items-center gap-2 p-0 m-0">
+                            <input class="form-check-input ms-0 me-2" type="checkbox" name="use_global_faqs" value="1" id="useGlobalFaqsToggle" 
+                                   {{ old('use_global_faqs', true) ? 'checked' : '' }} style="width: 2.4em; height: 1.25em; cursor: pointer;">
+                            <div>
+                                <label class="form-check-label fw-bold text-dark font-heading m-0" for="useGlobalFaqsToggle" style="cursor: pointer; font-size: 0.9rem;">
+                                    Use Global FAQs (from Settings)
+                                </label>
+                                <div class="text-muted small" style="font-size: 0.75rem;">
+                                    Automatically applies global FAQs configured in Admin Settings. Uncheck to configure custom FAQs for this product.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Global FAQ Active Notice --}}
+                    <div id="globalFaqNotice" class="alert alert-success border-0 bg-success-subtle text-success py-2.5 px-3 rounded-3 d-flex align-items-center gap-2 mb-0" style="font-size: 0.85rem;">
+                        <i class="bi bi-check-circle-fill fs-5"></i>
+                        <span>This product will automatically display the <strong>Global FAQs</strong> managed in <a href="{{ route('admin.settings.index') }}#faqs" target="_blank" class="fw-bold text-success text-decoration-underline">Settings &gt; Global FAQs</a>.</span>
+                    </div>
+
+                    {{-- Custom FAQs Container (hidden when using global) --}}
+                    <div id="customFaqsSection" class="d-none mt-3">
+                        <div class="text-muted mb-2 small"><i class="bi bi-grip-vertical me-1"></i>Drag the handle on the left to reorder custom FAQs:</div>
+                        <div id="faqsContainer" class="d-flex flex-column gap-3">
+                            <div class="text-center py-3 text-muted" id="faqsEmpty" style="font-size:0.85rem;">
+                                <i class="bi bi-question-circle me-1"></i> No custom FAQs added yet. Click "Add FAQ" above to add one.
+                            </div>
                         </div>
                     </div>
                 </div>

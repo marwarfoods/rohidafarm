@@ -119,6 +119,7 @@ class ProductController extends Controller
             'is_trending' => $request->has('is_trending'),
             'is_best_seller' => $request->has('is_best_seller'),
             'is_new_arrival' => $request->has('is_new_arrival'),
+            'use_global_faqs' => $request->has('use_global_faqs'),
             'free_shipping_threshold' => $request->input('free_shipping_threshold'),
             'display_coupons' => $request->input('display_coupons'),
             'infographic_images' => array_values(array_unique($infographics)),
@@ -171,8 +172,8 @@ class ProductController extends Controller
             }
         }
 
-        // Save FAQs (question/answer pairs, in submitted order)
-        if ($request->has('faqs')) {
+        // Save FAQs (question/answer pairs, in submitted order) if custom FAQs are selected
+        if (!$request->has('use_global_faqs') && $request->has('faqs')) {
             foreach ($request->input('faqs') as $index => $f) {
                 if (!empty($f['question']) && !empty($f['answer'])) {
                     \App\Models\ProductFaq::create([
@@ -249,6 +250,7 @@ class ProductController extends Controller
             'is_trending' => $request->has('is_trending'),
             'is_best_seller' => $request->has('is_best_seller'),
             'is_new_arrival' => $request->has('is_new_arrival'),
+            'use_global_faqs' => $request->has('use_global_faqs'),
             'free_shipping_threshold' => $request->input('free_shipping_threshold'),
             'display_coupons' => $request->input('display_coupons'),
         ]);
@@ -368,8 +370,8 @@ class ProductController extends Controller
             }
         }
 
-        // Save new FAQs (question/answer pairs, in submitted order)
-        if ($request->has('faqs')) {
+        // Save new FAQs (question/answer pairs, in submitted order) if custom FAQs are active
+        if (!$request->has('use_global_faqs') && $request->has('faqs')) {
             foreach ($request->input('faqs') as $index => $f) {
                 if (!empty($f['question']) && !empty($f['answer'])) {
                     \App\Models\ProductFaq::create([

@@ -25,7 +25,8 @@ class SettingController extends Controller
     public function index()
     {
         $settings = Setting::all()->groupBy('group');
-        return view('admin.settings.index', compact('settings'));
+        $globalFaqs = \App\Models\Faq::orderBy('sort_order')->get();
+        return view('admin.settings.index', compact('settings', 'globalFaqs'));
     }
 
     /**
@@ -34,8 +35,9 @@ class SettingController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'settings' => 'required|array',
-            'settings.*' => 'nullable|string'
+            'settings' => 'nullable|array',
+            'settings.*' => 'nullable|string',
+            'global_faqs' => 'nullable|array',
         ];
         
         $request->validate($rules);
@@ -93,6 +95,25 @@ class SettingController extends Controller
             }
 
             Setting::set($key, $value, $type, $group, $description);
+        }
+
+        // Handle Global FAQs synchronization
+        if ($request->has('global_faqs_submitted')) {
+            \App\Models\Faq::truncate();
+            $rawFaqs = $request->input('global_faqs', []);
+            foreach ($rawFaqs as $index => $faqData) {
+                $q = trim($faqData['question'] ?? '');
+                $a = trim($faqData['answer'] ?? '');
+                if (!empty($q) && !empty($a)) {
+                    \App\Models\Faq::create([
+                        'question' => $q,
+                        'answer' => $a,
+                        'category' => 'General',
+                        'sort_order' => $index,
+                        'is_active' => true,
+                    ]);
+                }
+            }
         }
 
         self::logActivity('settings_update', 'Updated dynamic system configuration options.');
