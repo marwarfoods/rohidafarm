@@ -114,17 +114,17 @@
             <div class="card border-0 shadow-sm rounded-4 bg-white mb-4">
                 <div class="card-header bg-white rounded-top-4 px-4 py-3 border-bottom d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="fw-bold text-dark m-0"><i class="bi bi-box-seam text-success me-2"></i>Weight Variants</h6>
-                        <p class="text-muted m-0 mt-1" style="font-size:0.78rem;">Add different size/weight options with their own prices.</p>
+                        <h6 class="fw-bold text-dark m-0"><i class="bi bi-box-seam text-success me-2"></i>Weight Variants &amp; Variant Images</h6>
+                        <p class="text-muted m-0 mt-1" style="font-size:0.78rem;">Configure size/weight options, prices, stock, and individual variant images/galleries.</p>
                     </div>
                     <button type="button" class="btn btn-success btn-sm rounded-pill px-3" id="btnAddVariant">
-                        <i class="bi bi-plus-lg me-1"></i> Add Option
+                        <i class="bi bi-plus-lg me-1"></i> Add Variant
                     </button>
                 </div>
-                <div class="card-body p-0">
+                <div class="card-body p-3">
                     <div id="variantsContainer">
                         <div class="text-center py-4 text-muted" id="emptyVariantRow" style="font-size:0.85rem;">
-                            <i class="bi bi-plus-circle me-1"></i> Click "Add Option" to add weight variants.
+                            <i class="bi bi-plus-circle me-1"></i> Click "Add Variant" to configure size/weight options and custom images.
                         </div>
                     </div>
                 </div>

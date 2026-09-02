@@ -120,49 +120,125 @@
             <div class="card border-0 shadow-sm rounded-4 bg-white mb-4">
                 <div class="card-header bg-white rounded-top-4 px-4 py-3 border-bottom d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="fw-bold text-dark m-0"><i class="bi bi-box-seam text-success me-2"></i>Weight Variants</h6>
-                        <p class="text-muted m-0 mt-1" style="font-size:0.78rem;">Size/weight options with their own prices.</p>
+                        <h6 class="fw-bold text-dark m-0"><i class="bi bi-box-seam text-success me-2"></i>Weight Variants &amp; Variant Images</h6>
+                        <p class="text-muted m-0 mt-1" style="font-size:0.78rem;">Configure size/weight options, prices, stock, and individual variant images/galleries.</p>
                     </div>
                     <button type="button" class="btn btn-success btn-sm rounded-pill px-3" id="btnAddVariant">
-                        <i class="bi bi-plus-lg me-1"></i> Add Option
+                        <i class="bi bi-plus-lg me-1"></i> Add Variant
                     </button>
                 </div>
-                <div class="card-body p-0">
+                <div class="card-body p-3">
                     <div id="variantsContainer">
                         @foreach($product->variants as $index => $v)
-                            <div class="variant-item px-4 py-3 border-bottom">
-                                <div class="row g-3 mb-3">
-                                    <div class="col-md-4">
-                                        <label class="form-label text-muted mb-1" style="font-size:0.8rem;">Weight *</label>
-                                        <input type="text" name="variants[{{ $index }}][weight]" class="form-control border" required value="{{ $v->weight }}">
+                            <div class="variant-item card border rounded-3 mb-3 bg-white shadow-sm overflow-hidden" data-index="{{ $index }}">
+                                {{-- Accordion Header --}}
+                                <div class="card-header bg-light px-3 py-2.5 d-flex justify-content-between align-items-center variant-header" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#variantCollapse_{{ $index }}" aria-expanded="true">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-chevron-down variant-toggle-icon text-muted" style="transition: transform 0.2s;"></i>
+                                        <span class="badge bg-success font-heading variant-weight-badge">{{ $v->weight ?: 'New Variant' }}</span>
+                                        <span class="text-dark fw-bold variant-price-preview">₹{{ number_format($v->sale_price, 0) }}</span>
+                                        <div class="variant-header-thumb-container d-inline-block ms-1">
+                                            @if($v->image_path)
+                                                <img src="{{ asset($v->image_path) }}" class="rounded border variant-header-thumb" style="width: 28px; height: 28px; object-fit: cover;">
+                                            @endif
+                                        </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label text-muted mb-1" style="font-size:0.8rem;">MRP (₹)</label>
-                                        <input type="number" step="0.01" name="variants[{{ $index }}][mrp]" class="form-control border" value="{{ $v->mrp }}">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label text-muted mb-1" style="font-size:0.8rem;">Sale Price (₹)</label>
-                                        <input type="number" step="0.01" name="variants[{{ $index }}][sale_price]" class="form-control border" value="{{ $v->sale_price }}">
+                                    <div class="d-flex align-items-center gap-2" onclick="event.stopPropagation();">
+                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 py-0.5 btn-remove-variant" style="font-size: 0.75rem;">
+                                            <i class="bi bi-trash me-1"></i> Delete
+                                        </button>
                                     </div>
                                 </div>
-                                <div class="row g-3 align-items-end">
-                                    <div class="col-md-4">
-                                        <label class="form-label text-muted mb-1" style="font-size:0.8rem;">Stock</label>
-                                        <input type="number" name="variants[{{ $index }}][stock]" class="form-control border" value="{{ $v->stock }}">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label text-muted mb-1" style="font-size:0.8rem;">Max Cart Qty</label>
-                                        <input type="number" name="variants[{{ $index }}][max_cart_qty]" class="form-control border" value="{{ $v->max_cart_qty }}" placeholder="No limit">
-                                    </div>
-                                    <div class="col-md-4 d-flex justify-content-md-end">
-                                        <button type="button" class="btn btn-sm btn-outline-danger border rounded-pill px-3 btn-remove-variant"><i class="bi bi-trash me-1"></i>Remove</button>
+
+                                {{-- Accordion Body --}}
+                                <div id="variantCollapse_{{ $index }}" class="collapse show">
+                                    <div class="card-body p-3">
+                                        {{-- Row 1: Weight, MRP, Sale Price, Stock, Max Cart Qty --}}
+                                        <div class="row g-3 mb-3">
+                                            <div class="col-md-3">
+                                                <label class="form-label text-dark fw-semibold mb-1" style="font-size:0.8rem;">Weight Option *</label>
+                                                <input type="text" name="variants[{{ $index }}][weight]" class="form-control form-control-sm border variant-weight-input" required value="{{ $v->weight }}" placeholder="e.g. 500ml or 1kg">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label class="form-label text-dark fw-semibold mb-1" style="font-size:0.8rem;">MRP (₹)</label>
+                                                <input type="number" step="0.01" name="variants[{{ $index }}][mrp]" class="form-control form-control-sm border" value="{{ $v->mrp }}" placeholder="999">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label class="form-label text-dark fw-semibold mb-1" style="font-size:0.8rem;">Sale Price (₹) *</label>
+                                                <input type="number" step="0.01" name="variants[{{ $index }}][sale_price]" class="form-control form-control-sm border variant-price-input" value="{{ $v->sale_price }}" placeholder="799" required>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label class="form-label text-dark fw-semibold mb-1" style="font-size:0.8rem;">Stock *</label>
+                                                <input type="number" name="variants[{{ $index }}][stock]" class="form-control form-control-sm border" value="{{ $v->stock }}">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label text-dark fw-semibold mb-1" style="font-size:0.8rem;">Max Cart Qty</label>
+                                                <input type="number" name="variants[{{ $index }}][max_cart_qty]" class="form-control form-control-sm border" value="{{ $v->max_cart_qty }}" placeholder="No limit">
+                                            </div>
+                                        </div>
+
+                                        {{-- Row 2: Variant Main Image & Variant Gallery Images --}}
+                                        <div class="p-3 bg-light rounded-3 border">
+                                            <div class="row g-3">
+                                                {{-- Variant Main Thumbnail --}}
+                                                <div class="col-md-5 border-end">
+                                                    <label class="form-label text-dark fw-semibold mb-1 d-flex align-items-center gap-1" style="font-size:0.8rem;">
+                                                        <i class="bi bi-image text-success"></i> Variant Main Image
+                                                    </label>
+                                                    <p class="text-muted m-0 mb-2" style="font-size: 0.72rem;">Primary photo shown when this variant is selected.</p>
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <div class="variant-main-img-preview border rounded bg-white d-flex align-items-center justify-content-center overflow-hidden" style="width: 54px; height: 54px; flex-shrink: 0;">
+                                                            @if($v->image_path)
+                                                                <img src="{{ asset($v->image_path) }}" class="w-100 h-100 object-fit-cover">
+                                                            @else
+                                                                <i class="bi bi-image text-muted" style="font-size: 1.3rem;"></i>
+                                                            @endif
+                                                        </div>
+                                                        <div class="flex-grow-1">
+                                                            <input type="text" name="variants[{{ $index }}][image_path]" class="form-control form-control-sm media-picker-input variant-main-img-input" value="{{ $v->image_path }}" placeholder="Pick main image...">
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {{-- Variant Additional Gallery Images --}}
+                                                <div class="col-md-7">
+                                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                                        <label class="form-label text-dark fw-semibold m-0 d-flex align-items-center gap-1" style="font-size:0.8rem;">
+                                                            <i class="bi bi-images text-success"></i> Variant Gallery Images
+                                                        </label>
+                                                        <button type="button" class="btn btn-outline-success btn-sm py-0.5 px-2.5 btn-add-variant-gallery" data-index="{{ $index }}" style="font-size: 0.72rem;">
+                                                            <i class="bi bi-plus-lg me-1"></i> Add Gallery Photo
+                                                        </button>
+                                                    </div>
+                                                    <p class="text-muted m-0 mb-2" style="font-size: 0.72rem;">Slides shown in product detail gallery when this variant is active.</p>
+                                                    
+                                                    <div class="d-flex flex-wrap gap-2 p-2 border rounded bg-white min-height-50 variant-gallery-chips-container">
+                                                        @php $vGalleries = is_array($v->gallery_images) ? $v->gallery_images : []; @endphp
+                                                        @foreach($vGalleries as $gIdx => $gPath)
+                                                            @if(!empty($gPath))
+                                                                <div class="position-relative variant-gallery-chip">
+                                                                    <input type="hidden" name="variants[{{ $index }}][gallery_images][]" value="{{ $gPath }}">
+                                                                    <img src="{{ asset($gPath) }}" class="rounded border" style="width: 48px; height: 48px; object-fit: cover;">
+                                                                    <button type="button" class="btn btn-danger btn-sm rounded-circle position-absolute top-0 end-0 p-0 d-flex align-items-center justify-content-center" style="width: 18px; height: 18px; font-size: 10px; transform: translate(30%, -30%);" onclick="this.closest('.variant-gallery-chip').remove();">
+                                                                        <i class="bi bi-x"></i>
+                                                                    </button>
+                                                                </div>
+                                                            @endif
+                                                        @endforeach
+                                                        <span class="text-muted small align-self-center empty-variant-gallery-msg {{ count($vGalleries) ? 'd-none' : '' }}" style="font-size: 0.75rem;">
+                                                            No gallery photos added yet for this variant.
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         @endforeach
                         @if($product->variants->isEmpty())
                             <div class="text-center py-4 text-muted" id="emptyVariantRow" style="font-size:0.85rem;">
-                                <i class="bi bi-plus-circle me-1"></i> Click "Add Option" to add weight variants.
+                                <i class="bi bi-plus-circle me-1"></i> Click "Add Variant" to configure size/weight options.
                             </div>
                         @endif
                     </div>

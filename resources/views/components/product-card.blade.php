@@ -110,6 +110,7 @@
                                         data-mrp="{{ $variant->mrp }}" 
                                         data-weight="{{ $variant->weight }}"
                                         data-stock="{{ $variant->stock }}"
+                                        data-image="{{ $variant->image_path ? asset($variant->image_path) : '' }}"
                                         {{ $variant->stock <= 0 ? 'disabled' : '' }}
                                         {{ $variant->weight == $product->weight && $variant->stock > 0 ? 'selected' : '' }}>
                                     {{ $variant->weight }} {{ $variant->stock <= 0 ? '(Out of Stock)' : '' }}

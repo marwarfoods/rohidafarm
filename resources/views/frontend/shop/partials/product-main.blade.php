@@ -208,6 +208,8 @@
                                      data-best-price="₹{{ number_format($variantBestPrice, 0) }}"
                                      data-best-coupon="{{ isset($bestCoupon) && $bestCoupon ? $bestCoupon->code : '' }}"
                                      data-stock="{{ $variant->stock }}"
+                                     data-image="{{ $variant->image_path ? asset($variant->image_path) : '' }}"
+                                     data-gallery='@json($variant->gallery_images ? array_values(array_map(fn($p) => asset($p), $variant->gallery_images)) : [])'
                                      style="cursor:pointer;min-width:110px;width:auto;padding:8px 14px;min-height:82px;flex-shrink:0;">
                                     @if($varDiscount > 0)
                                         <span class="position-absolute badge bg-danger text-white px-1 rounded-1" style="font-size:0.55rem;top:4px;right:4px;color:#fff !important;">{{ $varDiscount }}% off</span>

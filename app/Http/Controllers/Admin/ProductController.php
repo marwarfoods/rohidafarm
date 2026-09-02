@@ -145,15 +145,23 @@ class ProductController extends Controller
             }
         }
 
-        // Save variants (weight options)
+        // Save variants (weight options) with individual images & galleries
         if ($request->has('variants')) {
             foreach ($request->input('variants') as $v) {
                 if (!empty($v['weight'])) {
+                    $galleryImages = [];
+                    if (!empty($v['gallery_images'])) {
+                        $galleryImages = is_array($v['gallery_images']) 
+                            ? array_values(array_filter($v['gallery_images']))
+                            : array_values(array_filter(explode(',', $v['gallery_images'])));
+                    }
                     ProductVariant::create([
                         'product_id' => $product->id,
                         'name' => $product->name . ' - ' . $v['weight'],
                         'sku' => $product->sku . '-' . Str::slug($v['weight']),
                         'weight' => $v['weight'],
+                        'image_path' => !empty($v['image_path']) ? $v['image_path'] : null,
+                        'gallery_images' => !empty($galleryImages) ? $galleryImages : null,
                         'mrp' => $v['mrp'] ?? $product->mrp,
                         'sale_price' => $v['sale_price'] ?? $product->sale_price,
                         'stock' => $v['stock'] ?? $product->stock,
@@ -334,15 +342,23 @@ class ProductController extends Controller
             }
         }
 
-        // Save new variants
+        // Save new variants with individual images & galleries
         if ($request->has('variants')) {
             foreach ($request->input('variants') as $v) {
                 if (!empty($v['weight'])) {
+                    $galleryImages = [];
+                    if (!empty($v['gallery_images'])) {
+                        $galleryImages = is_array($v['gallery_images']) 
+                            ? array_values(array_filter($v['gallery_images']))
+                            : array_values(array_filter(explode(',', $v['gallery_images'])));
+                    }
                     ProductVariant::create([
                         'product_id' => $product->id,
                         'name' => $product->name . ' - ' . $v['weight'],
                         'sku' => $product->sku . '-' . Str::slug($v['weight']),
                         'weight' => $v['weight'],
+                        'image_path' => !empty($v['image_path']) ? $v['image_path'] : null,
+                        'gallery_images' => !empty($galleryImages) ? $galleryImages : null,
                         'mrp' => $v['mrp'] ?? $product->mrp,
                         'sale_price' => $v['sale_price'] ?? $product->sale_price,
                         'stock' => $v['stock'] ?? $product->stock,

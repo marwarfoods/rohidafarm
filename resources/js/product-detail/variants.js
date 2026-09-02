@@ -25,6 +25,26 @@ export function initVariants() {
             const newId        = this.getAttribute('data-id');
             const newStock     = parseInt(this.getAttribute('data-stock') || '0');
 
+            // Variant Image & Gallery Switching
+            const varImg = this.getAttribute('data-image');
+            let varGallery = [];
+            try {
+                const rawGal = this.getAttribute('data-gallery');
+                varGallery = rawGal ? JSON.parse(rawGal) : [];
+            } catch(e) {}
+
+            const allVarImgs = [];
+            if (varImg) allVarImgs.push(varImg);
+            if (Array.isArray(varGallery)) {
+                varGallery.forEach(g => {
+                    if (g && !allVarImgs.includes(g)) allVarImgs.push(g);
+                });
+            }
+
+            if (typeof window.updateProductGalleryImages === 'function') {
+                window.updateProductGalleryImages(allVarImgs.length > 0 ? allVarImgs : null);
+            }
+
             // Skeleton price animation
             if (priceTag)     priceTag.classList.add('skeleton-loading-text');
             if (mrpTag)       mrpTag.classList.add('skeleton-loading-text');
@@ -104,4 +124,29 @@ export function initVariants() {
             }
         });
     });
+
+    // Sync active variant images on initial load
+    setTimeout(() => {
+        const activeCard = document.querySelector('.variant-card.active');
+        if (activeCard) {
+            const varImg = activeCard.getAttribute('data-image');
+            let varGallery = [];
+            try {
+                const rawGal = activeCard.getAttribute('data-gallery');
+                varGallery = rawGal ? JSON.parse(rawGal) : [];
+            } catch(e) {}
+
+            const allVarImgs = [];
+            if (varImg) allVarImgs.push(varImg);
+            if (Array.isArray(varGallery)) {
+                varGallery.forEach(g => {
+                    if (g && !allVarImgs.includes(g)) allVarImgs.push(g);
+                });
+            }
+
+            if (allVarImgs.length > 0 && typeof window.updateProductGalleryImages === 'function') {
+                window.updateProductGalleryImages(allVarImgs);
+            }
+        }
+    }, 100);
 }

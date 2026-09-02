@@ -69,54 +69,223 @@ document.addEventListener('DOMContentLoaded', function() {
         updateDiscount(); // run once on load
     }
 
-    // 5. Weight Variants
+    // 5. Weight Variants & Variant Images
     const btnAddVariant = document.getElementById('btnAddVariant');
     const variantsContainer = document.getElementById('variantsContainer');
 
-    if (btnAddVariant && variantsContainer) {
-        // Wire existing delete buttons
-        variantsContainer.querySelectorAll('.btn-remove-variant').forEach(btn => {
-            btn.addEventListener('click', function() {
-                this.closest('.variant-item').remove();
+    // Reusable hidden input for variant gallery picker
+    let variantGalleryPickerInput = document.getElementById('variantGallerySelectorInput');
+    if (!variantGalleryPickerInput) {
+        variantGalleryPickerInput = document.createElement('input');
+        variantGalleryPickerInput.type = 'text';
+        variantGalleryPickerInput.id = 'variantGallerySelectorInput';
+        variantGalleryPickerInput.style.display = 'none';
+        document.body.appendChild(variantGalleryPickerInput);
+        if (window.initMediaPicker) {
+            initMediaPicker('#variantGallerySelectorInput', null, 'image');
+        }
+    }
+
+    let activeVariantGalleryTarget = null;
+    let activeVariantIndex = null;
+
+    if (variantGalleryPickerInput) {
+        variantGalleryPickerInput.addEventListener('change', function() {
+            const fp = this.value;
+            if (!fp || !activeVariantGalleryTarget) return;
+
+            const chip = document.createElement('div');
+            chip.className = 'position-relative variant-gallery-chip';
+            chip.innerHTML = `
+                <input type="hidden" name="variants[${activeVariantIndex}][gallery_images][]" value="${fp}">
+                <img src="${fp.startsWith('http') || fp.startsWith('/') ? fp : '/' + fp}" class="rounded border" style="width: 48px; height: 48px; object-fit: cover;">
+                <button type="button" class="btn btn-danger btn-sm rounded-circle position-absolute top-0 end-0 p-0 d-flex align-items-center justify-content-center" style="width: 18px; height: 18px; font-size: 10px; transform: translate(30%, -30%);">
+                    <i class="bi bi-x"></i>
+                </button>
+            `;
+            chip.querySelector('button').addEventListener('click', function() {
+                const container = this.closest('.variant-gallery-chips-container');
+                chip.remove();
+                if (container && !container.querySelectorAll('.variant-gallery-chip').length) {
+                    container.querySelector('.empty-variant-gallery-msg')?.classList.remove('d-none');
+                }
             });
+
+            const emptyMsg = activeVariantGalleryTarget.querySelector('.empty-variant-gallery-msg');
+            if (emptyMsg) emptyMsg.classList.add('d-none');
+
+            activeVariantGalleryTarget.appendChild(chip);
+            this.value = '';
+        });
+    }
+
+    function wireVariantCard(card, idx) {
+        const weightInput = card.querySelector('.variant-weight-input');
+        const priceInput = card.querySelector('.variant-price-input');
+        const weightBadge = card.querySelector('.variant-weight-badge');
+        const pricePreview = card.querySelector('.variant-price-preview');
+        const mainImgInput = card.querySelector('.variant-main-img-input');
+        const mainImgPreview = card.querySelector('.variant-main-img-preview');
+        const headerThumbContainer = card.querySelector('.variant-header-thumb-container');
+
+        if (weightInput && weightBadge) {
+            weightInput.addEventListener('input', function() {
+                weightBadge.textContent = this.value.trim() || `Variant #${idx + 1}`;
+            });
+        }
+
+        if (priceInput && pricePreview) {
+            priceInput.addEventListener('input', function() {
+                const val = parseFloat(this.value) || 0;
+                pricePreview.textContent = `₹${val.toLocaleString('en-IN')}`;
+            });
+        }
+
+        if (mainImgInput) {
+            if (window.initMediaPicker && !mainImgInput.parentNode.classList.contains('media-picker-group')) {
+                initMediaPicker(mainImgInput, null, 'image');
+            }
+            mainImgInput.addEventListener('change', function() {
+                const val = this.value.trim();
+                const src = val ? (val.startsWith('http') || val.startsWith('/') ? val : '/' + val) : '';
+                if (src) {
+                    if (mainImgPreview) mainImgPreview.innerHTML = `<img src="${src}" class="w-100 h-100 object-fit-cover">`;
+                    if (headerThumbContainer) headerThumbContainer.innerHTML = `<img src="${src}" class="rounded border variant-header-thumb" style="width: 28px; height: 28px; object-fit: cover;">`;
+                } else {
+                    if (mainImgPreview) mainImgPreview.innerHTML = `<i class="bi bi-image text-muted" style="font-size: 1.3rem;"></i>`;
+                    if (headerThumbContainer) headerThumbContainer.innerHTML = '';
+                }
+            });
+        }
+
+        const btnAddGal = card.querySelector('.btn-add-variant-gallery');
+        const galContainer = card.querySelector('.variant-gallery-chips-container');
+        if (btnAddGal && galContainer) {
+            btnAddGal.addEventListener('click', function(e) {
+                e.preventDefault();
+                activeVariantGalleryTarget = galContainer;
+                activeVariantIndex = card.dataset.index || idx;
+                
+                const group = variantGalleryPickerInput?.closest('.media-picker-group');
+                const chooseBtn = group ? group.querySelector('button') : null;
+                if (chooseBtn) {
+                    chooseBtn.click();
+                }
+            });
+        }
+
+        const removeBtn = card.querySelector('.btn-remove-variant');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                card.remove();
+                if (variantsContainer && !variantsContainer.querySelectorAll('.variant-item').length) {
+                    const empty = document.createElement('div');
+                    empty.id = 'emptyVariantRow';
+                    empty.className = 'text-center py-4 text-muted';
+                    empty.style.fontSize = '0.85rem';
+                    empty.innerHTML = '<i class="bi bi-plus-circle me-1"></i> Click "Add Variant" to configure size/weight options and custom images.';
+                    variantsContainer.appendChild(empty);
+                }
+            });
+        }
+    }
+
+    if (variantsContainer) {
+        // Wire all existing variants on page load
+        variantsContainer.querySelectorAll('.variant-item').forEach((item, i) => {
+            wireVariantCard(item, parseInt(item.dataset.index || i));
         });
 
-        btnAddVariant.addEventListener('click', () => {
+        btnAddVariant?.addEventListener('click', () => {
             document.getElementById('emptyVariantRow')?.remove();
+            const currIdx = variantIndex;
             const item = document.createElement('div');
-            item.className = 'variant-item px-4 py-3 border-bottom';
+            item.className = 'variant-item card border rounded-3 mb-3 bg-white shadow-sm overflow-hidden';
+            item.dataset.index = currIdx;
             item.innerHTML = `
-                <div class="row g-3 mb-3">
-                    <div class="col-md-4">
-                        <label class="form-label text-muted mb-1" style="font-size:0.8rem;">Weight *</label>
-                        <input type="text" name="variants[${variantIndex}][weight]" class="form-control border" required placeholder="e.g. 500ml">
+                {{-- Accordion Header --}}
+                <div class="card-header bg-light px-3 py-2.5 d-flex justify-content-between align-items-center variant-header" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#variantCollapse_${currIdx}" aria-expanded="true">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-chevron-down variant-toggle-icon text-muted" style="transition: transform 0.2s;"></i>
+                        <span class="badge bg-success font-heading variant-weight-badge">New Variant</span>
+                        <span class="text-dark fw-bold variant-price-preview">₹0</span>
+                        <div class="variant-header-thumb-container d-inline-block ms-1"></div>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label text-muted mb-1" style="font-size:0.8rem;">MRP (₹)</label>
-                        <input type="number" step="0.01" name="variants[${variantIndex}][mrp]" class="form-control border" placeholder="999">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label text-muted mb-1" style="font-size:0.8rem;">Sale Price (₹)</label>
-                        <input type="number" step="0.01" name="variants[${variantIndex}][sale_price]" class="form-control border" placeholder="799">
+                    <div class="d-flex align-items-center gap-2" onclick="event.stopPropagation();">
+                        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 py-0.5 btn-remove-variant" style="font-size: 0.75rem;">
+                            <i class="bi bi-trash me-1"></i> Delete
+                        </button>
                     </div>
                 </div>
-                <div class="row g-3 align-items-end">
-                    <div class="col-md-4">
-                        <label class="form-label text-muted mb-1" style="font-size:0.8rem;">Stock</label>
-                        <input type="number" name="variants[${variantIndex}][stock]" class="form-control border" value="100">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label text-muted mb-1" style="font-size:0.8rem;">Max Cart Qty</label>
-                        <input type="number" name="variants[${variantIndex}][max_cart_qty]" class="form-control border" placeholder="No limit">
-                    </div>
-                    <div class="col-md-4 d-flex justify-content-md-end">
-                        <button type="button" class="btn btn-sm btn-outline-danger border rounded-pill px-3 btn-remove-variant"><i class="bi bi-trash me-1"></i>Remove</button>
+
+                {{-- Accordion Body --}}
+                <div id="variantCollapse_${currIdx}" class="collapse show">
+                    <div class="card-body p-3">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-3">
+                                <label class="form-label text-dark fw-semibold mb-1" style="font-size:0.8rem;">Weight Option *</label>
+                                <input type="text" name="variants[${currIdx}][weight]" class="form-control form-control-sm border variant-weight-input" required placeholder="e.g. 500ml">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label text-dark fw-semibold mb-1" style="font-size:0.8rem;">MRP (₹)</label>
+                                <input type="number" step="0.01" name="variants[${currIdx}][mrp]" class="form-control form-control-sm border" placeholder="999">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label text-dark fw-semibold mb-1" style="font-size:0.8rem;">Sale Price (₹) *</label>
+                                <input type="number" step="0.01" name="variants[${currIdx}][sale_price]" class="form-control form-control-sm border variant-price-input" required placeholder="799">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label text-dark fw-semibold mb-1" style="font-size:0.8rem;">Stock *</label>
+                                <input type="number" name="variants[${currIdx}][stock]" class="form-control form-control-sm border" value="100">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-dark fw-semibold mb-1" style="font-size:0.8rem;">Max Cart Qty</label>
+                                <input type="number" name="variants[${currIdx}][max_cart_qty]" class="form-control form-control-sm border" placeholder="No limit">
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-light rounded-3 border">
+                            <div class="row g-3">
+                                <div class="col-md-5 border-end">
+                                    <label class="form-label text-dark fw-semibold mb-1 d-flex align-items-center gap-1" style="font-size:0.8rem;">
+                                        <i class="bi bi-image text-success"></i> Variant Main Image
+                                    </label>
+                                    <p class="text-muted m-0 mb-2" style="font-size: 0.72rem;">Primary photo shown when this variant is selected.</p>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="variant-main-img-preview border rounded bg-white d-flex align-items-center justify-content-center overflow-hidden" style="width: 54px; height: 54px; flex-shrink: 0;">
+                                            <i class="bi bi-image text-muted" style="font-size: 1.3rem;"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <input type="text" name="variants[${currIdx}][image_path]" class="form-control form-control-sm media-picker-input variant-main-img-input" placeholder="Pick main image...">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-7">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label class="form-label text-dark fw-semibold m-0 d-flex align-items-center gap-1" style="font-size:0.8rem;">
+                                            <i class="bi bi-images text-success"></i> Variant Gallery Images
+                                        </label>
+                                        <button type="button" class="btn btn-outline-success btn-sm py-0.5 px-2.5 btn-add-variant-gallery" data-index="${currIdx}" style="font-size: 0.72rem;">
+                                            <i class="bi bi-plus-lg me-1"></i> Add Gallery Photo
+                                        </button>
+                                    </div>
+                                    <p class="text-muted m-0 mb-2" style="font-size: 0.72rem;">Slides shown in product detail gallery when this variant is active.</p>
+                                    <div class="d-flex flex-wrap gap-2 p-2 border rounded bg-white min-height-50 variant-gallery-chips-container">
+                                        <span class="text-muted small align-self-center empty-variant-gallery-msg" style="font-size: 0.75rem;">
+                                            No gallery photos added yet for this variant.
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
             variantsContainer.appendChild(item);
+            wireVariantCard(item, currIdx);
             variantIndex++;
-            item.querySelector('.btn-remove-variant').addEventListener('click', () => item.remove());
         });
     }
 

@@ -26,8 +26,9 @@ export function initGallery() {
     });
 
     // Collect all product image URLs for lightbox
-    const allImages = Array.from(document.querySelectorAll('.img-main-slide'))
+    let allImages = Array.from(document.querySelectorAll('.img-main-slide'))
         .map(img => img.getAttribute('data-full') || img.src);
+    const defaultImages = [...allImages];
 
     const thumbContainer = document.querySelector('.thumb-slider-col');
 
@@ -40,28 +41,30 @@ export function initGallery() {
         const thumbWidth = firstThumb.getBoundingClientRect().width;
         if (thumbWidth <= 0) return;
         // Each thumb is square: height = width. Gap between each = 6px. Show 5 items.
-        const containerHeight = (thumbWidth * 5) + (6 * 4); // 5 items + 4 gaps
+        const containerHeight = (thumbWidth * Math.min(thumbs.length, 5)) + (6 * Math.max(0, Math.min(thumbs.length, 5) - 1));
         thumbContainer.style.height   = containerHeight + 'px';
         thumbContainer.style.maxHeight = containerHeight + 'px';
     }
 
     window.addEventListener('load', setThumbContainerHeight);
     window.addEventListener('resize', setThumbContainerHeight);
-    // Run early and again after fonts/images settle
     setTimeout(setThumbContainerHeight, 50);
     setTimeout(setThumbContainerHeight, 300);
     setTimeout(setThumbContainerHeight, 800);
 
 
     // ── Thumbnail Click ──────────────────────────────
-    document.querySelectorAll('.thumb-img-wrapper').forEach(thumb => {
-        thumb.addEventListener('click', function () {
-            const index = parseInt(this.getAttribute('data-slide-index'));
-            mainSwiper.slideTo(index);
-            document.querySelectorAll('.thumb-img-wrapper').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll(`.thumb-img-wrapper[data-slide-index="${index}"]`).forEach(t => t.classList.add('active'));
+    function wireThumbnailClicks() {
+        document.querySelectorAll('.thumb-img-wrapper').forEach(thumb => {
+            thumb.addEventListener('click', function () {
+                const index = parseInt(this.getAttribute('data-slide-index'));
+                mainSwiper.slideTo(index);
+                document.querySelectorAll('.thumb-img-wrapper').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll(`.thumb-img-wrapper[data-slide-index="${index}"]`).forEach(t => t.classList.add('active'));
+            });
         });
-    });
+    }
+    wireThumbnailClicks();
 
 
     // ── Thumbnail Scroll Up/Down Buttons ────────────
@@ -72,14 +75,12 @@ export function initGallery() {
         upBtn?.addEventListener('click', () => {
             let prevIndex = mainSwiper.activeIndex - 1;
             if (prevIndex < 0) prevIndex = allImages.length - 1;
-            console.log('Up arrow clicked. Navigating to slide index:', prevIndex, 'Total images:', allImages.length);
             mainSwiper.slideTo(prevIndex);
         });
         
         downBtn?.addEventListener('click', () => {
             let nextIndex = mainSwiper.activeIndex + 1;
             if (nextIndex >= allImages.length) nextIndex = 0;
-            console.log('Down arrow clicked. Navigating to slide index:', nextIndex, 'Total images:', allImages.length);
             mainSwiper.slideTo(nextIndex);
         });
     }
@@ -110,6 +111,7 @@ export function initGallery() {
 
     function buildLightboxSlides(startIndex) {
         const wrapper = document.getElementById('lightboxSwiperWrapper');
+        if (!wrapper) return;
         wrapper.innerHTML = '';
         allImages.forEach(src => {
             const slide = document.createElement('div');
@@ -127,17 +129,38 @@ export function initGallery() {
         });
     }
 
-    // Open lightbox on main image click
-    document.querySelectorAll('.img-main-slide').forEach((img, idx) => {
-        img.style.cursor = 'zoom-in';
-        img.addEventListener('click', function () {
-            buildLightboxSlides(idx);
-            const modal = new bootstrap.Modal(document.getElementById('imageLightboxModal'));
-            modal.show();
+    function wireMainImageZoomAndLightbox() {
+        // Open lightbox on main image click
+        document.querySelectorAll('.img-main-slide').forEach((img, idx) => {
+            img.style.cursor = 'zoom-in';
+            img.onclick = function () {
+                buildLightboxSlides(idx);
+                const modal = new bootstrap.Modal(document.getElementById('imageLightboxModal'));
+                modal.show();
+            };
         });
-    });
 
-    // Open lightbox on review photo click (from card thumbnails)
+        // Zoom on Desktop
+        document.querySelectorAll('.main-image-zoom-frame').forEach(frame => {
+            const img = frame.querySelector('img');
+            if (!img) return;
+            frame.onmousemove = function (e) {
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                img.style.transformOrigin = `${x}px ${y}px`;
+                img.style.transform = 'scale(1.7)';
+                img.style.transition = 'transform 0.1s ease';
+            };
+            frame.onmouseleave = function () {
+                img.style.transformOrigin = 'center center';
+                img.style.transform = 'scale(1)';
+            };
+        });
+    }
+    wireMainImageZoomAndLightbox();
+
+    // Open lightbox on review photo click
     document.querySelectorAll('.review-img-lightbox').forEach(img => {
         img.style.cursor = 'zoom-in';
         img.addEventListener('click', function () {
@@ -152,21 +175,41 @@ export function initGallery() {
         });
     });
 
+    // ── Global Variant Image & Gallery Switcher ────────
+    window.updateProductGalleryImages = function(imageUrls) {
+        const imgs = (imageUrls && imageUrls.length > 0) ? imageUrls : defaultImages;
+        allImages = imgs;
 
-    // ── Zoom on Desktop ──────────────────────────────
-    document.querySelectorAll('.main-image-zoom-frame').forEach(frame => {
-        const img = frame.querySelector('img');
-        frame.addEventListener('mousemove', function (e) {
-            const rect = this.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            img.style.transformOrigin = `${x}px ${y}px`;
-            img.style.transform = 'scale(1.7)';
-            img.style.transition = 'transform 0.1s ease';
-        });
-        frame.addEventListener('mouseleave', function () {
-            img.style.transformOrigin = 'center center';
-            img.style.transform = 'scale(1)';
-        });
-    });
+        // 1. Update Swiper slides
+        const swiperWrapper = document.querySelector('.main-product-slider .swiper-wrapper');
+        if (swiperWrapper) {
+            swiperWrapper.innerHTML = '';
+            imgs.forEach((src, idx) => {
+                const slide = document.createElement('div');
+                slide.className = 'swiper-slide main-image-zoom-frame';
+                slide.style.cursor = 'zoom-in';
+                slide.innerHTML = `<img src="${src}" alt="Product variant image" class="w-100 h-100 object-fit-cover img-main-slide" data-full="${src}" loading="eager">`;
+                swiperWrapper.appendChild(slide);
+            });
+            mainSwiper.update();
+            mainSwiper.slideTo(0, 300);
+        }
+
+        // 2. Update Thumbnails
+        if (thumbContainer) {
+            thumbContainer.innerHTML = '';
+            imgs.forEach((src, idx) => {
+                const thumb = document.createElement('div');
+                thumb.className = `thumb-img-wrapper ${idx === 0 ? 'active' : ''}`;
+                thumb.setAttribute('data-slide-index', idx);
+                thumb.innerHTML = `<img src="${src}" alt="Thumbnail ${idx + 1}">`;
+                thumbContainer.appendChild(thumb);
+            });
+            wireThumbnailClicks();
+            setThumbContainerHeight();
+        }
+
+        // 3. Re-wire Zoom & Lightbox on new DOM elements
+        wireMainImageZoomAndLightbox();
+    };
 }

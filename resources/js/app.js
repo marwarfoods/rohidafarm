@@ -483,6 +483,15 @@ document.addEventListener('DOMContentLoaded', function () {
         const variantInput = card.querySelector('.card-variant-id');
         if (variantInput) variantInput.value = variantId;
 
+        // Dynamic Variant Image Switch on Product Card
+        const variantImg = selectedOption.getAttribute('data-image');
+        const primaryImg = card.querySelector('.product-card-img-primary');
+        if (primaryImg && variantImg) {
+            primaryImg.style.opacity = '0.4';
+            primaryImg.src = variantImg;
+            setTimeout(() => { primaryImg.style.opacity = '1'; }, 150);
+        }
+
         const stock = parseInt(selectedOption.getAttribute('data-stock') || '0');
         const cartForm = card.querySelector('.add-to-cart-form');
         const soldOutBtn = card.querySelector('.card-sold-out-btn');

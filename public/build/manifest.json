@@ -36,13 +36,13 @@
     ]
   },
   "resources/js/admin/products.js": {
-    "file": "assets/products-Dm1p3deW.js",
+    "file": "assets/products--gH-MWZo.js",
     "name": "products",
     "src": "resources/js/admin/products.js",
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-BkjztGtF.js",
+    "file": "assets/app-Dgk_WD2e.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -77,7 +77,7 @@
     "isEntry": true
   },
   "resources/js/product-detail.js": {
-    "file": "assets/product-detail-Bbula3vM.js",
+    "file": "assets/product-detail-9CT8HTZa.js",
     "name": "product-detail",
     "src": "resources/js/product-detail.js",
     "isEntry": true
