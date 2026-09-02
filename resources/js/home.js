@@ -154,6 +154,9 @@ document.addEventListener('DOMContentLoaded', function () {
         slidesPerView: 1,
         spaceBetween: 20,
         grabCursor: true,
+        preventClicks: false,
+        preventClicksPropagation: false,
+        touchStartPreventDefault: false,
         pagination: {
             el: '.promo-three-slider .swiper-pagination',
             clickable: true,
