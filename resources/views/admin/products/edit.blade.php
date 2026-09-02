@@ -187,9 +187,12 @@
                                                     </label>
                                                     <p class="text-muted m-0 mb-2" style="font-size: 0.72rem;">Primary photo shown when this variant is selected.</p>
                                                     <div class="d-flex align-items-center gap-2">
-                                                        <div class="variant-main-img-preview border rounded bg-white d-flex align-items-center justify-content-center overflow-hidden" style="width: 54px; height: 54px; flex-shrink: 0;">
+                                                        <div class="variant-main-img-preview position-relative border rounded bg-white d-flex align-items-center justify-content-center overflow-visible" style="width: 54px; height: 54px; flex-shrink: 0;">
                                                             @if($v->image_path)
-                                                                <img src="{{ asset($v->image_path) }}" class="w-100 h-100 object-fit-cover">
+                                                                <img src="{{ asset($v->image_path) }}" class="w-100 h-100 object-fit-cover rounded">
+                                                                <button type="button" class="btn btn-danger btn-sm rounded-circle position-absolute top-0 end-0 p-0 btn-clear-variant-main-img d-flex align-items-center justify-content-center" title="Remove main image" style="width: 18px; height: 18px; font-size: 10px; transform: translate(30%, -30%); z-index: 5;">
+                                                                    <i class="bi bi-x"></i>
+                                                                </button>
                                                             @else
                                                                 <i class="bi bi-image text-muted" style="font-size: 1.3rem;"></i>
                                                             @endif

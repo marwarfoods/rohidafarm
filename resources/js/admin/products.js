@@ -143,19 +143,53 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (mainImgInput) {
             if (window.initMediaPicker && !mainImgInput.parentNode.classList.contains('media-picker-group')) {
-                initMediaPicker(mainImgInput, null, 'image');
+                initMediaPicker(mainImgInput, null, 'image', false);
             }
+
+            const updateMainImgDisplay = (src) => {
+                if (src) {
+                    const normSrc = src.startsWith('http') || src.startsWith('/') ? src : '/' + src;
+                    if (mainImgPreview) {
+                        mainImgPreview.innerHTML = `
+                            <img src="${normSrc}" class="w-100 h-100 object-fit-cover rounded">
+                            <button type="button" class="btn btn-danger btn-sm rounded-circle position-absolute top-0 end-0 p-0 btn-clear-variant-main-img d-flex align-items-center justify-content-center" title="Remove main image" style="width: 18px; height: 18px; font-size: 10px; transform: translate(30%, -30%); z-index: 5;">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        `;
+                        wireClearMainImgBtn();
+                    }
+                    if (headerThumbContainer) {
+                        headerThumbContainer.innerHTML = `<img src="${normSrc}" class="rounded border variant-header-thumb" style="width: 28px; height: 28px; object-fit: cover;">`;
+                    }
+                } else {
+                    if (mainImgPreview) {
+                        mainImgPreview.innerHTML = `<i class="bi bi-image text-muted" style="font-size: 1.3rem;"></i>`;
+                    }
+                    if (headerThumbContainer) {
+                        headerThumbContainer.innerHTML = '';
+                    }
+                }
+            };
+
+            const wireClearMainImgBtn = () => {
+                const clearBtn = mainImgPreview?.querySelector('.btn-clear-variant-main-img');
+                if (clearBtn) {
+                    clearBtn.onclick = function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        mainImgInput.value = '';
+                        updateMainImgDisplay('');
+                        mainImgInput.dispatchEvent(new Event('change'));
+                    };
+                }
+            };
+
             mainImgInput.addEventListener('change', function() {
                 const val = this.value.trim();
-                const src = val ? (val.startsWith('http') || val.startsWith('/') ? val : '/' + val) : '';
-                if (src) {
-                    if (mainImgPreview) mainImgPreview.innerHTML = `<img src="${src}" class="w-100 h-100 object-fit-cover">`;
-                    if (headerThumbContainer) headerThumbContainer.innerHTML = `<img src="${src}" class="rounded border variant-header-thumb" style="width: 28px; height: 28px; object-fit: cover;">`;
-                } else {
-                    if (mainImgPreview) mainImgPreview.innerHTML = `<i class="bi bi-image text-muted" style="font-size: 1.3rem;"></i>`;
-                    if (headerThumbContainer) headerThumbContainer.innerHTML = '';
-                }
+                updateMainImgDisplay(val);
             });
+
+            wireClearMainImgBtn();
         }
 
         const btnAddGal = card.querySelector('.btn-add-variant-gallery');
@@ -292,7 +326,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </label>
                                     <p class="text-muted m-0 mb-2" style="font-size: 0.72rem;">Primary photo shown when this variant is selected.</p>
                                     <div class="d-flex align-items-center gap-2">
-                                        <div class="variant-main-img-preview border rounded bg-white d-flex align-items-center justify-content-center overflow-hidden" style="width: 54px; height: 54px; flex-shrink: 0;">
+                                        <div class="variant-main-img-preview position-relative border rounded bg-white d-flex align-items-center justify-content-center overflow-visible" style="width: 54px; height: 54px; flex-shrink: 0;">
                                             <i class="bi bi-image text-muted" style="font-size: 1.3rem;"></i>
                                         </div>
                                         <div class="flex-grow-1">
