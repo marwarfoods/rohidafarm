@@ -16,7 +16,7 @@
                         <div style="z-index: 2; max-width: 55%;">
                             <h4 class="fw-bold font-heading text-dark mb-1 fs-5">Pure Cow Ghee</h4>
                             <p class="text-muted mb-3" style="font-size: 0.8rem; line-height: 1.3;">Made the Traditional Bilona Way</p>
-                            <a href="{{ route('shop.category', ['category' => 'ghee']) }}" data-instant class="btn btn-premium btn-sm px-4 py-2 rounded-pill text-uppercase font-heading" style="font-size: 0.7rem; letter-spacing: 0.5px;">Shop Now <i class="bi bi-arrow-right ms-1"></i></a>
+                            <a href="{{ route('shop.index') }}" class="btn btn-premium btn-sm px-4 py-2 rounded-pill text-uppercase font-heading" style="font-size: 0.7rem; letter-spacing: 0.5px;">Shop Now <i class="bi bi-arrow-right ms-1"></i></a>
                         </div>
                         <img src="{{ url('uploads/products/1784099286_cow-ghee-1.png') }}" alt="Cow Ghee Product" width="150" height="150" loading="lazy" decoding="async" class="position-absolute end-0 bottom-0" style="height: 150px; object-fit: contain; transform: translateY(10px) translateX(10px); z-index: 1; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">
                     </div>
@@ -28,7 +28,7 @@
                         <div style="z-index: 2; max-width: 55%;">
                             <h4 class="fw-bold font-heading text-dark mb-1 fs-5">Cold Pressed Oils</h4>
                             <p class="text-muted mb-3" style="font-size: 0.8rem; line-height: 1.3;">100% Pure, Wood-Pressed & Natural</p>
-                            <a href="{{ route('shop.category', ['category' => 'cold-pressed-oil']) }}" data-instant class="btn btn-premium btn-sm px-4 py-2 rounded-pill text-uppercase font-heading" style="font-size: 0.7rem; letter-spacing: 0.5px;">Shop Now <i class="bi bi-arrow-right ms-1"></i></a>
+                            <a href="{{ route('shop.index') }}" class="btn btn-premium btn-sm px-4 py-2 rounded-pill text-uppercase font-heading" style="font-size: 0.7rem; letter-spacing: 0.5px;">Shop Now <i class="bi bi-arrow-right ms-1"></i></a>
                         </div>
                         <img src="{{ url('uploads/products/1784100896_oil-2.png') }}" alt="Cold Pressed Oil Product" width="150" height="150" loading="lazy" decoding="async" class="position-absolute end-0 bottom-0" style="height: 150px; object-fit: contain; transform: translateY(10px) translateX(10px); z-index: 1; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">
                     </div>
@@ -40,7 +40,7 @@
                         <div style="z-index: 2; max-width: 55%;">
                             <h4 class="fw-bold font-heading text-dark mb-1 fs-5">Combo Pack</h4>
                             <p class="text-muted mb-3" style="font-size: 0.8rem; line-height: 1.3;">Ghee & Cold Pressed Oil</p>
-                            <a href="{{ route('shop.index') }}" data-instant class="btn btn-premium btn-sm px-4 py-2 rounded-pill text-uppercase font-heading" style="font-size: 0.7rem; letter-spacing: 0.5px;">Shop Now <i class="bi bi-arrow-right ms-1"></i></a>
+                            <a href="{{ route('shop.index') }}" class="btn btn-premium btn-sm px-4 py-2 rounded-pill text-uppercase font-heading" style="font-size: 0.7rem; letter-spacing: 0.5px;">Shop Now <i class="bi bi-arrow-right ms-1"></i></a>
                         </div>
                         <img src="{{ asset('images/combo.png') }}" alt="Combo Pack" width="150" height="150" loading="lazy" decoding="async" class="position-absolute end-0 bottom-0" style="height: 150px; object-fit: contain; transform: translateY(10px) translateX(10px); z-index: 1; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">
                     </div>
