@@ -14,27 +14,99 @@
 }
 
 // ---------- Lightbox Swiper Modal ----------
-#imageLightboxModal .modal-content {
-    background: rgba(0,0,0,0.92) !important;
-}
-#lightboxSwiper {
-    .swiper-slide {
+#imageLightboxModal {
+    .modal-dialog {
+        max-width: 90vw;
+        width: fit-content;
+        margin: 1.5rem auto;
         display: flex;
         align-items: center;
         justify-content: center;
     }
+
+    .modal-content {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        width: auto;
+    }
+
+    .modal-body {
+        padding: 0;
+        background: transparent !important;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+#lightboxSwiper {
+    width: auto;
+    max-width: 85vw;
+    max-height: 88vh;
+    background: transparent !important;
+    position: relative;
+
+    .swiper-wrapper {
+        background: transparent !important;
+    }
+
+    .swiper-slide {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent !important;
+
+        img {
+            max-height: 85vh;
+            max-width: 85vw;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            background: transparent !important;
+            border-radius: 16px;
+            filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.4));
+        }
+    }
+
     .swiper-button-next,
     .swiper-button-prev {
         color: #fff;
-        background: rgba(255,255,255,0.12);
-        width: 44px;
-        height: 44px;
+        background: rgba(0, 0, 0, 0.45);
+        backdrop-filter: blur(4px);
+        width: 42px;
+        height: 42px;
         border-radius: 50%;
-        --swiper-navigation-size: 18px;
+        --swiper-navigation-size: 16px;
+        transition: all 0.2s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
 
-        &:hover { background: rgba(255,255,255,0.25); }
+        &:hover {
+            background: rgba(0, 0, 0, 0.75);
+            transform: scale(1.08);
+        }
     }
-    .swiper-pagination-bullet-active { background: #fff !important; }
+
+    .swiper-button-prev {
+        left: 10px;
+    }
+    .swiper-button-next {
+        right: 10px;
+    }
+
+    .swiper-pagination {
+        bottom: 10px;
+    }
+
+    .swiper-pagination-bullet {
+        background: rgba(255, 255, 255, 0.6);
+        opacity: 0.7;
+    }
+    .swiper-pagination-bullet-active {
+        background: #fff !important;
+        opacity: 1;
+        transform: scale(1.2);
+    }
 }
 
 // ---------- Swiper Dot Active ----------

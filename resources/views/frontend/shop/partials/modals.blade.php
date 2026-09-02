@@ -1,11 +1,11 @@
 <!-- ═══════════ LIGHTBOX SLIDER MODAL ═══════════ -->
 <div class="modal fade" id="imageLightboxModal" tabindex="-1" aria-hidden="true" style="z-index:1070;">
-    <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content bg-transparent border-0">
-            <div class="modal-body p-0 position-relative">
-                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 z-3" data-bs-dismiss="modal" aria-label="Close" style="filter:invert(1) grayscale(100%) brightness(200%);"></button>
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 90vw; width: fit-content; margin: auto;">
+        <div class="modal-content bg-transparent border-0 shadow-none">
+            <div class="modal-body p-0 position-relative d-flex justify-content-center align-items-center">
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-1 z-3" data-bs-dismiss="modal" aria-label="Close" style="background-color: rgba(0,0,0,0.55); border-radius: 50%; padding: 8px; filter: invert(1) grayscale(100%) brightness(200%); transform: translate(30%, -30%);"></button>
                 <!-- Lightbox Swiper -->
-                <div class="swiper" id="lightboxSwiper" style="max-height:90vh;">
+                <div class="swiper" id="lightboxSwiper" style="max-height:88vh; max-width:88vw;">
                     <div class="swiper-wrapper" id="lightboxSwiperWrapper">
                         <!-- Slides injected by JS -->
                     </div>
