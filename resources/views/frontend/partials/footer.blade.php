@@ -1,4 +1,4 @@
-<footer class="footer pt-5 pb-4 position-relative overflow-hidden" style="font-family:'Plus Jakarta Sans',sans-serif; background-color: #FBF3E7;">
+<footer class="footer pt-5 pb-4 position-relative overflow-hidden" style="background-color: #FBF3E7;">
     <!-- Farm line-art background illustration -->
     <div class="position-absolute top-0 start-0 w-100 h-100" style="background-image:url('{{ asset('images/footerbg.png') }}');background-size:cover;background-repeat:no-repeat;background-position:center;z-index:0;pointer-events:none;"></div>
     <!-- Soft overlay so text stays crisp on top of the bg image (same on mobile & desktop) -->
@@ -21,7 +21,7 @@
                     @endif
                 </a>
                 <p class="mb-4" style="font-size:0.88rem;line-height:1.75;color:#5c5044;">
-                    Reviving the ancient Bilona churning process and wood-pressed oil extractions — delivering premium pure organic ghee and natural ingredients straight to your kitchen table, with love from our farm.
+                    Every product carries the patience of old methods and the trust of a farmer’s hand — that’s what Rohida Farm stands for.
                 </p>
                 <!-- Social Icons -->
                 <div class="d-flex gap-3 mt-2">
@@ -61,6 +61,7 @@
                     <ul class="list-unstyled d-flex flex-column gap-3 mt-3" style="font-size:0.88rem;">
                         <li><a href="{{ route('about') }}" class="footer-link">Our Story</a></li>
                         <li><a href="{{ url('/#bilona-process') }}" class="footer-link">Bilona Process</a></li>
+                        <li><a href="{{ route('track-order') }}" class="footer-link">Track Order</a></li>
                         <li><a href="{{ route('blogs.index') }}" class="footer-link">Healthy Blogs</a></li>
                         <li><a href="{{ route('contact') }}" class="footer-link">Contact Us</a></li>
                     </ul>
@@ -169,11 +170,14 @@
         <hr class="my-3 my-md-5" style="border-color:#d9c9ae;">
 
         <!-- Bottom Copyright Row -->
-        <div class="row align-items-center gy-2">
-            <div class="col-12 col-md-6 text-center text-md-start" style="font-size:0.82rem;color:#8a7a68;">
+        <div class="row align-items-center gy-3 gy-md-0">
+            <div class="col-12 col-md-4 text-center text-md-start order-1" style="font-size:0.82rem;color:#8a7a68;">
                 &copy; {{ date('Y') }} <span style="color:#5c5044;">RohidaFarm</span>. All Rights Reserved.
             </div>
-            <div class="col-12 col-md-6 text-center text-md-end" style="font-size:0.82rem;color:#8a7a68;">
+            <div class="col-12 col-md-4 text-center order-2 my-1 my-md-0">
+                <img src="{{ asset('images/vectors/footer-icons.png') }}" alt="Payment and Security Badges" class="img-fluid footer-bottom-icons" style="max-height: 40px; height: auto; object-fit: contain;">
+            </div>
+            <div class="col-12 col-md-4 text-center text-md-end order-3" style="font-size:0.82rem;color:#8a7a68;">
                 <span>Design & Developed by <a href="https://hinguland.com" target="_blank" class="text-decoration-none hover-gold" style="font-weight: 500; color: var(--primary-green);">Hinguland</a></span>
             </div>
         </div>

@@ -4,11 +4,19 @@
     $price = $product->sale_price;
     $mrp = $product->mrp;
     $discount = $product->discountPercentage();
-    $imagePath = $product->primaryImage ? asset($product->primaryImage->image_path) : asset('/assets/images/products/placeholder.jpg');
+    
+    // Primary image extraction
+    $primaryImgObj = $product->primaryImage ?: ($product->relationLoaded('images') ? $product->images->first() : $product->images()->first());
+    $imagePath = $primaryImgObj ? asset($primaryImgObj->image_path) : asset('/assets/images/products/placeholder.jpg');
     
     // Hover image extraction
-    $galleryFirst = $product->gallery->first();
-    $hoverImagePath = $galleryFirst ? asset($galleryFirst->image_path) : $imagePath;
+    $hoverImgObj = $product->gallery->first();
+    if (!$hoverImgObj && $product->images->count() > 1) {
+        $hoverImgObj = $product->images->first(function($img) use ($primaryImgObj) {
+            return $primaryImgObj ? $img->id !== $primaryImgObj->id : true;
+        });
+    }
+    $hoverImagePath = $hoverImgObj ? asset($hoverImgObj->image_path) : null;
     
     // Best Price calculation with dynamic coupon
     $bestCoupon = \App\Models\Coupon::where('is_active', true)
@@ -43,10 +51,10 @@
             </div>
         @endif
 
-        <a href="{{ route('shop.show', $product->slug) }}" class="d-block w-100 h-100">
-            <img src="{{ $imagePath }}" alt="{{ $product->name }}" width="400" height="400" class="w-100 h-100 object-fit-cover product-card-img-primary" loading="lazy" decoding="async" style="transition: var(--transition-smooth); opacity: 1;">
-            @if($hoverImagePath !== $imagePath)
-                <img src="{{ $hoverImagePath }}" alt="{{ $product->name }} - alternate view" width="400" height="400" class="w-100 h-100 object-fit-cover product-card-img-hover position-absolute top-0 start-0" loading="lazy" decoding="async" style="transition: var(--transition-smooth); opacity: 0; z-index: 2;">
+        <a href="{{ route('shop.show', $product->slug) }}" class="d-block w-100 h-100 position-relative">
+            <img src="{{ $imagePath }}" alt="{{ $product->name }}" width="400" height="400" class="w-100 h-100 object-fit-cover product-card-img-primary" loading="lazy" decoding="async">
+            @if($hoverImagePath && $hoverImagePath !== $imagePath)
+                <img src="{{ $hoverImagePath }}" alt="{{ $product->name }} - alternate view" width="400" height="400" class="w-100 h-100 object-fit-cover product-card-img-hover position-absolute top-0 start-0" loading="lazy" decoding="async" style="z-index: 2;">
             @endif
         </a>
 

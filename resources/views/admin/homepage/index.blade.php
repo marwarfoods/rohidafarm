@@ -178,6 +178,8 @@
             initMediaPicker('#editSliderMobileImageInput', '#editSliderMobileImagePreview', 'image');
             initMediaPicker('#sectionImagePcInput', '#sectionImagePcPreview', 'image');
             initMediaPicker('#sectionImageMobileInput', '#sectionImageMobilePreview', 'image');
+            initMediaPicker('#storyVideoInput', null, 'video');
+            initMediaPicker('#storyPosterInput', null, 'image');
         }
 
         // Live preview listeners for desktop banners

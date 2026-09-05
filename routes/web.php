@@ -224,7 +224,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/categories/store', [AdminCategoryController::class, 'store'])->name('categories.store');
         Route::post('/categories/subcategory/store', [AdminCategoryController::class, 'storeSubcategory'])->name('categories.subcategory.store');
         Route::post('/categories/{id}/update', [AdminCategoryController::class, 'update'])->name('categories.update');
-        Route::post('/categories/subcategory/{id}/update', [AdminCategoryController::class, 'updateSubcategory'])->name('categories.subcategory.update');
+        Route::get('/categories/{id}/faqs', [AdminCategoryController::class, 'getFaqs'])->name('categories.faqs.get');
+        Route::post('/categories/{id}/faqs', [AdminCategoryController::class, 'updateFaqs'])->name('categories.faqs.update');
         Route::delete('/categories/{id}/delete', [AdminCategoryController::class, 'destroy'])->name('categories.delete');
         Route::delete('/categories/subcategory/{id}/delete', [AdminCategoryController::class, 'destroySubcategory'])->name('categories.subcategory.delete');
     });

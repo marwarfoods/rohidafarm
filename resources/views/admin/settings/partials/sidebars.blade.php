@@ -69,6 +69,7 @@
     <div class="bg-light p-3 rounded-3 border mt-3 text-center">
         <span class="badge bg-{{ App\Models\Setting::get('delhivery_api_token') ? 'success' : 'warning text-dark' }} w-100 p-2 mb-2">Delhivery: {{ App\Models\Setting::get('delhivery_api_token') ? 'Connected' : 'Sandbox Mode' }}</span>
         <span class="badge bg-{{ App\Models\Setting::get('google_analytics_id') ? 'success' : 'secondary' }} w-100 p-2 mb-2">Google Analytics: {{ App\Models\Setting::get('google_analytics_id') ? 'Active' : 'Inactive' }}</span>
+        <span class="badge bg-{{ App\Models\Setting::get('meta_pixel_enabled') && (App\Models\Setting::get('meta_pixel_id') || App\Models\Setting::get('meta_pixel_code')) ? 'success' : 'secondary' }} w-100 p-2 mb-2">Meta Pixel: {{ App\Models\Setting::get('meta_pixel_enabled') && (App\Models\Setting::get('meta_pixel_id') || App\Models\Setting::get('meta_pixel_code')) ? 'Active & Tracking' : 'Disabled' }}</span>
         <span class="badge bg-{{ App\Models\Setting::get('turnstile_enabled') && App\Models\Setting::get('turnstile_site_key') ? 'success' : 'secondary' }} w-100 p-2">Cloudflare Turnstile: {{ App\Models\Setting::get('turnstile_enabled') && App\Models\Setting::get('turnstile_site_key') ? 'Active & Protecting' : 'Disabled' }}</span>
     </div>
 </div>

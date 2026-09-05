@@ -1,16 +1,17 @@
 <!-- Making Of Video Section -->
-<section class="about-video-section">
-    <div class="container text-center" data-aos="fade-up">
-        <h2 class="section-title">Making Of Rohida Farm Vedic A2 Ghee</h2>
-        <p class="section-subtitle">Get an inside look at our farm and manufacturing facility with a comprehensive visual guide.</p>
-
-        <div class="about-video-wrapper mx-auto" id="aboutVideoWrapper">
-            <video id="aboutFeatureVideo" poster="{{ asset('images/vedic-craftsmanship.png') }}" preload="metadata" playsinline>
-                <source src="{{ asset('uploads/videos/1784521286_video-837.mp4') }}" type="video/mp4">
+<section class="about-video-section py-4 py-md-5">
+    <div class="container" data-aos="fade-up">
+        <div class="about-video-wrapper w-100 mx-auto" id="aboutVideoWrapper">
+            <video id="aboutFeatureVideo" 
+                   class="w-100" 
+                   muted 
+                   loop 
+                   playsinline 
+                   preload="metadata"
+                   style="width: 100%; height: auto; max-height: 620px; display: block; object-fit: cover; border-radius: 24px;">
+                <source src="{{ asset('images/videos/about-us.mp4') }}" type="video/mp4">
+                Your browser does not support HTML5 video.
             </video>
-            <button type="button" class="about-video-play-btn" id="aboutVideoPlayBtn" aria-label="Play video">
-                <i class="fa-solid fa-play"></i>
-            </button>
         </div>
     </div>
 </section>

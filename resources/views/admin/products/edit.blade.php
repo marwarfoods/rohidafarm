@@ -391,10 +391,10 @@
 
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Option A: Pick from Media Library</label>
+                            <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Option A: Pick from Media Library (Multi-select)</label>
                             <div class="input-group">
                                 <input type="text" name="infographic_urls" id="infographicMediaInput" class="form-control media-picker-input"
-                                       placeholder="Choose from media library..." value="{{ old('infographic_urls') }}">
+                                       data-multiple="true" placeholder="Choose multiple from gallery..." value="{{ old('infographic_urls') }}">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -730,7 +730,37 @@
         }
 
         if (typeof window.initMediaPicker === 'function') {
-            window.initMediaPicker('#infographicMediaInput', '#infographicPreview', 'image');
+            window.initMediaPicker('#infographicMediaInput', null, 'image', true);
+        }
+
+        const infographicInput = document.getElementById('infographicMediaInput');
+        if (infographicInput) {
+            infographicInput.addEventListener('media-picker:selected', function(e) {
+                const items = e.detail && e.detail.items ? e.detail.items : [];
+                if (items.length > 0) {
+                    const container = document.getElementById('infographicGrid');
+                    const emptyMsg = document.getElementById('emptyInfographicsMsg');
+                    if (emptyMsg) emptyMsg.remove();
+                    
+                    items.forEach(item => {
+                        const path = item.path;
+                        const fullUrl = item.fullUrl || (path.startsWith('http') ? path : (window.location.origin + '/' + path.replace(/^\//, '')));
+                        container.insertAdjacentHTML('beforeend', `
+                            <div class="position-relative infographic-card-item">
+                                <input type="hidden" name="existing_infographics[]" value="${path}">
+                                <img src="${fullUrl}" alt="story banner" style="height: 120px; width: 90px; object-fit: cover; border-radius: 10px; border: 2px solid #ddd;">
+                                <button type="button" class="btn btn-danger btn-sm rounded-circle position-absolute top-0 end-0 m-1 p-0 d-flex align-items-center justify-content-center"
+                                        style="width: 22px; height: 22px; font-size: 12px; line-height: 1;"
+                                        onclick="this.closest('.infographic-card-item').remove()"
+                                        title="Remove image">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                        `);
+                    });
+                    infographicInput.value = '';
+                }
+            });
         }
     });
 

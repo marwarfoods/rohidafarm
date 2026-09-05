@@ -19,9 +19,6 @@
             {{-- Ratings & Reviews (Flipkart Style review sliders) --}}
             @include('frontend.shop.partials.reviews')
 
-            {{-- Product FAQs --}}
-            @include('frontend.shop.partials.faqs')
-
             {{-- Recently Viewed Products Slider --}}
             @include('frontend.shop.partials.recently-viewed')
         </div>

@@ -5,20 +5,20 @@
         <!-- Block 1: Text Left, Image Right -->
         <div class="row g-5 align-items-center story-block">
             <div class="col-lg-6" data-aos="fade-right">
-                <h2 class="story-heading">Our Story</h2>
+                <h2 class="story-heading">Everything Has A Story.<br>Here's Ours.</h2>
                 <p class="story-text">
-                    At Rohida Farm, our journey began with a simple belief — <strong>good food has the power to bring people together</strong>. What started as a passion for wholesome, authentic flavors soon grew into a mission: to create food that's not only delicious but also nourishing, sustainable, and crafted with care.
+                    We'd wake up to that sound before we woke up to anything else. Not an alarm, not the radio — just the soft, steady churn of makhan being separated from curd, the way it had always been done, the way her mother had taught her, and her mother before that.
                 </p>
                 <p class="story-text">
-                    We source our ingredients responsibly, working closely with farmers and trusted suppliers who share our values. Every product we create is born from the perfect balance of traditional recipes and modern sensibilities, ensuring that every bite is rich in taste and goodness.
+                    By the time we were ready for school, a small katori of fresh makhan would be waiting for us, still cool, still carrying the faint smell of the earthen matka it had rested in overnight. And in the evenings, that same makhan would go into a kadhai over a slow wood flame, turning golden, turning fragrant, until the whole house smelled like ghee — warm, nutty, unmistakably home.
                 </p>
                 <p class="story-text mb-0">
-                    From our humble beginnings to where we stand today, Rohida Farm has always been about <strong>quality without compromise</strong>. We are constantly evolving, yet our core remains the same — freshness, flavor, and a genuine love for food.
+                    That smell is something we still carry with us. Not as a memory, but as a promise.
                 </p>
             </div>
             <div class="col-lg-6" data-aos="fade-left">
                 <div class="story-visual">
-                    <img src="{{ asset('images/svgs/Rohida Frm Web Vactor 02.svg') }}" alt="Rohida Farm Heritage" loading="lazy">
+                    <img src="{{ asset('images/svgs/Rohida Farm Web Vector 07.svg') }}" alt="Rohida Farm Heritage" loading="lazy">
                 </div>
             </div>
         </div>
@@ -31,16 +31,16 @@
                 </div>
             </div>
             <div class="col-lg-6 order-lg-2" data-aos="fade-left">
-                <h2 class="story-heading">We Are Proudly And Passionately Obsessed With Everything Organic!</h2>
-                <p class="story-text mb-0">
-                    In our daily routine, we sometimes forget to take stock of what we are eating and how we are eating. The choices we make with respect to food affects us and our entire family. So, we must consciously invest energy in finding the right kinds of food for us and our family to help build immunity.
+                <h2 class="story-heading">Our World Is A Little Slower — On Purpose</h2>
+                <p class="story-text">
+                    We know life today moves fast. Deadlines, deliveries, notifications — everyone's chasing something. We're not asking you to slow down. We're just asking you to borrow a little bit of our world for a moment — the one with charpais under a neem tree, chaas in a steel glass, and a matka that still keeps water cooler than any fridge.
                 </p>
-
-                <div class="story-triad-pills">
-                    <span class="triad-pill"><i class="fa-solid fa-circle-check"></i> Purity</span>
-                    <span class="triad-pill"><i class="fa-solid fa-circle-check"></i> Transparency</span>
-                    <span class="triad-pill"><i class="fa-solid fa-circle-check"></i> Tradition</span>
-                </div>
+                <p class="story-text">
+                    A world where ghee isn't rushed out of a machine, but earned, slowly, over hours of patient churning.
+                </p>
+                <p class="story-text mb-0">
+                    That's the world Rohida Farm comes from. And it's the world we want to bring to your kitchen — one jar at a time.
+                </p>
             </div>
         </div>
 

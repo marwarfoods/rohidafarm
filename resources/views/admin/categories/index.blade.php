@@ -101,8 +101,14 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Right: Edit, Delete, Chevron -->
+                                <!-- Right: FAQ, Edit, Delete, Chevron -->
                                 <div class="d-flex align-items-center gap-2 me-3" onclick="event.stopPropagation();">
+                                    <button type="button" class="btn btn-sm btn-outline-primary border-0 faq-cat-btn" 
+                                            data-id="{{ $cat->id }}" 
+                                            data-name="{{ $cat->name }}" 
+                                            title="Manage Category FAQs">
+                                        <i class="bi bi-question-circle fs-6"></i>
+                                    </button>
                                     <button type="button" class="btn btn-sm btn-outline-success border-0 edit-cat-btn" 
                                             data-id="{{ $cat->id }}" 
                                             data-name="{{ $cat->name }}" 
@@ -289,6 +295,61 @@
     </div>
 </div>
 
+<!-- ── Manage Category FAQs Modal ── -->
+<div class="modal fade" id="categoryFaqsModal" tabindex="-1" aria-labelledby="categoryFaqsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-header border-bottom px-4 py-3">
+                <div>
+                    <h5 class="modal-title fw-bold text-dark font-heading m-0" id="categoryFaqsModalLabel">
+                        <i class="bi bi-question-circle-fill text-success me-2"></i>Manage Category FAQs
+                    </h5>
+                    <small class="text-muted" id="categoryFaqsCategoryName">Configure FAQs for category</small>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="categoryFaqsForm" method="POST">
+                @csrf
+                <div class="modal-body p-4">
+                    <div id="categoryFaqsLoading" class="text-center py-4">
+                        <div class="spinner-border text-success" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="text-muted small mt-2">Loading FAQs...</p>
+                    </div>
+
+                    <div id="categoryFaqsBody" class="d-none">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="text-muted small">FAQs will appear on this Category's page on the store.</span>
+                            <button type="button" class="btn btn-outline-success btn-sm rounded-pill font-heading fw-semibold" id="btnAddCategoryFaq">
+                                <i class="bi bi-plus-lg me-1"></i>Add FAQ Question
+                            </button>
+                        </div>
+
+                        <div id="categoryFaqsContainer" class="d-flex flex-column gap-3" style="max-height: 55vh; overflow-y: auto;">
+                            <!-- Dynamic FAQ Items -->
+                        </div>
+
+                        <div id="categoryFaqsEmpty" class="text-center py-4 border rounded-3 bg-light d-none">
+                            <i class="bi bi-question-circle text-muted fs-3 d-block mb-1"></i>
+                            <p class="text-muted small m-0">No FAQs added for this category yet.</p>
+                            <button type="button" class="btn btn-success btn-sm rounded-pill mt-2" onclick="document.getElementById('btnAddCategoryFaq').click()">
+                                <i class="bi bi-plus-lg me-1"></i>Add First FAQ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top bg-light px-4 py-3">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success px-4 bg-success text-white border-0" id="btnSaveCategoryFaqs">
+                        <i class="bi bi-check2-circle me-1"></i>Save FAQs
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <style>
 /* Accordion styling overrides */
 .accordion-button::after {
@@ -300,8 +361,20 @@
 .accordion-button .bi-chevron-down {
     transition: transform 0.2s ease-in-out;
 }
+.cat-faq-item-card {
+    border: 1px solid #ECE7DD;
+    background: #fff;
+    border-radius: 12px;
+    padding: 14px;
+    transition: all 0.2s ease;
+}
+.cat-faq-item-card:hover {
+    border-color: #248443;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
 </style>
 
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize Global Icon Pickers
@@ -404,6 +477,173 @@ document.addEventListener('DOMContentLoaded', function() {
             editSubModal.show();
         });
     });
+
+    // ── Manage Category FAQs Modal Logic ──
+    const categoryFaqsModalEl = document.getElementById('categoryFaqsModal');
+    const categoryFaqsModal = new bootstrap.Modal(categoryFaqsModalEl);
+    const categoryFaqsForm = document.getElementById('categoryFaqsForm');
+    const categoryFaqsContainer = document.getElementById('categoryFaqsContainer');
+    const categoryFaqsLoading = document.getElementById('categoryFaqsLoading');
+    const categoryFaqsBody = document.getElementById('categoryFaqsBody');
+    const categoryFaqsEmpty = document.getElementById('categoryFaqsEmpty');
+    const categoryFaqsCategoryName = document.getElementById('categoryFaqsCategoryName');
+    const btnAddCategoryFaq = document.getElementById('btnAddCategoryFaq');
+    const btnSaveCategoryFaqs = document.getElementById('btnSaveCategoryFaqs');
+
+    let currentCategoryId = null;
+
+    // Initialize Sortable on category FAQs container
+    if (categoryFaqsContainer && typeof Sortable !== 'undefined') {
+        Sortable.create(categoryFaqsContainer, {
+            handle: '.drag-handle',
+            animation: 150,
+            onEnd: function() {
+                reindexFaqRows();
+            }
+        });
+    }
+
+    function reindexFaqRows() {
+        const rows = categoryFaqsContainer.querySelectorAll('.cat-faq-item-card');
+        rows.forEach((row, index) => {
+            const qInput = row.querySelector('.faq-question-input');
+            const aInput = row.querySelector('.faq-answer-input');
+            const numBadge = row.querySelector('.faq-num-badge');
+            if (qInput) qInput.name = `faqs[${index}][question]`;
+            if (aInput) aInput.name = `faqs[${index}][answer]`;
+            if (numBadge) numBadge.textContent = `#${index + 1}`;
+        });
+        if (rows.length === 0) {
+            categoryFaqsEmpty.classList.remove('d-none');
+        } else {
+            categoryFaqsEmpty.classList.add('d-none');
+        }
+    }
+
+    function createFaqRow(question = '', answer = '', index = 0) {
+        const card = document.createElement('div');
+        card.className = 'cat-faq-item-card position-relative';
+        card.innerHTML = `
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="drag-handle text-muted" style="cursor: grab;" title="Drag to reorder"><i class="bi bi-grip-vertical"></i></span>
+                    <span class="badge bg-light text-dark border faq-num-badge font-heading">#${index + 1}</span>
+                    <strong class="text-dark small">FAQ Item</strong>
+                </div>
+                <button type="button" class="btn btn-outline-danger btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center btn-remove-cat-faq" style="width: 26px; height: 26px;" title="Remove FAQ">
+                    <i class="bi bi-trash" style="font-size: 0.75rem;"></i>
+                </button>
+            </div>
+            <div class="mb-2">
+                <label class="form-label text-muted small mb-1 fw-semibold">Question</label>
+                <input type="text" name="faqs[${index}][question]" class="form-control form-control-sm bg-light border faq-question-input" value="${escapeHtml(question)}" placeholder="e.g. Is this Ghee prepared via Vedic Bilona method?" required>
+            </div>
+            <div>
+                <label class="form-label text-muted small mb-1 fw-semibold">Answer</label>
+                <textarea name="faqs[${index}][answer]" class="form-control form-control-sm bg-light border faq-answer-input" rows="2" placeholder="Write a clear, helpful answer..." required>${escapeHtml(answer)}</textarea>
+            </div>
+        `;
+        card.querySelector('.btn-remove-cat-faq').addEventListener('click', function() {
+            card.remove();
+            reindexFaqRows();
+        });
+        return card;
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    document.querySelectorAll('.faq-cat-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            currentCategoryId = this.getAttribute('data-id');
+            const catName = this.getAttribute('data-name');
+            categoryFaqsCategoryName.textContent = `Configure FAQs for ${catName}`;
+            categoryFaqsForm.action = `/admin/categories/${currentCategoryId}/faqs`;
+
+            // Reset & show loading
+            categoryFaqsLoading.classList.remove('d-none');
+            categoryFaqsBody.classList.add('d-none');
+            categoryFaqsContainer.innerHTML = '';
+            categoryFaqsModal.show();
+
+            // Fetch existing FAQs
+            fetch(`/admin/categories/${currentCategoryId}/faqs`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                categoryFaqsLoading.classList.add('d-none');
+                categoryFaqsBody.classList.remove('d-none');
+                if (data.faqs && data.faqs.length > 0) {
+                    data.faqs.forEach((faq, idx) => {
+                        categoryFaqsContainer.appendChild(createFaqRow(faq.question, faq.answer, idx));
+                    });
+                    categoryFaqsEmpty.classList.add('d-none');
+                } else {
+                    categoryFaqsEmpty.classList.remove('d-none');
+                }
+            })
+            .catch(err => {
+                categoryFaqsLoading.classList.add('d-none');
+                categoryFaqsBody.classList.remove('d-none');
+                categoryFaqsEmpty.classList.remove('d-none');
+            });
+        });
+    });
+
+    if (btnAddCategoryFaq) {
+        btnAddCategoryFaq.addEventListener('click', function() {
+            const currentCount = categoryFaqsContainer.querySelectorAll('.cat-faq-item-card').length;
+            const newRow = createFaqRow('', '', currentCount);
+            categoryFaqsContainer.appendChild(newRow);
+            categoryFaqsEmpty.classList.add('d-none');
+            newRow.querySelector('.faq-question-input').focus();
+        });
+    }
+
+    if (categoryFaqsForm) {
+        categoryFaqsForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            btnSaveCategoryFaqs.disabled = true;
+            btnSaveCategoryFaqs.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Saving...';
+
+            const formData = new FormData(this);
+
+            fetch(this.action, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                btnSaveCategoryFaqs.disabled = false;
+                btnSaveCategoryFaqs.innerHTML = '<i class="bi bi-check2-circle me-1"></i>Save FAQs';
+                if (data.success) {
+                    categoryFaqsModal.hide();
+                    alert(data.message || 'Category FAQs updated successfully!');
+                }
+            })
+            .catch(err => {
+                btnSaveCategoryFaqs.disabled = false;
+                btnSaveCategoryFaqs.innerHTML = '<i class="bi bi-check2-circle me-1"></i>Save FAQs';
+                alert('Error saving FAQs. Please try again.');
+            });
+        });
+    }
 });
 </script>
 @endsection

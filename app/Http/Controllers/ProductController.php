@@ -54,6 +54,9 @@ class ProductController extends Controller
         $activeCategory = null;
         if ($category) {
             $activeCategory = $this->categoryRepo->findBySlug($category);
+            if ($activeCategory) {
+                $activeCategory->load('faqs');
+            }
         }
 
         $globalFaqs = \App\Models\Faq::where('is_active', true)->orderBy('sort_order')->get();

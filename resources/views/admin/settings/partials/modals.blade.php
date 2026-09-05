@@ -47,6 +47,30 @@
     </div>
 </div>
 
+<!-- Meta Pixel Help Modal -->
+<div class="modal fade" id="metaPixelHelpModal" tabindex="-1" aria-labelledby="metaPixelHelpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-bottom py-3">
+                <h5 class="modal-title font-heading fw-bold text-dark" id="metaPixelHelpModalLabel">
+                    <i class="fa-brands fa-meta text-primary me-2" style="color: #0668E1 !important;"></i>How to get Meta (Facebook) Pixel ID?
+                </h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <ol class="text-muted" style="font-size: 0.9rem; line-height: 1.8;">
+                    <li>Log in to <a href="https://business.facebook.com/events_manager2" target="_blank" class="text-primary fw-semibold">Meta Events Manager</a>.</li>
+                    <li>Select your Business Account and go to <strong>Data Sources</strong> (Datasets / Pixels).</li>
+                    <li>Select or create your <strong>Pixel / Dataset</strong>.</li>
+                    <li>Go to the <strong>Settings</strong> tab, and locate the <strong>Dataset ID / Pixel ID</strong> (a 15-16 digit number).</li>
+                    <li>Copy that ID and paste it in the <strong>Meta Pixel ID</strong> field.</li>
+                    <li>Toggle the <strong>Enable Meta Pixel</strong> switch to ON and click <strong>Save Configurations</strong>.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Razorpay Test Modal -->
 <div class="modal fade" id="razorpayTestModal" tabindex="-1" aria-labelledby="razorpayTestModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">

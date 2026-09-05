@@ -62,15 +62,19 @@ class HomepageManageController extends Controller
             'home_section_image_pc' => 'required|string|max:1000',
             'home_section_image_mobile' => 'nullable|string|max:1000',
             'home_section_image_link' => 'nullable|string|max:500',
+            'home_story_video' => 'nullable|string|max:1000',
+            'home_story_poster' => 'nullable|string|max:1000',
         ]);
 
         Setting::set('home_section_image_pc', $request->input('home_section_image_pc'), 'string', 'homepage');
         Setting::set('home_section_image_mobile', $request->input('home_section_image_mobile'), 'string', 'homepage');
         Setting::set('home_section_image_link', $request->input('home_section_image_link'), 'string', 'homepage');
+        Setting::set('home_story_video', $request->input('home_story_video'), 'string', 'homepage');
+        Setting::set('home_story_poster', $request->input('home_story_poster'), 'string', 'homepage');
 
-        $this->logActivity('Updated Homepage Section Image settings.');
+        $this->logActivity('Updated Homepage Section Images and Story Video settings.');
 
-        return redirect()->route('admin.homepage.index', ['#section-image-content'])->with('success', 'Homepage Section Image updated successfully.');
+        return redirect()->route('admin.homepage.index', ['#section-image-content'])->with('success', 'Homepage Section Images and Story Video updated successfully.');
     }
 
     /**

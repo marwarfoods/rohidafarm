@@ -75,10 +75,18 @@ class SettingController extends Controller
                 $description = $settingModel->description;
                 
                 // If it is boolean, make sure it is handled
-                if ($type === 'boolean') {
+                if ($type === 'boolean' || str_ends_with($key, '_enabled')) {
+                    $type = 'boolean';
                     $value = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
                 }
             } else {
+                if (str_ends_with($key, '_enabled')) {
+                    $type = 'boolean';
+                    $group = 'integrations';
+                    $value = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+                } elseif (str_starts_with($key, 'meta_pixel_')) {
+                    $group = 'integrations';
+                }
                 // If it's the state-wise JSON, force it to be JSON type
                 if ($key === 'tax_state_wise') {
                     $type = 'json';

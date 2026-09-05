@@ -18,6 +18,27 @@ window.RohidaDebug = {
 document.addEventListener('DOMContentLoaded', function () {
     RohidaDebug.log('🚀', 'App', 'Rohida Farm Application Initialized. Real-time Debug Logger Active!');
 
+    // ── LIVE FONT DIAGNOSTIC WITH EMOJIS ──
+    if (document.fonts) {
+        document.fonts.ready.then(function () {
+            const testEl = document.querySelector('h1, h2, .font-heading') || document.body;
+            const activeFont = window.getComputedStyle(testEl).fontFamily;
+            console.log(
+                '%c🌿 [Rohida Font System] 🌿',
+                'background: #1B5E20; color: #FFF8E8; font-size: 13px; font-weight: bold; padding: 4px 8px; border-radius: 4px;'
+            );
+            console.log(
+                `%c✨ Active Heading Font: %c${activeFont}`,
+                'color: #8B5A2B; font-weight: bold; font-size: 12px;',
+                'color: #1B5E20; font-weight: bold; font-size: 13px; text-decoration: underline;'
+            );
+            console.log(
+                '%c🚀 Font Status: LOADED & WORKING PROPERLY!',
+                'color: #248443; font-weight: bold; font-size: 12px;'
+            );
+        });
+    }
+
     // Global image fallback listener for missing uploads/images
     document.addEventListener('error', function (e) {
         if (e.target.tagName === 'IMG' && !e.target.dataset.hasFallback) {

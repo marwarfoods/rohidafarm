@@ -3,11 +3,13 @@
     <div class="marquee-track">
         <div class="marquee-content">
             @for($i = 0; $i < 2; $i++)
-                <span>We Are Reviving The Traditional Ways Of Old Bharat</span>
+                <span>Everything Has A Story. Here's Ours.</span>
                 <i class="fa-solid fa-circle marquee-dot"></i>
-                <span>The Taste Of Nature</span>
+                <span>Our World Is A Little Slower — On Purpose</span>
                 <i class="fa-solid fa-circle marquee-dot"></i>
-                <span>We Are Reviving The Traditional Ways Of Old Bharat</span>
+                <span>Hand-Churned Traditional Vedic Bilona Ghee</span>
+                <i class="fa-solid fa-circle marquee-dot"></i>
+                <span>Pure Indigenous Tharparkar Cows</span>
                 <i class="fa-solid fa-circle marquee-dot"></i>
             @endfor
         </div>

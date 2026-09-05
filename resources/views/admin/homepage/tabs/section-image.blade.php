@@ -32,17 +32,27 @@
                 </div>
             </div>
 
-            <div class="mb-4">
-                <label class="form-label fw-bold text-dark" style="font-size: 0.85rem;">Optional Click Link</label>
-                <input type="text" name="home_section_image_link" class="form-control @error('home_section_image_link') is-invalid @enderror" value="{{ old('home_section_image_link', \App\Models\Setting::get('home_section_image_link')) }}" placeholder="e.g. /shop">
-                @error('home_section_image_link')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-                <small class="text-muted">If provided, the image will act as a clickable banner.</small>
+            <hr class="my-4" style="border-color: #ECE7DD;">
+
+            <h5 class="fw-bold font-heading text-dark mb-3">
+                <i class="bi bi-play-circle text-success me-2"></i>The Rohida Farm Journey Story Video
+            </h5>
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold text-dark" style="font-size: 0.85rem;">Story Video URL / File (MP4 or YouTube Link)</label>
+                    <input type="text" name="home_story_video" id="storyVideoInput" class="form-control" value="{{ old('home_story_video', \App\Models\Setting::get('home_story_video', 'uploads/videos/1784521286_video-837.mp4')) }}" placeholder="Select MP4 video or paste YouTube URL...">
+                    <small class="text-muted d-block mt-1">Accepts local uploaded MP4 videos (with hover preview) or YouTube URLs.</small>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold text-dark" style="font-size: 0.85rem;">Story Video Poster / Cover Image</label>
+                    <input type="text" name="home_story_poster" id="storyPosterInput" class="form-control" value="{{ old('home_story_poster', \App\Models\Setting::get('home_story_poster', 'images/our-roots-heritage.jpg')) }}" placeholder="Choose cover image...">
+                    <small class="text-muted d-block mt-1">Image displayed before video is played.</small>
+                </div>
             </div>
 
             <div class="text-end">
-                <button type="submit" class="btn btn-premium px-5 rounded-pill text-uppercase fw-bold" style="font-size: 0.85rem;">Save Section Images</button>
+                <button type="submit" class="btn btn-premium px-5 rounded-pill text-uppercase fw-bold" style="font-size: 0.85rem;">Save Section Settings</button>
             </div>
         </form>
     </div>

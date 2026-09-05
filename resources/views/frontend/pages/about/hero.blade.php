@@ -11,12 +11,12 @@
                     </span>
 
                     <h1 class="hero-title">
-                        Tradition You Can <span class="highlight-text">Taste</span><br>
-                        Purity You Can Trust
+                        Everything Has A Story.<br>
+                        <span class="highlight-text">Here’s Ours.</span>
                     </h1>
 
                     <p class="hero-subtitle">
-                        At <strong>Rohida Farm</strong>, we believe that true nutrition begins with honesty — honest farming, honest ingredients, and honest methods, rooted in the wisdom of Rajasthan.
+                        Before the sun was fully up, Dadi would already be sitting on the aangan, a matka of curd between her knees, the madani spinning between her palms — the same rhythm, the same hands, that had been doing this for as long as anyone in the family could remember.
                     </p>
 
                     <div class="d-flex flex-wrap align-items-center gap-3 mt-4">
@@ -39,26 +39,12 @@
 
         </div>
 
-        <!-- Trust Icon Row -->
-        <div class="hero-trust-row row g-2 mt-3 justify-content-center" data-aos="fade-up">
-            <div class="col-4 col-md-3 text-center">
-                <div class="trust-icon">
-                    <img src="{{ asset('images/svgs/Rohida Farm Web Vector 04.svg') }}" alt="Purity">
-                </div>
-                <h6>Purity</h6>
-            </div>
-            <div class="col-4 col-md-3 text-center">
-                <div class="trust-icon">
-                    <img src="{{ asset('images/svgs/Rohida Farm Web Vector 03.svg') }}" alt="Tradition">
-                </div>
-                <h6>Tradition</h6>
-            </div>
-            <div class="col-4 col-md-3 text-center">
-                <div class="trust-icon">
-                    <img src="{{ asset('images/svgs/Rohida Farm Web Vector 07.svg') }}" alt="No Adulteration">
-                </div>
-                <h6>No Adulteration</h6>
-            </div>
+        <!-- Traditional Vedic Bilona Process Illustration Banner -->
+        <div class="hero-trust-banner text-center mt-3 pt-3" data-aos="fade-up">
+            <img src="{{ asset('images/proses.png') }}" 
+                 alt="Traditional Vedic Bilona Process" 
+                 class="img-fluid hero-trust-vector-img" 
+                 loading="lazy">
         </div>
     </div>
 </section>

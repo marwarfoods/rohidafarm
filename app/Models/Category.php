@@ -31,4 +31,12 @@ class Category extends Model
     {
         return $this->hasMany(Product::class);
     }
+
+    /**
+     * Category FAQs relation (ordered for display).
+     */
+    public function faqs(): HasMany
+    {
+        return $this->hasMany(CategoryFaq::class)->orderBy('sort_order');
+    }
 }

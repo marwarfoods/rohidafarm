@@ -8,10 +8,13 @@
                     <span class="text-uppercase fw-bold mb-2 d-block founder-eyebrow">The Vision</span>
                     <h2 class="founder-heading">A Note From Our Founder</h2>
                     <p class="founder-text">
-                        Rohida Farm's deep-seated passion for Indian culture and its timeless values has been the cornerstone of his belief system. He's fascinated by the wisdom of ancient Indian sciences and the Vedas. Over 20 years, he's worked in the health and fitness industry.
+                        Raja Patel's connection to farming didn't begin with a business plan — it began with the land itself, and a deep respect for the traditions his family and community in Rajasthan have carried forward for generations.
+                    </p>
+                    <p class="founder-text">
+                        Studying agriculture only deepened that pull — a growing conviction that India's traditional farming wisdom, if presented with the care it deserves, could stand shoulder to shoulder with any premium brand in the world. Rohida Farm grew out of that belief.
                     </p>
                     <p class="founder-text mb-0">
-                        Now, he wants to bring back the rich traditions of India to modern society. He believes that the milk from our indigenous Gir desi cows, as mentioned in ancient texts, is far better than milk from H/Jersey cows that flood the market. He hopes to make a positive impact on society by promoting India's rich heritage.
+                        Our herd today is made up of indigenous Tharparkar desi cows — a hardy, native Rajasthani breed long relied upon by our ancestors, who followed the same Bilona method we still use to make our ghee. Raja's hope is simple: to carry that Old Bharat wisdom forward, unchanged, and let it find its place in modern Indian homes.
                     </p>
                 </div>
 

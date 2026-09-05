@@ -5,10 +5,7 @@
 <section class="py-5 text-center" style="background-color: var(--cream-bg, #FFF9F1); border-bottom: 1px solid var(--border-color);">
     <div class="container py-4" data-aos="fade-up">
         <span class="text-uppercase fw-bold text-success" style="font-size: 0.78rem; letter-spacing: 2px;">Support & Inquiry</span>
-        <h1 class="display-4 font-heading fw-bold text-dark mt-2 mb-3">Contact Us</h1>
-        <p class="text-muted mx-auto" style="max-width: 600px; font-size: 1.1rem;">
-            Have questions about our traditional Bilona Cow Ghee or your delivery? Reach out to our wellness team.
-        </p>
+        <h1 class="display-4 font-heading fw-bold text-dark mt-2 mb-0">Contact Us</h1>
     </div>
 </section>
 

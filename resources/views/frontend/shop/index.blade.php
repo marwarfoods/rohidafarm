@@ -83,17 +83,27 @@
             </div>
         </div>
 
-        {{-- ── 1. Global FAQs Section ── --}}
-        @if(isset($globalFaqs) && $globalFaqs->isNotEmpty())
+        {{-- ── 1. Category FAQs / Global FAQs Section ── --}}
+        @php
+            $displayFaqs = collect();
+            $faqSectionTitle = 'Frequently Asked Questions';
+            if ($activeCategory && $activeCategory->faqs && $activeCategory->faqs->isNotEmpty()) {
+                $displayFaqs = $activeCategory->faqs;
+                $faqSectionTitle = $activeCategory->name . ' FAQs';
+            } elseif (isset($globalFaqs) && $globalFaqs->isNotEmpty()) {
+                $displayFaqs = $globalFaqs;
+            }
+        @endphp
+        @if($displayFaqs->isNotEmpty())
             <div class="my-5">
                 <div class="bg-white p-4 p-md-5 rounded-4 shadow-sm border" style="border-color:#f6f3eb !important;">
                     <div class="text-center mb-4">
                         <span class="text-uppercase fw-bold text-success" style="font-size: 0.75rem; letter-spacing: 2px;">Have Questions?</span>
-                        <h3 class="font-heading fw-bold mt-1 text-dark display-6">Frequently Asked Questions</h3>
+                        <h3 class="font-heading fw-bold mt-1 text-dark display-6">{{ $faqSectionTitle }}</h3>
                     </div>
 
                     <div class="accordion mx-auto" id="shopFaqAccordion" style="max-width: 820px;">
-                        @foreach($globalFaqs as $index => $faq)
+                        @foreach($displayFaqs as $index => $faq)
                             <div class="accordion-item border-0 border-bottom" style="border-color:#f6f3eb !important;">
                                 <h2 class="accordion-header" id="shopFaqHeading{{ $faq->id ?? $index }}">
                                     <button class="accordion-button collapsed fw-bold text-dark bg-transparent shadow-none px-2 py-3" type="button"
@@ -104,7 +114,7 @@
                                 </h2>
                                 <div id="shopFaqCollapse{{ $faq->id ?? $index }}" class="accordion-collapse collapse" aria-labelledby="shopFaqHeading{{ $faq->id ?? $index }}" data-bs-parent="#shopFaqAccordion">
                                     <div class="accordion-body text-muted px-2 pb-3 pt-0" style="font-size: 0.88rem; line-height: 1.75;">
-                                        {{ $faq->answer }}
+                                        {!! nl2br(e($faq->answer)) !!}
                                     </div>
                                 </div>
                             </div>

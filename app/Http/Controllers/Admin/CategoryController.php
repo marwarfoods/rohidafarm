@@ -177,4 +177,65 @@ class CategoryController extends Controller
 
         return back()->with('success', 'Subcategory deleted successfully.');
     }
+
+    /**
+     * Get Category FAQs (for modal editing).
+     */
+    public function getFaqs($id)
+    {
+        $category = Category::with('faqs')->findOrFail($id);
+        return response()->json([
+            'success' => true,
+            'category' => [
+                'id' => $category->id,
+                'name' => $category->name,
+            ],
+            'faqs' => $category->faqs
+        ]);
+    }
+
+    /**
+     * Save/Update Category FAQs.
+     */
+    public function updateFaqs(Request $request, $id)
+    {
+        $category = Category::findOrFail($id);
+
+        $request->validate([
+            'faqs' => 'nullable|array',
+            'faqs.*.question' => 'required|string|max:500',
+            'faqs.*.answer' => 'required|string',
+        ]);
+
+        // Delete existing FAQs and recreate with new sort order
+        \App\Models\CategoryFaq::where('category_id', $category->id)->delete();
+
+        $rawFaqs = $request->input('faqs', []);
+        $createdCount = 0;
+
+        foreach ($rawFaqs as $index => $faqData) {
+            $q = trim($faqData['question'] ?? '');
+            $a = trim($faqData['answer'] ?? '');
+            if (!empty($q) && !empty($a)) {
+                \App\Models\CategoryFaq::create([
+                    'category_id' => $category->id,
+                    'question' => $q,
+                    'answer' => $a,
+                    'sort_order' => $index,
+                ]);
+                $createdCount++;
+            }
+        }
+
+        self::logActivity('category_faqs_update', "Updated FAQs for category {$category->name} ({$createdCount} items)");
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully updated {$createdCount} FAQs for {$category->name}."
+            ]);
+        }
+
+        return back()->with('success', "Successfully updated FAQs for {$category->name}.");
+    }
 }

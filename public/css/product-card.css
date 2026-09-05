@@ -9,6 +9,26 @@
     transform: translateY(-2px);
 }
 
+/* Image hover transition */
+.product-card .product-card-img-primary {
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    opacity: 1;
+}
+.product-card .product-card-img-hover {
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    opacity: 0;
+    pointer-events: none;
+}
+.product-card:hover .product-card-img-primary {
+    opacity: 0 !important;
+}
+.product-card:hover .product-card-img-hover {
+    opacity: 1 !important;
+}
+.product-card:hover .product-actions {
+    transform: translateY(0) !important;
+}
+
 .product-card .card-body {
     padding: 8px 12px 10px 12px !important;
 }

@@ -1,3 +1,47 @@
+// ── Custom Site-Wide Font: Bagiora (All Weights) ──
+@font-face {
+    font-family: 'Bagiora';
+    src: url('/fonts/bagiora/Bagiora-Regular.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Bagiora';
+    src: url('/fonts/bagiora/Bagiora-Medium.otf') format('opentype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Bagiora';
+    src: url('/fonts/bagiora/Bagiora-Semibold.otf') format('opentype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Bagiora';
+    src: url('/fonts/bagiora/Bagiora-Bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Bagiora';
+    src: url('/fonts/bagiora/Bagiora-Extrabold.otf') format('opentype');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Bagiora';
+    src: url('/fonts/bagiora/Bagiora-Black.otf') format('opentype');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
 :root {
     --primary-brown: #8B5A2B;
     --gold-accent: #D4A017;
@@ -10,8 +54,8 @@
     --border-color: #E8DCC4;
     --shadow-soft: 0 10px 30px rgba(139, 90, 43, 0.08);
     --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    --font-heading: 'Fraunces', Georgia, serif;
-    --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-heading: 'Bagiora', sans-serif;
+    --font-body: 'Bagiora', sans-serif;
 }
 
 // Typography Base

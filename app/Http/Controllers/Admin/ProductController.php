@@ -88,6 +88,14 @@ class ProductController extends Controller
         }
 
         $infographics = [];
+        if ($request->has('existing_infographics')) {
+            $existing = $request->input('existing_infographics', []);
+            if (is_array($existing)) {
+                foreach ($existing as $eImg) {
+                    if (!empty($eImg)) $infographics[] = $eImg;
+                }
+            }
+        }
         if ($request->hasFile('infographic_images')) {
             foreach ($request->file('infographic_images') as $file) {
                 $fileName = time() . '_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
@@ -104,7 +112,7 @@ class ProductController extends Controller
                     if ($path) $infographics[] = $path;
                 }
             } else {
-                $lines = array_filter(array_map('trim', explode("\n", $raw)));
+                $lines = array_filter(array_map('trim', preg_split('/[,\n\r]+/', $raw)));
                 foreach ($lines as $line) {
                     if ($line) $infographics[] = $line;
                 }
@@ -293,7 +301,7 @@ class ProductController extends Controller
                     if ($path) $infographics[] = $path;
                 }
             } else {
-                $lines = array_filter(array_map('trim', explode("\n", $raw)));
+                $lines = array_filter(array_map('trim', preg_split('/[,\n\r]+/', $raw)));
                 foreach ($lines as $line) {
                     if ($line) $infographics[] = $line;
                 }

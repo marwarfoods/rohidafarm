@@ -101,4 +101,57 @@
 
         <div id="turnstileTestResult" class="mt-3 d-none"></div>
     </div>
+
+    <hr class="my-4">
+
+    <!-- Meta Pixel (Facebook Pixel) Section -->
+    <div>
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h6 class="fw-bold text-dark d-flex align-items-center m-0">
+                <i class="fa-brands fa-meta text-primary fs-5 me-2" style="color: #0668E1 !important;"></i> Meta Pixel (Facebook Pixel)
+                <i class="bi bi-question-circle text-primary ms-2 cursor-pointer" data-bs-toggle="modal" data-bs-target="#metaPixelHelpModal" style="font-size: 1.1rem;" title="How to get Meta Pixel ID?"></i>
+            </h6>
+            <span class="badge bg-{{ \App\Models\Setting::get('meta_pixel_enabled') && (\App\Models\Setting::get('meta_pixel_id') || \App\Models\Setting::get('meta_pixel_code')) ? 'success' : 'secondary' }}">
+                {{ \App\Models\Setting::get('meta_pixel_enabled') && (\App\Models\Setting::get('meta_pixel_id') || \App\Models\Setting::get('meta_pixel_code')) ? 'Active & Tracking' : 'Disabled' }}
+            </span>
+        </div>
+
+        <div class="card border rounded-3 p-3 bg-light mb-3">
+            <div class="form-check form-switch mb-1">
+                <input type="hidden" name="settings[meta_pixel_enabled]" value="0">
+                <input class="form-check-input" type="checkbox" name="settings[meta_pixel_enabled]" value="1" id="metaPixelSwitch" {{ \App\Models\Setting::get('meta_pixel_enabled') ? 'checked' : '' }}>
+                <label class="form-check-label fw-bold text-dark fs-6" for="metaPixelSwitch">Enable Meta Pixel Tracking on Website</label>
+            </div>
+            <small class="text-muted d-block">Track conversions, ad performance, page views, and optimize Facebook/Instagram ad campaigns across your store.</small>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Meta Pixel ID / Dataset ID</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white text-muted"><i class="fa-brands fa-facebook-f"></i></span>
+                    <input type="text" name="settings[meta_pixel_id]" id="inputMetaPixelId" class="form-control bg-light border p-2 font-monospace" placeholder="e.g. 1234567890123456" value="{{ \App\Models\Setting::get('meta_pixel_id') }}">
+                </div>
+                <small class="text-muted">Numeric Pixel ID from Meta Events Manager (auto-generates standard tracking code).</small>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold text-dark d-flex justify-content-between align-items-center" style="font-size: 0.85rem;">
+                    <span>Custom Meta Code / Script (Optional)</span>
+                    <span class="badge bg-light text-muted border">Advanced</span>
+                </label>
+                <textarea name="settings[meta_pixel_code]" id="inputMetaPixelCode" rows="2" class="form-control bg-light border p-2 font-monospace" style="font-size: 0.8rem;" placeholder="<!-- Optional: Paste custom Facebook tracking script or standard event snippet -->">{{ \App\Models\Setting::get('meta_pixel_code') }}</textarea>
+                <small class="text-muted">Optional: Paste custom snippet or manual base code if you prefer not using just the Pixel ID.</small>
+            </div>
+        </div>
+
+        <div class="alert alert-light border rounded-3 py-2 px-3 mt-3 d-flex align-items-center justify-content-between" style="font-size:0.85rem;">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-info-circle-fill text-primary fs-5"></i>
+                <span>When enabled, standard <code>PageView</code> and pixel scripts will automatically load across the store.</span>
+            </div>
+            <a href="https://business.facebook.com/events_manager2" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3 text-nowrap">
+                <i class="bi bi-box-arrow-up-right me-1"></i> Meta Events Manager
+            </a>
+        </div>
+    </div>
 </div>

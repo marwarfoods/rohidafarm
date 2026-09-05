@@ -2,22 +2,13 @@
 
 @section('content')
 {{-- Page Hero --}}
-<section class="py-5 text-center position-relative overflow-hidden"
+<section class="py-4 text-center position-relative overflow-hidden"
     style="background: linear-gradient(135deg, #f0f9f4 0%, #ffffff 60%, #f7fdf9 100%); border-bottom: 1px solid #e8f5e9;">
-    <div class="container py-4" data-aos="fade-up">
-        <nav aria-label="breadcrumb" class="mb-3">
-            <ol class="breadcrumb justify-content-center" style="font-size:0.82rem;">
-                <li class="breadcrumb-item"><a href="{{ route('home') }}" class="text-success text-decoration-none">Home</a></li>
-                <li class="breadcrumb-item active text-muted">Track Order</li>
-            </ol>
-        </nav>
+    <div class="container py-3" data-aos="fade-up">
         <span class="text-uppercase fw-bold text-success" style="font-size:0.75rem;letter-spacing:2.5px;">
             <i class="bi bi-truck me-1"></i>Shipment Tracking
         </span>
-        <h1 class="display-5 font-heading fw-bold text-dark mt-2 mb-3">Track Your Order</h1>
-        <p class="text-muted mx-auto" style="max-width:560px;font-size:1rem;">
-            Enter your order number below to get real-time shipment updates and delivery status.
-        </p>
+        <h1 class="display-5 font-heading fw-bold text-dark mt-2 mb-0">Track Your Order</h1>
     </div>
 </section>
 

@@ -34,24 +34,32 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-/* About Us — "Making Of" Video Play Button */
+/* About Us — Auto Play Video on Scroll into View (Muted) */
 document.addEventListener('DOMContentLoaded', function () {
     const video = document.getElementById('aboutFeatureVideo');
-    const playBtn = document.getElementById('aboutVideoPlayBtn');
-    if (!video || !playBtn) return;
+    if (!video) return;
 
-    playBtn.addEventListener('click', function () {
-        video.controls = true;
-        video.play();
-        playBtn.classList.add('is-playing');
+    video.muted = true;
+
+    const videoObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                video.muted = true;
+                const playPromise = video.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(function () {
+                        // Autoplay was prevented
+                    });
+                }
+            } else {
+                video.pause();
+            }
+        });
+    }, {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.2
     });
 
-    video.addEventListener('pause', function () {
-        if (!video.ended) return;
-        playBtn.classList.remove('is-playing');
-    });
-
-    video.addEventListener('ended', function () {
-        playBtn.classList.remove('is-playing');
-    });
+    videoObserver.observe(video);
 });

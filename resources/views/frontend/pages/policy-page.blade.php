@@ -5,21 +5,7 @@
 <section class="py-5 text-center position-relative overflow-hidden"
     style="background: linear-gradient(135deg, #f0f9f4 0%, #ffffff 60%, #f7fdf9 100%); border-bottom: 1px solid #e8f5e9;">
     <div class="container py-4" data-aos="fade-up">
-        <nav aria-label="breadcrumb" class="mb-3">
-            <ol class="breadcrumb justify-content-center" style="font-size:0.82rem;">
-                <li class="breadcrumb-item"><a href="{{ route('home') }}" class="text-success text-decoration-none">Home</a></li>
-                <li class="breadcrumb-item active text-muted">{{ $page->title }}</li>
-            </ol>
-        </nav>
-        <span class="text-uppercase fw-bold text-success" style="font-size: 0.75rem; letter-spacing: 2.5px;">
-            <i class="bi bi-shield-check me-1"></i>Legal & Policies
-        </span>
-        <h1 class="display-5 font-heading fw-bold text-dark mt-2 mb-3">{{ $page->title }}</h1>
-        @if($page->updated_at)
-            <p class="text-muted" style="font-size:0.85rem;">
-                <i class="bi bi-clock me-1"></i>Last updated: {{ $page->updated_at->format('d F Y') }}
-            </p>
-        @endif
+        <h1 class="display-5 font-heading fw-bold text-dark mt-2 mb-0">{{ $page->title }}</h1>
     </div>
 </section>
 
