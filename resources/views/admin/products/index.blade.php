@@ -12,12 +12,18 @@
 {{-- Bulk Status Action Bar --}}
 <div class="d-none align-items-center gap-2 mb-3 p-3 rounded-3 border border-success-subtle bg-success-subtle" id="bulkStatusBar">
     <span class="fw-semibold text-dark" id="bulkSelectedCount" style="font-size: 0.85rem;">0 selected</span>
-    <select class="form-select form-select-sm border shadow-none" id="bulkStatusAction" style="font-size: 0.8rem; width: 190px;">
+    <select class="form-select form-select-sm border shadow-none" id="bulkStatusAction" style="font-size: 0.8rem; width: 220px;">
         <option value="">Bulk Action...</option>
         <option value="is_active:1">Mark Active</option>
         <option value="is_active:0">Mark Inactive</option>
-        <option value="is_featured:1">Mark Featured</option>
-        <option value="is_featured:0">Unmark Featured</option>
+        <option value="show_on_home:1">Enable: Show on Home</option>
+        <option value="show_on_home:0">Disable: Show on Home</option>
+        <option value="show_on_shop:1">Enable: Show on Shop</option>
+        <option value="show_on_shop:0">Disable: Show on Shop</option>
+        <option value="show_on_category:1">Enable: Show on Category</option>
+        <option value="show_on_category:0">Disable: Show on Category</option>
+        <option value="is_featured:1">Mark Featured Badge</option>
+        <option value="is_featured:0">Unmark Featured Badge</option>
     </select>
     <button type="button" class="btn btn-success btn-sm" id="bulkStatusApplyBtn"><i class="bi bi-check2-circle"></i> Apply</button>
     <button type="button" class="btn btn-outline-secondary btn-sm" id="bulkStatusCancelBtn">Cancel</button>
@@ -33,7 +39,7 @@
 @endif
 
 <x-admin-table
-    :headers="[auth()->user()->hasPermission('products-edit') ? '<input type=\'checkbox\' id=\'selectAllProducts\'>' : '', 'ID', 'Product Name & Image', 'Category', 'SKU', 'Original / Off Price', 'Stock', 'Status', 'Actions']"
+    :headers="[auth()->user()->hasPermission('products-edit') ? '<input type=\'checkbox\' id=\'selectAllProducts\'>' : '', 'ID', 'Product Name & Image', 'Category', 'SKU', 'Original / Off Price', 'Stock', 'Status & Placement', 'Actions']"
     :items="$products"
     title="Products Catalog"
     description="Manage your store products, modify pricing, stock levels, and assign categories.">
@@ -78,9 +84,20 @@
                 <span class="badge product-status-active-badge {{ $prod->is_active ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-secondary border' }} d-block mb-1" style="width: fit-content;">
                     {{ $prod->is_active ? 'Active' : 'Inactive' }}
                 </span>
-                @if($prod->is_featured)
-                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle product-status-featured-badge" style="width: fit-content;">Featured</span>
-                @endif
+                <div class="d-flex flex-wrap gap-1 mt-1">
+                    @if($prod->show_on_home)
+                        <span class="badge bg-light text-primary border" style="font-size:0.68rem;" title="Visible on Homepage">Home</span>
+                    @endif
+                    @if($prod->show_on_shop)
+                        <span class="badge bg-light text-success border" style="font-size:0.68rem;" title="Visible on Shop Page">Shop</span>
+                    @endif
+                    @if($prod->show_on_category)
+                        <span class="badge bg-light text-secondary border" style="font-size:0.68rem;" title="Visible on Category Page">Cat</span>
+                    @endif
+                    @if($prod->is_featured)
+                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle" style="font-size:0.68rem;">Featured</span>
+                    @endif
+                </div>
             </td>
             <td class="text-end px-4 py-3">
                 <div class="d-inline-flex gap-2">

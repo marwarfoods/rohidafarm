@@ -42,6 +42,7 @@ class ProductRepository implements ProductRepositoryInterface
         return Cache::remember("products.featured.{$limit}", 3600, function () use ($limit) {
             return $this->model->with(['category', 'images'])
                 ->where('is_active', true)
+                ->where('show_on_home', true)
                 ->where('is_featured', true)
                 ->limit($limit)
                 ->get();
@@ -53,6 +54,7 @@ class ProductRepository implements ProductRepositoryInterface
         return Cache::remember("products.trending.{$limit}", 3600, function () use ($limit) {
             return $this->model->with(['category', 'images'])
                 ->where('is_active', true)
+                ->where('show_on_home', true)
                 ->where('is_trending', true)
                 ->limit($limit)
                 ->get();
@@ -64,6 +66,7 @@ class ProductRepository implements ProductRepositoryInterface
         return Cache::remember("products.bestsellers.{$limit}", 3600, function () use ($limit) {
             return $this->model->with(['category', 'images'])
                 ->where('is_active', true)
+                ->where('show_on_home', true)
                 ->where('is_best_seller', true)
                 ->limit($limit)
                 ->get();
@@ -75,6 +78,7 @@ class ProductRepository implements ProductRepositoryInterface
         return Cache::remember("products.newarrivals.{$limit}", 3600, function () use ($limit) {
             return $this->model->with(['category', 'images'])
                 ->where('is_active', true)
+                ->where('show_on_home', true)
                 ->where('is_new_arrival', true)
                 ->limit($limit)
                 ->get();
@@ -94,6 +98,13 @@ class ProductRepository implements ProductRepositoryInterface
     public function filterAndPaginate(array $filters, int $perPage = 12)
     {
         $query = $this->model->with(['category', 'images', 'primaryImage', 'variants'])->where('is_active', true);
+
+        // Visibility context: Category page vs Shop page
+        if (!empty($filters['category']) || !empty($filters['subcategory'])) {
+            $query->where('show_on_category', true);
+        } else {
+            $query->where('show_on_shop', true);
+        }
 
         // Filter by Category
         if (!empty($filters['category'])) {

@@ -60,7 +60,8 @@ class ProductController extends Controller
         $videoReviews = \App\Models\VideoReview::with('product.primaryImage')->where('is_active', true)->orderBy('sort_order')->get();
 
         $exploreQuery = \App\Models\Product::with(['category:id,name,slug', 'images', 'primaryImage', 'variants'])
-            ->where('is_active', true);
+            ->where('is_active', true)
+            ->where('show_on_category', true);
         if ($activeCategory) {
             $exploreQuery->where('category_id', '!=', $activeCategory->id);
         }
@@ -68,6 +69,7 @@ class ProductController extends Controller
         if ($exploreProducts->isEmpty()) {
             $exploreProducts = \App\Models\Product::with(['category:id,name,slug', 'images', 'primaryImage', 'variants'])
                 ->where('is_active', true)
+                ->where('show_on_category', true)
                 ->inRandomOrder()
                 ->limit(8)
                 ->get();

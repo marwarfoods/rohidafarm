@@ -119,6 +119,9 @@ class ProductController extends Controller
             'is_trending' => $request->has('is_trending'),
             'is_best_seller' => $request->has('is_best_seller'),
             'is_new_arrival' => $request->has('is_new_arrival'),
+            'show_on_home' => $request->has('show_on_home'),
+            'show_on_shop' => $request->has('show_on_shop'),
+            'show_on_category' => $request->has('show_on_category'),
             'use_global_faqs' => $request->has('use_global_faqs'),
             'free_shipping_threshold' => $request->input('free_shipping_threshold'),
             'display_coupons' => $request->input('display_coupons'),
@@ -250,6 +253,9 @@ class ProductController extends Controller
             'is_trending' => $request->has('is_trending'),
             'is_best_seller' => $request->has('is_best_seller'),
             'is_new_arrival' => $request->has('is_new_arrival'),
+            'show_on_home' => $request->has('show_on_home'),
+            'show_on_shop' => $request->has('show_on_shop'),
+            'show_on_category' => $request->has('show_on_category'),
             'use_global_faqs' => $request->has('use_global_faqs'),
             'free_shipping_threshold' => $request->input('free_shipping_threshold'),
             'display_coupons' => $request->input('display_coupons'),
@@ -432,7 +438,7 @@ class ProductController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'field' => 'required|string|in:is_active,is_featured',
+            'field' => 'required|string|in:is_active,is_featured,show_on_home,show_on_shop,show_on_category',
             'value' => 'required|boolean',
         ]);
 

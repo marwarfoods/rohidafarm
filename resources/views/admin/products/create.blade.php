@@ -394,14 +394,50 @@
                 </div>
             </div>
 
+            {{-- Visibility & Placement --}}
+            <div class="card border-0 shadow-sm rounded-4 bg-white mb-4">
+                <div class="card-header bg-white rounded-top-4 px-4 py-3 border-bottom">
+                    <h6 class="fw-bold text-dark m-0"><i class="bi bi-eye text-success me-2"></i>Visibility &amp; Placement</h6>
+                    <p class="text-muted m-0 mt-1" style="font-size:0.78rem;">Control where this product is displayed across the website.</p>
+                </div>
+                <div class="card-body p-4">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" name="show_on_home" id="show_on_home" value="1"
+                               {{ old('show_on_home', '1') ? 'checked' : '' }}>
+                        <label class="form-check-label fw-semibold text-dark" for="show_on_home" style="font-size:0.85rem;">
+                            Show on Homepage
+                        </label>
+                        <div class="text-muted" style="font-size:0.75rem;">Display in home page featured/trending/category/all-product grids.</div>
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" name="show_on_shop" id="show_on_shop" value="1"
+                               {{ old('show_on_shop', '1') ? 'checked' : '' }}>
+                        <label class="form-check-label fw-semibold text-dark" for="show_on_shop" style="font-size:0.85rem;">
+                            Show on Shop Page
+                        </label>
+                        <div class="text-muted" style="font-size:0.75rem;">Display in main /shop all products listing.</div>
+                    </div>
+
+                    <div class="form-check form-switch mb-1">
+                        <input class="form-check-input" type="checkbox" name="show_on_category" id="show_on_category" value="1"
+                               {{ old('show_on_category', '1') ? 'checked' : '' }}>
+                        <label class="form-check-label fw-semibold text-dark" for="show_on_category" style="font-size:0.85rem;">
+                            Show on Category Page
+                        </label>
+                        <div class="text-muted" style="font-size:0.75rem;">Display when browsing this product's category or subcategory page.</div>
+                    </div>
+                </div>
+            </div>
+
             {{-- Product Labels --}}
             <div class="card border-0 shadow-sm rounded-4 bg-white mb-4">
                 <div class="card-header bg-white rounded-top-4 px-4 py-3 border-bottom">
-                    <h6 class="fw-bold text-dark m-0"><i class="bi bi-flag text-success me-2"></i>Product Labels</h6>
+                    <h6 class="fw-bold text-dark m-0"><i class="bi bi-flag text-success me-2"></i>Product Badges &amp; Highlights</h6>
                 </div>
                 <div class="card-body p-4">
                     @foreach([
-                        ['is_featured',    'is_featured',    'Feature on Home Page',    true],
+                        ['is_featured',    'is_featured',    'Featured Product Badge',  true],
                         ['is_organic',     'is_organic',     '100% Organic Certified',  true],
                         ['is_bilona',      'is_bilona',      'Bilona Method Churned',   false],
                         ['is_best_seller', 'is_best_seller', 'Best Seller Badge',       false],

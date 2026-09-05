@@ -153,46 +153,76 @@ class CheckoutController extends Controller
                 );
             }
 
-            // 2. Create the order using OrderService (handles stock deduction, cart clearing)
-            $order = $this->orderService->createFromCart(
-                $shippingData,
-                $request->input('payment_method')
-            );
-
             // Handle Razorpay Payment Flow (or COD advance flow)
-            if ($request->input('payment_method') === 'razorpay' || ($request->input('payment_method') === 'cod' && $order->advance_amount > 0)) {
+            $totals = $this->cartService->getTotals($shippingData['state'] ?? null, $request->input('payment_method'));
+            
+            if ($request->input('payment_method') === 'razorpay' || ($request->input('payment_method') === 'cod' && ($totals['cod_advance'] ?? 0) > 0)) {
+                // Pre-validate stock availability before initiating gateway
+                foreach ($items as $item) {
+                    if ($item->variant_id) {
+                        $variant = \App\Models\ProductVariant::find($item->variant_id);
+                        if (!$variant || $variant->stock < $item->quantity) {
+                            return back()->with('error', "Product variant {$item->variant?->name} is out of stock.")->withInput();
+                        }
+                    } else {
+                        $product = \App\Models\Product::find($item->product_id);
+                        if (!$product || $product->stock < $item->quantity) {
+                            return back()->with('error', "Product {$item->product?->name} is out of stock.")->withInput();
+                        }
+                    }
+                }
+
                 try {
                     $keyId = \App\Models\Setting::get('razorpay_key_id') ?: env('RAZORPAY_KEY', 'rzp_test_dummy');
                     $keySecret = \App\Models\Setting::get('razorpay_secret_key') ?: env('RAZORPAY_SECRET', 'dummy_secret');
                     
                     $api = new \Razorpay\Api\Api($keyId, $keySecret);
                     
-                    $amountToPay = $request->input('payment_method') === 'cod' ? $order->advance_amount : $order->total;
+                    $amountToPay = $request->input('payment_method') === 'cod' ? $totals['cod_advance'] : $totals['total'];
+                    $tempToken = (string) \Illuminate\Support\Str::uuid();
 
                     $razorpayOrder = $api->order->create([
-                        'receipt'  => $order->order_number,
+                        'receipt'  => 'TMP-' . substr($tempToken, 0, 8),
                         'amount'   => (int)round($amountToPay * 100), // convert to paise
                         'currency' => 'INR',
                     ]);
 
+                    $pendingData = [
+                        'type' => 'cart',
+                        'user_id' => Auth::id(),
+                        'shipping_data' => $shippingData,
+                        'payment_method' => $request->input('payment_method'),
+                        'amount' => $amountToPay,
+                        'token' => $tempToken,
+                        'razorpay_order_id' => $razorpayOrder['id'],
+                    ];
+
+                    \Illuminate\Support\Facades\Cache::put('pending_rzp_' . $razorpayOrder['id'], $pendingData, now()->addHours(24));
+                    \Illuminate\Support\Facades\Cache::put('pending_rzp_' . $tempToken, $pendingData, now()->addHours(24));
+                    session(['pending_rzp_checkout' => $pendingData]);
+
                     return response()->view('frontend.checkout.razorpay', [
-                        'order' => $order,
+                        'token' => $tempToken,
                         'razorpayOrderId' => $razorpayOrder['id'],
                         'amount' => (int)round($amountToPay * 100),
                         'key' => $keyId,
                         'user' => Auth::user() ?? (object)['name' => $shippingData['name'], 'email' => $request->input('email'), 'phone' => $shippingData['phone']]
                     ])->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
                 } catch (\Exception $e) {
-                    // Abort the orphaned order if razorpay initialization fails
-                    $this->orderService->abort($order->id);
                     return back()->with('error', 'Payment Gateway Error: ' . $e->getMessage());
                 }
             }
 
+            // 2. Create the order using OrderService (for COD without advance or Wallet)
+            $order = $this->orderService->createFromCart(
+                $shippingData,
+                $request->input('payment_method')
+            );
+
             // 3. Process payment for Cash On Delivery (without advance) or Wallet
             $this->paymentService->process($order, $request->input('payment_method'));
 
-            // Clear cart ONLY for COD / successful upfront flows (not Razorpay which happens later)
+            // Clear cart for COD / successful upfront flows
             $this->cartService->clear();
 
             // Send Order Confirmation Mail
@@ -302,15 +332,29 @@ class CheckoutController extends Controller
             // Fetch product and variant
             $product = \App\Models\Product::findOrFail($request->input('product_id'));
             $variant = $request->input('variant_id') ? \App\Models\ProductVariant::find($request->input('variant_id')) : null;
+            $quantity = (int)$request->input('quantity');
 
-            // 2. Create the order directly using OrderService
-            $order = $this->orderService->createDirectOrder(
-                $product,
-                $variant,
-                (int)$request->input('quantity'),
-                $shippingData,
-                'razorpay'
-            );
+            // Stock check
+            if ($variant) {
+                if ($variant->stock < $quantity) {
+                    return response()->json(['message' => "Product variant {$variant->name} is out of stock."], 400);
+                }
+            } else {
+                if ($product->stock < $quantity) {
+                    return response()->json(['message' => "Product {$product->name} is out of stock."], 400);
+                }
+            }
+
+            // Calculate amount
+            $price = $variant ? $variant->sale_price : $product->sale_price;
+            $subtotal = $price * $quantity;
+            $shippingThreshold = $product->free_shipping_threshold ?? \App\Models\Setting::get('free_shipping_threshold', 499);
+            $shippingChargeSetting = \App\Models\Setting::get('shipping_charges', 50);
+            $shippingCharges = ($subtotal >= $shippingThreshold) ? 0 : $shippingChargeSetting;
+            $tax = 0;
+            $total = $subtotal + $shippingCharges + $tax;
+
+            $tempToken = (string) \Illuminate\Support\Str::uuid();
 
             // Handle Razorpay Payment Flow
             $keyId = \App\Models\Setting::get('razorpay_key_id') ?: env('RAZORPAY_KEY', 'rzp_test_dummy');
@@ -319,17 +363,34 @@ class CheckoutController extends Controller
             $api = new \Razorpay\Api\Api($keyId, $keySecret);
             
             $razorpayOrder = $api->order->create([
-                'receipt'  => $order->order_number,
-                'amount'   => (int)round($order->total * 100), // convert to paise
+                'receipt'  => 'TMP-' . substr($tempToken, 0, 8),
+                'amount'   => (int)round($total * 100), // convert to paise
                 'currency' => 'INR',
             ]);
+
+            $pendingData = [
+                'type' => 'direct',
+                'user_id' => Auth::id(),
+                'product_id' => $product->id,
+                'variant_id' => $variant?->id,
+                'quantity' => $quantity,
+                'shipping_data' => $shippingData,
+                'payment_method' => 'razorpay',
+                'amount' => $total,
+                'token' => $tempToken,
+                'razorpay_order_id' => $razorpayOrder['id'],
+            ];
+
+            \Illuminate\Support\Facades\Cache::put('pending_rzp_' . $razorpayOrder['id'], $pendingData, now()->addHours(24));
+            \Illuminate\Support\Facades\Cache::put('pending_rzp_' . $tempToken, $pendingData, now()->addHours(24));
+            session(['pending_rzp_checkout' => $pendingData]);
 
             return response()->json([
                 'status' => 'success',
                 'razorpayOrderId' => $razorpayOrder['id'],
-                'amount' => (int)round($order->total * 100),
+                'amount' => (int)round($total * 100),
                 'key' => $keyId,
-                'uuid' => $order->uuid,
+                'uuid' => $tempToken,
                 'app_name' => config('app.name', 'RohidaFarm'),
                 'user' => Auth::user() ?? (object)['name' => $shippingData['name'], 'email' => $request->input('email'), 'phone' => $shippingData['phone']]
             ]);
@@ -362,48 +423,92 @@ class CheckoutController extends Controller
                 'razorpay_order_id'   => $orderId
             ]);
 
-            $order = Order::where('uuid', $uuid)->firstOrFail();
-            
-            // Process payment as successful
-            $paymentAmount = $order->payment_method === 'cod' ? $order->advance_amount : null;
-            $this->paymentService->process($order, 'razorpay', $paymentId, $paymentAmount);
+            // Find pending checkout data
+            $pendingData = \Illuminate\Support\Facades\Cache::get('pending_rzp_' . $orderId)
+                ?? \Illuminate\Support\Facades\Cache::get('pending_rzp_' . $uuid)
+                ?? session('pending_rzp_checkout');
 
-            if ($order->payment_method === 'cod') {
-                $order->update(['payment_status' => 'partial']);
-            }
-
-            // Clear the cart here upon successful Razorpay payment
-            $this->cartService->clear();
-
-            // Send Order Confirmation Mail
-            try {
-                \Illuminate\Support\Facades\Mail::to($order->user->email)->send(new \App\Mail\OrderPlacedMail($order));
-            } catch (\Exception $e) {
-                logger()->error('Failed to send OrderPlacedMail: ' . $e->getMessage());
-            }
-
-            // Send Admin Notification Mail
-            try {
-                $adminEmails = \App\Models\User::where('role', 'admin')->pluck('email')->toArray();
-                $primarySettingEmail = \App\Models\Setting::get('contact_email_1') ?: \App\Models\Setting::get('contact_email');
-                if ($primarySettingEmail && !in_array($primarySettingEmail, $adminEmails)) {
-                    $adminEmails[] = $primarySettingEmail;
+            if ($pendingData) {
+                // Ensure user context is active
+                if (!Auth::check() && !empty($pendingData['user_id'])) {
+                    Auth::loginUsingId($pendingData['user_id']);
                 }
 
-                if (!empty($adminEmails)) {
-                    \Illuminate\Support\Facades\Mail::to($adminEmails)->send(new \App\Mail\AdminNewOrderMail($order));
+                // Create Order only after payment is verified
+                if ($pendingData['type'] === 'cart') {
+                    $order = $this->orderService->createFromCart(
+                        $pendingData['shipping_data'],
+                        $pendingData['payment_method']
+                    );
+                    // Clear cart upon successful payment
+                    $this->cartService->clear();
+                } else {
+                    $product = \App\Models\Product::findOrFail($pendingData['product_id']);
+                    $variant = !empty($pendingData['variant_id']) ? \App\Models\ProductVariant::find($pendingData['variant_id']) : null;
+                    $order = $this->orderService->createDirectOrder(
+                        $product,
+                        $variant,
+                        (int)$pendingData['quantity'],
+                        $pendingData['shipping_data'],
+                        'razorpay'
+                    );
                 }
-            } catch (\Exception $e) {
-                logger()->error('Failed to send AdminNewOrderMail: ' . $e->getMessage());
+
+                // Clean up pending data
+                \Illuminate\Support\Facades\Cache::forget('pending_rzp_' . $orderId);
+                \Illuminate\Support\Facades\Cache::forget('pending_rzp_' . $uuid);
+                session()->forget('pending_rzp_checkout');
+
+                // Process payment as successful
+                $paymentAmount = $order->payment_method === 'cod' ? $order->advance_amount : null;
+                $this->paymentService->process($order, 'razorpay', $paymentId, $paymentAmount);
+
+                if ($order->payment_method === 'cod') {
+                    $order->update(['payment_status' => 'partial']);
+                }
+
+                // Send Order Confirmation Mail
+                try {
+                    \Illuminate\Support\Facades\Mail::to($order->user->email)->send(new \App\Mail\OrderPlacedMail($order));
+                } catch (\Exception $e) {
+                    logger()->error('Failed to send OrderPlacedMail: ' . $e->getMessage());
+                }
+
+                // Send Admin Notification Mail
+                try {
+                    $adminEmails = \App\Models\User::where('role', 'admin')->pluck('email')->toArray();
+                    $primarySettingEmail = \App\Models\Setting::get('contact_email_1') ?: \App\Models\Setting::get('contact_email');
+                    if ($primarySettingEmail && !in_array($primarySettingEmail, $adminEmails)) {
+                        $adminEmails[] = $primarySettingEmail;
+                    }
+
+                    if (!empty($adminEmails)) {
+                        \Illuminate\Support\Facades\Mail::to($adminEmails)->send(new \App\Mail\AdminNewOrderMail($order));
+                    }
+                } catch (\Exception $e) {
+                    logger()->error('Failed to send AdminNewOrderMail: ' . $e->getMessage());
+                }
+
+                return redirect()->route('checkout.success', $order->uuid)->with('success', 'Payment successful! Order placed.');
             }
 
-            return redirect()->route('checkout.success', $order->uuid)->with('success', 'Payment successful! Order placed.');
-        } catch (\Exception $e) {
-            // Failed signature or error
+            // Fallback for pre-existing order records
             $order = Order::where('uuid', $uuid)->first();
-            if ($order && $order->status === 'pending') {
-                $this->orderService->abort($order->id);
+            if ($order) {
+                $paymentAmount = $order->payment_method === 'cod' ? $order->advance_amount : null;
+                $this->paymentService->process($order, 'razorpay', $paymentId, $paymentAmount);
+
+                if ($order->payment_method === 'cod') {
+                    $order->update(['payment_status' => 'partial']);
+                }
+
+                $this->cartService->clear();
+                return redirect()->route('checkout.success', $order->uuid)->with('success', 'Payment successful! Order placed.');
             }
+
+            return redirect()->route('checkout.index')->with('error', 'Unable to retrieve order details for payment verification.');
+        } catch (\Exception $e) {
+            logger()->error('Razorpay verification error: ' . $e->getMessage());
             return redirect()->route('checkout.index')->with('error', 'Payment verification failed: ' . $e->getMessage());
         }
     }
@@ -413,6 +518,9 @@ class CheckoutController extends Controller
      */
     public function razorpayCancel(string $uuid)
     {
+        \Illuminate\Support\Facades\Cache::forget('pending_rzp_' . $uuid);
+        session()->forget('pending_rzp_checkout');
+
         $order = Order::where('uuid', $uuid)->first();
         if ($order && $order->status === 'pending') {
             $this->orderService->abort($order->id);

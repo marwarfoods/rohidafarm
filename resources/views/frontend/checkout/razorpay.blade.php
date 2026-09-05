@@ -14,11 +14,11 @@
         <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
         <input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
         <input type="hidden" name="razorpay_signature" id="razorpay_signature">
-        <input type="hidden" name="uuid" value="{{ $order->uuid }}">
+        <input type="hidden" name="uuid" value="{{ $token ?? ($order->uuid ?? '') }}">
     </form>
 
-    <!-- Form to cancel the orphaned order if payment fails or modal is closed -->
-    <form action="{{ route('checkout.razorpay.cancel', $order->uuid) }}" method="POST" id="razorpayCancelForm" class="d-none">
+    <!-- Form to cancel the pending checkout if payment fails or modal is closed -->
+    <form action="{{ route('checkout.razorpay.cancel', $token ?? ($order->uuid ?? 'cancel')) }}" method="POST" id="razorpayCancelForm" class="d-none">
         @csrf
     </form>
 </div>
@@ -33,7 +33,7 @@
             "amount": "{{ $amount }}",
             "currency": "INR",
             "name": "{{ config('app.name', 'RohidaFarm') }}",
-            "description": "Order Payment #{{ $order->order_number }}",
+            "description": "Rohida Farms Order Payment",
             "image": "{{ asset('assets/images/logo.png') }}",
             "order_id": "{{ $razorpayOrderId }}",
             "handler": function (response) {
