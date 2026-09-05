@@ -3,42 +3,7 @@ import './media-gallery';
 import './icon-picker';
 import './header';
 
-// ── GLOBAL DEBUG LOGGER WITH EMOJIS ──────────────────
-window.RohidaDebug = {
-    log: function(emoji, category, message, data = null) {
-        const time = new Date().toLocaleTimeString();
-        if (data) {
-            console.log(`%c${emoji} [${time}] [Rohida ${category}] ${message}`, 'color: #8B5A2B; font-weight: bold; background-color: #FFF8E8; padding: 2px 6px; border-radius: 4px;', data);
-        } else {
-            console.log(`%c${emoji} [${time}] [Rohida ${category}] ${message}`, 'color: #8B5A2B; font-weight: bold; background-color: #FFF8E8; padding: 2px 6px; border-radius: 4px;');
-        }
-    }
-};
-
 document.addEventListener('DOMContentLoaded', function () {
-    RohidaDebug.log('🚀', 'App', 'Rohida Farm Application Initialized. Real-time Debug Logger Active!');
-
-    // ── LIVE FONT DIAGNOSTIC WITH EMOJIS ──
-    if (document.fonts) {
-        document.fonts.ready.then(function () {
-            const testEl = document.querySelector('h1, h2, .font-heading') || document.body;
-            const activeFont = window.getComputedStyle(testEl).fontFamily;
-            console.log(
-                '%c🌿 [Rohida Font System] 🌿',
-                'background: #1B5E20; color: #FFF8E8; font-size: 13px; font-weight: bold; padding: 4px 8px; border-radius: 4px;'
-            );
-            console.log(
-                `%c✨ Active Heading Font: %c${activeFont}`,
-                'color: #8B5A2B; font-weight: bold; font-size: 12px;',
-                'color: #1B5E20; font-weight: bold; font-size: 13px; text-decoration: underline;'
-            );
-            console.log(
-                '%c🚀 Font Status: LOADED & WORKING PROPERLY!',
-                'color: #248443; font-weight: bold; font-size: 12px;'
-            );
-        });
-    }
-
     // Global image fallback listener for missing uploads/images
     document.addEventListener('error', function (e) {
         if (e.target.tagName === 'IMG' && !e.target.dataset.hasFallback) {
@@ -60,38 +25,6 @@ document.addEventListener('DOMContentLoaded', function () {
             setTimeout(() => AOS.refresh(), 100);
         });
     }
-
-    // ── AUTOMATIC GLITCH CHECKER ──
-    window.addEventListener('load', function() {
-        console.group('🔍 [Glitch Checker] Automated Page Diagnostics');
-        let glitchesFound = 0;
-
-        // 1. Check for broken images
-        const images = document.querySelectorAll('img');
-        images.forEach(img => {
-            if (!img.complete || img.naturalWidth === 0) {
-                console.error(`🚨 [Glitch] Broken Image found:`, img.src || img);
-                glitchesFound++;
-            }
-        });
-
-        // 2. Check for empty or placeholder links
-        const links = document.querySelectorAll('a:not([data-bs-toggle])');
-        links.forEach(link => {
-            const href = link.getAttribute('href');
-            if (!href || href.trim() === '#' || href.trim() === '') {
-                console.warn(`⚠️ [Glitch] Empty/Placeholder Link found:`, link.textContent.trim() || link);
-                glitchesFound++;
-            }
-        });
-
-        if (glitchesFound === 0) {
-            console.log('✅ [Glitch Checker] No major glitches found on this page!');
-        } else {
-            console.log(`⚠️ [Glitch Checker] Found ${glitchesFound} potential glitches to fix.`);
-        }
-        console.groupEnd();
-    });
 
     // Fixed Sticky Header logic
     const header = document.querySelector('.navbar-sticky');
@@ -118,7 +51,6 @@ document.addEventListener('DOMContentLoaded', function () {
             else if (!isInc && val > 1) val--;
             inp.value = val;
             
-            RohidaDebug.log('➕', 'Cart Qty', `Quantity button clicked for item #${id} -> New value: ${val}`);
             updateCartQtyOffcanvas(id, val);
         }
 
@@ -128,14 +60,12 @@ document.addEventListener('DOMContentLoaded', function () {
             const id = btn.getAttribute('data-id');
             btn.innerHTML = '<span class="spinner-border spinner-border-sm text-danger" style="width: 14px; height: 14px;" role="status"></span>';
             btn.style.pointerEvents = 'none';
-            RohidaDebug.log('🗑️', 'Cart Remove', `Remove button clicked for Cart Item #${id}`);
             removeCartItemOffcanvas(id);
         }
 
         // Wishlist remove
         if (e.target.closest('.btn-offcanvas-wishlist-remove')) {
             const id = e.target.closest('.btn-offcanvas-wishlist-remove').getAttribute('data-id');
-            RohidaDebug.log('❤️', 'Wishlist', `Wishlist toggle triggered for Product #${id}`);
             toggleWishlistOffcanvas(id);
         }
     });
@@ -186,7 +116,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     window.reloadCartDrawer = function(callback) {
         const cacheBuster = new Date().getTime();
-        RohidaDebug.log('🔄', 'Cart Drawer', `Fetching fresh real-time cart drawer HTML (t=${cacheBuster})...`);
         fetch('/cart/drawer?t=' + cacheBuster, {
             headers: {
                 'Cache-Control': 'no-cache',
@@ -240,8 +169,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     });
                 }
-                RohidaDebug.log('🏷️', 'Cart Badges', `Updated ${currentBadges.length} cart badge elements across DOM -> Badge Count: ${countText}`);
-                RohidaDebug.log('✅', 'Cart Drawer', `Cart Drawer successfully reloaded & synchronized in real-time!`);
 
                 // The innerHTML swap above tears down any previously-initialized
                 // "Hot Choices" Swiper instances along with their DOM, so re-init
@@ -251,7 +178,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 // If on checkout page and cart is now empty, redirect to home
                 if (window.location.pathname === '/checkout' || window.location.pathname.startsWith('/checkout/')) {
                     if (newEmpty && !newEmpty.classList.contains('d-none')) {
-                        RohidaDebug.log('⚠️', 'Checkout Guard', 'Cart is empty on checkout page -> Redirecting to home...');
                         window.location.href = '/';
                         return;
                     }
@@ -260,7 +186,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (callback) callback();
             })
             .catch(err => {
-                RohidaDebug.log('❌', 'Cart Drawer', 'Error refreshing cart drawer HTML:', err);
                 if (callback) callback();
             });
     }
@@ -290,7 +215,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return res.json();
         })
         .then(data => {
-            RohidaDebug.log('✅', 'Cart Qty', `Quantity update confirmed on server for item #${id} -> Reloading page...`);
             window.location.reload();
         })
         .catch(err => {
@@ -314,7 +238,6 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(res => res.json())
         .then(data => {
             if (data.status === 'success' || data.success) {
-                RohidaDebug.log('🗑️', 'Cart Remove', `Item #${id} removed successfully -> Reloading page...`);
                 window.location.reload();
             } else {
                 hideCartSkeleton();
@@ -356,10 +279,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const isInsideOffcanvas = Boolean(form.closest('#cartOffcanvas'));
 
         if (isInsideOffcanvas) {
-            RohidaDebug.log('🔥', 'Cart Drawer', `Hot Choices Add triggered inside Cart Drawer -> Product #${productId}, Variant #${variantId}`);
             sessionStorage.setItem('open_cart_drawer', '1');
-        } else {
-            RohidaDebug.log('🛒', 'Add To Cart', `Add to Cart triggered -> Product #${productId}, Variant #${variantId}, Qty: ${qty}`);
         }
         
         fetch(form.action, {
@@ -373,7 +293,6 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(res => {
             if (res.ok) {
                 if (isInsideOffcanvas) {
-                    RohidaDebug.log('⚡', 'Cart Drawer', `Hot Choice item added -> Reloading page for 100% accuracy!`);
                     window.location.reload();
                     return;
                 }
@@ -385,7 +304,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Trigger Top Add-Ons Modal ("✔ Added to Cart!")
                 const addonsModalEl = document.getElementById('addToCartAddonsModal');
                 if (addonsModalEl) {
-                    RohidaDebug.log('✨', 'Add-Ons Modal', `Opening 'Added to Cart!' Top Add-ons Modal...`);
                     const addonsModal = bootstrap.Modal.getOrCreateInstance(addonsModalEl);
                     addonsModal.show();
                 } else {
@@ -480,8 +398,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const formattedMrp = `₹${mrp.toLocaleString('en-IN', {maximumFractionDigits: 0})}`;
         const bestPrice = `Best Price ₹${Math.round(price * 0.85).toLocaleString('en-IN')} with PURE15`;
 
-        RohidaDebug.log('🏷️', 'Variant Change', `Product #${productId} variant changed -> Selected Variant #${variantId}, Price: ${formattedPrice}`);
-
         const salePriceEl = card.querySelector('.card-sale-price');
         const mrpPriceEl = card.querySelector('.card-mrp-price');
         const bestPriceEl = card.querySelector('.card-best-price');
@@ -545,13 +461,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Hide mobile sticky CTA and prevent background scroll when any offcanvas is opened
     document.addEventListener('show.bs.offcanvas', function (e) {
-        const id = e.target.id || 'offcanvas';
-        RohidaDebug.log('📱', 'Offcanvas', `Offcanvas '${id}' opened -> Body scroll locked.`);
         document.body.classList.add('hide-mobile-cta', 'offcanvas-active');
     });
     document.addEventListener('hidden.bs.offcanvas', function (e) {
-        const id = e.target.id || 'offcanvas';
-        RohidaDebug.log('📱', 'Offcanvas', `Offcanvas '${id}' closed -> Body scroll restored.`);
         if (!document.querySelector('.offcanvas.show')) {
             document.body.classList.remove('hide-mobile-cta', 'offcanvas-active');
         }

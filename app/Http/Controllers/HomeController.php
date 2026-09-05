@@ -25,7 +25,6 @@ class HomeController extends Controller
 
     /**
      * Display home page.
-     * Heavy product queries are cached; lightweight queries run fresh each time.
      */
     public function index()
     {
@@ -70,14 +69,11 @@ class HomeController extends Controller
         $nativeIngredients = \App\Models\NativeIngredient::where('is_active', true)
             ->orderBy('sort_order')->get();
 
-        // ── Vedic Craftsmanship (Bilona Process) Steps ─────────────────
         $bilonaSteps = \App\Models\BilonaStep::where('is_active', true)
             ->orderBy('sort_order')->get();
 
-        \Illuminate\Support\Facades\Log::info('🏠 HOMEPAGE LOAD — Vedic Craftsmanship steps fetched from DB: ' . $bilonaSteps->map(fn($s) => "[#{$s->id} \"{$s->title}\" -> {$s->image_path}]")->implode(' | '));
-
         // ── All Products Grid ─────────────────────────────────────────
-        $allProducts = Product::with(['category:id,name,slug', 'images', 'primaryImage', 'variants'])
+        $allProducts = Product::with(['category:id,name,slug', 'images', 'primaryImage', 'gallery', 'variants'])
             ->where('is_active', true)
             ->where('show_on_home', true)
             ->orderBy('created_at', 'desc')

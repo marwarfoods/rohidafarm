@@ -437,12 +437,12 @@
                 </div>
                 <div class="card-body p-4">
                     @foreach([
-                        ['is_featured',    'is_featured',    'Featured Product Badge',  true],
-                        ['is_organic',     'is_organic',     '100% Organic Certified',  true],
-                        ['is_bilona',      'is_bilona',      'Bilona Method Churned',   false],
-                        ['is_best_seller', 'is_best_seller', 'Best Seller Badge',       false],
-                        ['is_trending',    'is_trending',    'Trending Badge',          false],
-                        ['is_new_arrival', 'is_new_arrival', 'New Arrival Badge',       false],
+                        ['is_featured',    'is_featured',    'Selling Fast Badge',             false],
+                        ['is_best_seller', 'is_best_seller', 'Best Seller Badge',              false],
+                        ['is_trending',    'is_trending',    'Top Rated Badge',                false],
+                        ['is_new_arrival', 'is_new_arrival', 'New Arrival Badge',              false],
+                        ['is_organic',     'is_organic',     '100% Organic Certified Badge',   false],
+                        ['is_bilona',      'is_bilona',      'Bilona Method Churned Badge',    false],
                     ] as [$name, $id, $label, $default])
                         <div class="form-check form-switch mb-2">
                             <input class="form-check-input" type="checkbox" name="{{ $name }}" id="{{ $id }}" value="1"

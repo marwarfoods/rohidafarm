@@ -141,6 +141,7 @@ class OrderService
                 $this->delhiveryService->createShipment($order);
             } catch (\Exception $e) {
                 logger()->error('Delhivery shipment creation failed: ' . $e->getMessage());
+                $order->update(['shipment_status' => 'Shipment Failed - Needs Manual Booking']);
             }
 
             // 8. Log activity
@@ -351,10 +352,11 @@ class OrderService
 
             // Create tracking update
             TrackOrder::create([
-                'order_id' => $order->id,
-                'status' => $this->mapTrackStatus($status),
-                'description' => $description ?: "Order status updated to " . ucfirst($status),
-                'location' => 'Warehouse'
+                'order_id'    => $order->id,
+                'status'      => $this->mapTrackStatus($status),
+                'description' => $description ?: "Order status updated to " . ucfirst(str_replace('_', ' ', $status)),
+                'location'    => $trackingCarrier ? "{$trackingCarrier} Logistics Hub" : 'Rohida Farm Processing Hub',
+                'occurred_at' => now(),
             ]);
 
             // If order status is delivered, update payment status if it was COD

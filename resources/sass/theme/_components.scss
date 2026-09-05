@@ -52,10 +52,11 @@
         box-shadow: 0 10px 25px rgba(27, 94, 32, 0.08) !important;
         
         .product-card-img-primary {
-            opacity: 0 !important;
+            transform: scale(1.03);
         }
         .product-card-img-hover {
             opacity: 1 !important;
+            transform: scale(1.03);
         }
         .product-actions {
             transform: translateY(0) !important;

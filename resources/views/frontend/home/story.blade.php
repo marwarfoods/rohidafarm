@@ -53,10 +53,7 @@
             <!-- Left Feature Card: A2 Vedic Churning -->
             <div class="col-12 col-md-4 d-flex">
                 <div class="story-feature-card w-100 d-flex align-items-center gap-3">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 overflow-hidden" 
-                         style="width: 48px; height: 48px; background: rgba(196, 154, 69, 0.14); border: 1px solid rgba(196, 154, 69, 0.35); padding: 6px;">
-                        <img src="{{ asset('images/svgs/Rohida Farm Web Vector 03.svg') }}" alt="A2 Vedic Churning" width="34" height="34" style="object-fit: contain;">
-                    </div>
+                    <img src="{{ asset('images/left.png') }}" alt="A2 Vedic Churning" class="flex-shrink-0" style="width: 48px; height: 48px; object-fit: contain;">
                     <div>
                         <h6 class="fw-bold font-heading m-0 text-dark" style="color: #5C3D2E !important; font-size: 0.95rem;">
                             A2 Vedic Churning
@@ -82,10 +79,7 @@
             <!-- Right Feature Card: Ethical Grass-Fed Dairy -->
             <div class="col-12 col-md-4 d-flex">
                 <div class="story-feature-card w-100 d-flex align-items-center gap-3">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 overflow-hidden" 
-                         style="width: 48px; height: 48px; background: rgba(196, 154, 69, 0.14); border: 1px solid rgba(196, 154, 69, 0.35); padding: 6px;">
-                        <img src="{{ asset('images/svgs/Rohida Farm Web Vector 07.svg') }}" alt="Ethical Grass-Fed Dairy" width="34" height="34" style="object-fit: contain;">
-                    </div>
+                    <img src="{{ asset('images/right.png') }}" alt="Ethical Grass-Fed Dairy" class="flex-shrink-0" style="width: 48px; height: 48px; object-fit: contain;">
                     <div>
                         <h6 class="fw-bold font-heading m-0 text-dark" style="color: #5C3D2E !important; font-size: 0.95rem;">
                             Ethical Grass-Fed Dairy

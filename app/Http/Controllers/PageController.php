@@ -116,9 +116,65 @@ class PageController extends Controller
         $timeline = [];
 
         if ($orderNo) {
-            $order = Order::with('shipment')->where('order_number', $orderNo)->first();
+            // Normalize order number: trim whitespace, strip leading/trailing '#', spaces, etc.
+            $rawInput = trim($orderNo);
+            $cleanOrderNo = preg_replace('/^#+/', '', $rawInput);
+            $cleanOrderNo = trim($cleanOrderNo);
+
+            $order = Order::with(['shipment', 'items.product', 'trackingUpdates'])
+                ->where(function($q) use ($cleanOrderNo, $rawInput) {
+                    $q->where('order_number', $cleanOrderNo)
+                      ->orWhere('order_number', $rawInput)
+                      ->orWhere('order_number', '#' . $cleanOrderNo)
+                      ->orWhereRaw('LOWER(TRIM(LEADING "#" FROM order_number)) = ?', [strtolower($cleanOrderNo)])
+                      ->orWhere('tracking_number', $rawInput)
+                      ->orWhere('tracking_number', $cleanOrderNo);
+                })
+                ->first();
+
             if ($order) {
-                $timeline = $this->delhiveryService->getTrackingTimeline($order);
+                // Fetch all tracking updates in chronological order
+                $dbUpdates = $order->trackingUpdates()->orderBy('occurred_at', 'asc')->orderBy('id', 'asc')->get();
+
+                if ($dbUpdates->isNotEmpty()) {
+                    $timeline = [];
+                    $statusLabels = [
+                        'order_placed'     => 'Order Placed',
+                        'pending'          => 'Order Placed',
+                        'processing'       => 'Order Processing / Packed',
+                        'packed'           => 'Packed & Manifested',
+                        'shipped'          => 'Dispatched / In Transit',
+                        'out_for_delivery' => 'Out for Delivery',
+                        'delivered'        => 'Delivered',
+                        'cancelled'        => 'Cancelled',
+                        'returned'         => 'Returned',
+                    ];
+
+                    foreach ($dbUpdates as $index => $tu) {
+                        $label = $statusLabels[$tu->status] ?? ucwords(str_replace('_', ' ', $tu->status));
+                        $occurredTime = $tu->occurred_at ?: $tu->created_at;
+                        $formattedDate = $occurredTime ? $occurredTime->format('d M Y, h:i A') : '';
+
+                        $timeline[] = [
+                            'status'      => $label,
+                            'activity'    => $label,
+                            'description' => $tu->description ?: "Order status updated to {$label}.",
+                            'location'    => $tu->location ?: 'Rohida Farm Processing Hub',
+                            'time'        => $formattedDate,
+                            'date'        => $formattedDate,
+                            'completed'   => true,
+                            'is_latest'   => false,
+                        ];
+                    }
+
+                    // Reverse so the newest milestone appears at the top
+                    $timeline = array_reverse($timeline);
+                    if (!empty($timeline)) {
+                        $timeline[0]['is_latest'] = true;
+                    }
+                } else {
+                    $timeline = $this->delhiveryService->getTrackingTimeline($order);
+                }
             } else {
                 session()->now('error', 'No orders found matching this order number.');
             }

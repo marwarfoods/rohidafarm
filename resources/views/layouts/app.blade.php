@@ -30,10 +30,19 @@
     <meta name="twitter:description" content="{{ $seo['og_description'] ?? 'Premium luxury organic ghee' }}">
     <meta name="twitter:image" content="{{ $seo['og_image'] ?? asset('/assets/images/logo.png') }}">
 
-    {{-- -- Favicon -- --}}
-    @if(\App\Models\Setting::get('favicon'))
-        <link rel="icon" type="image/png" href="{{ asset(\App\Models\Setting::get('favicon')) }}">
-    @endif
+    {{-- -- Favicon & Web App Icons (Google Search & PWA Compliant) -- --}}
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('favicon-48x48.png') }}">
+    <link rel="icon" type="image/png" sizes="96x96" href="{{ asset('favicon-96x96.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('favicon-192x192.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+    <link rel="manifest" href="{{ asset('site.webmanifest') }}">
+    <meta name="msapplication-TileImage" content="{{ asset('favicon-144x144.png') }}">
+    <meta name="msapplication-TileColor" content="#8B5A2B">
+    <meta name="theme-color" content="#8B5A2B">
 
     {{-- -- JSON-LD Structured Data (LocalBusiness schema for SEO) -- --}}
     <script type="application/ld+json">
@@ -305,9 +314,7 @@
                 btnConfirmAddons.disabled = true;
                 btnConfirmAddons.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Adding...';
 
-                if (typeof window.RohidaDebug === 'object') {
-                    window.RohidaDebug.log('✨', 'Add-Ons Modal', `Add-Ons modal confirmed! User selected ${checkboxes.length} add-on item(s)...`);
-                }
+
 
                 const promises = [];
                 checkboxes.forEach(function (cb) {

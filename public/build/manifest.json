@@ -42,7 +42,7 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-CY-b4XA9.js",
+    "file": "assets/app-W6t4fowv.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -71,13 +71,13 @@
     "isEntry": true
   },
   "resources/js/mail.js": {
-    "file": "assets/mail-B7acMwGO.js",
+    "file": "assets/mail-BvRk9kiK.js",
     "name": "mail",
     "src": "resources/js/mail.js",
     "isEntry": true
   },
   "resources/js/product-detail.js": {
-    "file": "assets/product-detail-9CT8HTZa.js",
+    "file": "assets/product-detail-DA6u-Y4M.js",
     "name": "product-detail",
     "src": "resources/js/product-detail.js",
     "isEntry": true
@@ -95,7 +95,7 @@
     "isEntry": true
   },
   "resources/sass/about.scss": {
-    "file": "assets/about-BiUFFaaD.css",
+    "file": "assets/about-DwPwKqRR.css",
     "name": "about",
     "names": [
       "about.css"
@@ -126,7 +126,7 @@
     "isEntry": true
   },
   "resources/sass/app.scss": {
-    "file": "assets/app-Df75r8QV.css",
+    "file": "assets/app-Cc4xsRhV.css",
     "name": "app",
     "names": [
       "app.css"

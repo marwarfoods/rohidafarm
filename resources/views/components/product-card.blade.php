@@ -6,17 +6,59 @@
     $discount = $product->discountPercentage();
     
     // Primary image extraction
-    $primaryImgObj = $product->primaryImage ?: ($product->relationLoaded('images') ? $product->images->first() : $product->images()->first());
-    $imagePath = $primaryImgObj ? asset($primaryImgObj->image_path) : asset('/assets/images/products/placeholder.jpg');
+    $primaryImgObj = $product->primaryImage 
+        ?: ($product->relationLoaded('images') 
+            ? ($product->images->firstWhere('is_primary', true) ?? $product->images->first()) 
+            : ($product->images()->where('is_primary', true)->first() ?? $product->images()->first()));
+            
+    $primaryRawPath = $primaryImgObj ? $primaryImgObj->image_path : null;
+    $imagePath = $primaryRawPath ? asset($primaryRawPath) : asset('/assets/images/products/placeholder.jpg');
     
-    // Hover image extraction
-    $hoverImgObj = $product->gallery->first();
-    if (!$hoverImgObj && $product->images->count() > 1) {
-        $hoverImgObj = $product->images->first(function($img) use ($primaryImgObj) {
-            return $primaryImgObj ? $img->id !== $primaryImgObj->id : true;
-        });
+    // Hover image extraction (looks in gallery, all images, or variant images)
+    $hoverImagePath = null;
+    $hoverImgRawPath = null;
+    
+    // 1. Check gallery relation (non-primary images)
+    $galleryList = $product->relationLoaded('gallery') ? $product->gallery : $product->gallery()->get();
+    $hoverGalleryObj = $galleryList->first(function($img) use ($primaryRawPath) {
+        return !empty($img->image_path) && $img->image_path !== $primaryRawPath;
+    });
+    if ($hoverGalleryObj) {
+        $hoverImgRawPath = $hoverGalleryObj->image_path;
     }
-    $hoverImagePath = $hoverImgObj ? asset($hoverImgObj->image_path) : null;
+    
+    // 2. If not found in gallery, check all product images
+    if (!$hoverImgRawPath) {
+        $allImagesList = $product->relationLoaded('images') ? $product->images : $product->images()->get();
+        $hoverAllObj = $allImagesList->first(function($img) use ($primaryRawPath) {
+            return !empty($img->image_path) && $img->image_path !== $primaryRawPath;
+        });
+        if ($hoverAllObj) {
+            $hoverImgRawPath = $hoverAllObj->image_path;
+        }
+    }
+    
+    // 3. If still not found, check variant images or variant galleries
+    if (!$hoverImgRawPath && $product->relationLoaded('variants')) {
+        foreach ($product->variants as $variant) {
+            if (!empty($variant->image_path) && $variant->image_path !== $primaryRawPath) {
+                $hoverImgRawPath = $variant->image_path;
+                break;
+            }
+            if (!empty($variant->gallery_images) && is_array($variant->gallery_images)) {
+                foreach ($variant->gallery_images as $vGalleryPath) {
+                    if (!empty($vGalleryPath) && $vGalleryPath !== $primaryRawPath) {
+                        $hoverImgRawPath = $vGalleryPath;
+                        break 2;
+                    }
+                }
+            }
+        }
+    }
+    
+    if ($hoverImgRawPath && $hoverImgRawPath !== $primaryRawPath) {
+        $hoverImagePath = asset($hoverImgRawPath);
+    }
     
     // Best Price calculation with dynamic coupon
     $bestCoupon = \App\Models\Coupon::where('is_active', true)

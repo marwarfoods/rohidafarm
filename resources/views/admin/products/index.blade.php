@@ -22,8 +22,12 @@
         <option value="show_on_shop:0">Disable: Show on Shop</option>
         <option value="show_on_category:1">Enable: Show on Category</option>
         <option value="show_on_category:0">Disable: Show on Category</option>
-        <option value="is_featured:1">Mark Featured Badge</option>
-        <option value="is_featured:0">Unmark Featured Badge</option>
+        <option value="is_featured:1">Mark Selling Fast Badge</option>
+        <option value="is_featured:0">Unmark Selling Fast Badge</option>
+        <option value="is_best_seller:1">Mark Best Seller Badge</option>
+        <option value="is_best_seller:0">Unmark Best Seller Badge</option>
+        <option value="is_trending:1">Mark Top Rated Badge</option>
+        <option value="is_trending:0">Unmark Top Rated Badge</option>
     </select>
     <button type="button" class="btn btn-success btn-sm" id="bulkStatusApplyBtn"><i class="bi bi-check2-circle"></i> Apply</button>
     <button type="button" class="btn btn-outline-secondary btn-sm" id="bulkStatusCancelBtn">Cancel</button>
@@ -95,7 +99,13 @@
                         <span class="badge bg-light text-secondary border" style="font-size:0.68rem;" title="Visible on Category Page">Cat</span>
                     @endif
                     @if($prod->is_featured)
-                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle" style="font-size:0.68rem;">Featured</span>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size:0.68rem;" title="Selling Fast Badge">Selling Fast</span>
+                    @endif
+                    @if($prod->is_best_seller)
+                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle" style="font-size:0.68rem;" title="Best Seller Badge">Best Seller</span>
+                    @endif
+                    @if($prod->is_trending)
+                        <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size:0.68rem;" title="Top Rated / Trending Badge">Top Rated</span>
                     @endif
                 </div>
             </td>

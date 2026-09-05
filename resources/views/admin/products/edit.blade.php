@@ -630,12 +630,12 @@
                 </div>
                 <div class="card-body p-4">
                     @foreach([
-                        ['is_featured',    'is_featured',    'Featured Product Badge',  $product->is_featured],
-                        ['is_organic',     'is_organic',     '100% Organic Certified',  $product->is_organic],
-                        ['is_bilona',      'is_bilona',      'Bilona Method Churned',   $product->is_bilona],
-                        ['is_best_seller', 'is_best_seller', 'Best Seller Badge',       $product->is_best_seller],
-                        ['is_trending',    'is_trending',    'Trending Badge',          $product->is_trending],
-                        ['is_new_arrival', 'is_new_arrival', 'New Arrival Badge',       $product->is_new_arrival],
+                        ['is_featured',    'is_featured',    'Selling Fast Badge',             $product->is_featured],
+                        ['is_best_seller', 'is_best_seller', 'Best Seller Badge',              $product->is_best_seller],
+                        ['is_trending',    'is_trending',    'Top Rated Badge',                $product->is_trending],
+                        ['is_new_arrival', 'is_new_arrival', 'New Arrival Badge',              $product->is_new_arrival],
+                        ['is_organic',     'is_organic',     '100% Organic Certified Badge',   $product->is_organic],
+                        ['is_bilona',      'is_bilona',      'Bilona Method Churned Badge',    $product->is_bilona],
                     ] as [$name, $id, $label, $val])
                         <div class="form-check form-switch mb-2">
                             <input class="form-check-input" type="checkbox" name="{{ $name }}" id="{{ $id }}" value="1" {{ $val ? 'checked' : '' }}>

@@ -77,11 +77,11 @@
                             {{-- Order Summary --}}
                             <div class="row g-3 mb-4">
                                 <div class="col-6 col-md-3 text-center">
-                                    <div class="fw-bold text-dark" style="font-size:1.1rem;">₹{{ number_format($order->total_amount, 2) }}</div>
+                                    <div class="fw-bold text-dark" style="font-size:1.1rem;">₹{{ number_format($order->total ?? $order->total_amount ?? 0, 2) }}</div>
                                     <div class="text-muted" style="font-size:0.75rem;">Order Total</div>
                                 </div>
                                 <div class="col-6 col-md-3 text-center">
-                                    <div class="fw-bold text-dark">{{ $order->items->count() }}</div>
+                                    <div class="fw-bold text-dark">{{ $order->items ? $order->items->count() : 1 }}</div>
                                     <div class="text-muted" style="font-size:0.75rem;">Items</div>
                                 </div>
                                 <div class="col-6 col-md-3 text-center">
@@ -89,28 +89,30 @@
                                     <div class="text-muted" style="font-size:0.75rem;">Payment</div>
                                 </div>
                                 <div class="col-6 col-md-3 text-center">
-                                    @if($order->shipment && $order->shipment->awb_code)
+                                    @if(!empty($order->tracking_number))
+                                        <div class="fw-bold text-success" style="font-size:0.9rem;">{{ $order->tracking_number }}</div>
+                                    @elseif($order->shipment && $order->shipment->awb_code)
                                         <div class="fw-bold text-success" style="font-size:0.9rem;">{{ $order->shipment->awb_code }}</div>
                                     @else
                                         <div class="text-muted fw-semibold">—</div>
                                     @endif
-                                    <div class="text-muted" style="font-size:0.75rem;">AWB Code</div>
+                                    <div class="text-muted" style="font-size:0.75rem;">Tracking / AWB</div>
                                 </div>
                             </div>
 
                             {{-- Shipping Address --}}
-                            @if($order->shipping_address)
-                                @php $addr = is_string($order->shipping_address) ? json_decode($order->shipping_address, true) : (array)$order->shipping_address; @endphp
+                            @if($order->shipping_name || $order->shipping_address_line1 || $order->shipping_address)
                                 <div class="rounded-3 p-3 mb-4" style="background:#f8fdf9;border:1px solid #e8f5e9;">
                                     <div class="fw-semibold text-success mb-1" style="font-size:0.8rem;letter-spacing:1px;text-transform:uppercase;">
                                         <i class="bi bi-geo-alt-fill me-1"></i>Shipping To
                                     </div>
                                     <div class="text-dark" style="font-size:0.88rem;line-height:1.6;">
-                                        {{ $addr['name'] ?? '' }}<br>
-                                        {{ $addr['address_line1'] ?? $addr['address'] ?? '' }}<br>
-                                        @if(!empty($addr['city'])){{ $addr['city'] }}, @endif
-                                        @if(!empty($addr['state'])){{ $addr['state'] }}@endif
-                                        @if(!empty($addr['pincode'])) — {{ $addr['pincode'] }}@endif
+                                        <strong>{{ $order->shipping_name }}</strong>@if($order->shipping_phone) — {{ $order->shipping_phone }}@endif<br>
+                                        {{ $order->shipping_address_line1 ?: ($order->shipping_address ?? '') }}
+                                        @if($order->shipping_address_line2), {{ $order->shipping_address_line2 }}@endif<br>
+                                        @if(!empty($order->shipping_city)){{ $order->shipping_city }}, @endif
+                                        @if(!empty($order->shipping_state)){{ $order->shipping_state }}@endif
+                                        @if(!empty($order->shipping_postal_code)) — {{ $order->shipping_postal_code }}@endif
                                     </div>
                                 </div>
                             @endif
@@ -118,16 +120,44 @@
                             {{-- Tracking Timeline --}}
                             @if($timeline && count($timeline) > 0)
                                 <h6 class="fw-bold text-dark mb-3"><i class="bi bi-clock-history me-2 text-success"></i>Tracking Timeline</h6>
-                                <div class="position-relative" style="padding-left: 28px;">
-                                    <div class="position-absolute start-0 top-0 bottom-0" style="width:2px;background:#e8f5e9;left:10px;"></div>
+                                <div class="position-relative ps-4 py-2">
+                                    <div class="position-absolute start-0 top-0 bottom-0" style="width: 2px; background: #e0e7e1; left: 14px;"></div>
                                     @foreach($timeline as $event)
-                                        <div class="position-relative mb-3 pb-3" style="border-bottom:1px dashed #e8f5e9;">
-                                            <div class="position-absolute rounded-circle bg-success" style="width:12px;height:12px;left:-24px;top:4px;border:2px solid #fff;box-shadow:0 0 0 2px #a8d5a2;"></div>
-                                            <div class="fw-semibold text-dark" style="font-size:0.88rem;">{{ $event['activity'] ?? $event['status'] ?? 'Status Update' }}</div>
-                                            <div class="text-muted" style="font-size:0.78rem;">
-                                                @if(!empty($event['date'])){{ $event['date'] }}@endif
-                                                @if(!empty($event['location'])) — {{ $event['location'] }}@endif
+                                        @php
+                                            $isLatest = !empty($event['is_latest']);
+                                        @endphp
+                                        <div class="position-relative mb-4 ps-3">
+                                            {{-- Status Dot Indicator --}}
+                                            <div class="position-absolute rounded-circle {{ $isLatest ? 'bg-success shadow-sm' : 'bg-success opacity-75' }}" 
+                                                 style="width: 14px; height: 14px; left: -20px; top: 3px; border: 2.5px solid #fff; box-shadow: 0 0 0 2px {{ $isLatest ? '#81c784' : '#c8e6c9' }};"></div>
+
+                                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-1">
+                                                <div class="fw-bold {{ $isLatest ? 'text-dark' : 'text-secondary' }}" style="font-size: 0.92rem;">
+                                                    {{ $event['activity'] ?? $event['status'] ?? 'Status Update' }}
+                                                    @if($isLatest)
+                                                        <span class="badge bg-success-subtle text-success border border-success-subtle ms-1 px-2 py-0.5" style="font-size: 0.68rem; letter-spacing: 0.5px;">LATEST</span>
+                                                    @endif
+                                                </div>
+                                                @if(!empty($event['date']) || !empty($event['time']))
+                                                    <span class="badge rounded-pill bg-light text-dark border px-2.5 py-1 d-inline-flex align-items-center gap-1" style="font-size: 0.76rem; font-weight: 600;">
+                                                        <i class="bi bi-calendar3 text-success"></i>
+                                                        <span>{{ $event['date'] ?: $event['time'] }}</span>
+                                                    </span>
+                                                @endif
                                             </div>
+
+                                            @if(!empty($event['description']))
+                                                <p class="text-secondary mb-1" style="font-size: 0.82rem; line-height: 1.5;">
+                                                    {{ $event['description'] }}
+                                                </p>
+                                            @endif
+
+                                            @if(!empty($event['location']))
+                                                <div class="text-muted d-inline-flex align-items-center gap-1" style="font-size: 0.75rem;">
+                                                    <i class="bi bi-geo-alt text-secondary"></i>
+                                                    <span>{{ $event['location'] }}</span>
+                                                </div>
+                                            @endif
                                         </div>
                                     @endforeach
                                 </div>

@@ -62,7 +62,7 @@ class ProductController extends Controller
         $globalFaqs = \App\Models\Faq::where('is_active', true)->orderBy('sort_order')->get();
         $videoReviews = \App\Models\VideoReview::with('product.primaryImage')->where('is_active', true)->orderBy('sort_order')->get();
 
-        $exploreQuery = \App\Models\Product::with(['category:id,name,slug', 'images', 'primaryImage', 'variants'])
+        $exploreQuery = \App\Models\Product::with(['category:id,name,slug', 'images', 'primaryImage', 'gallery', 'variants'])
             ->where('is_active', true)
             ->where('show_on_category', true);
         if ($activeCategory) {
@@ -70,7 +70,7 @@ class ProductController extends Controller
         }
         $exploreProducts = $exploreQuery->inRandomOrder()->limit(8)->get();
         if ($exploreProducts->isEmpty()) {
-            $exploreProducts = \App\Models\Product::with(['category:id,name,slug', 'images', 'primaryImage', 'variants'])
+            $exploreProducts = \App\Models\Product::with(['category:id,name,slug', 'images', 'primaryImage', 'gallery', 'variants'])
                 ->where('is_active', true)
                 ->where('show_on_category', true)
                 ->inRandomOrder()
@@ -229,8 +229,8 @@ class ProductController extends Controller
      */
     public function ajaxSearch(Request $request)
     {
-        $query = trim($request->input('search'));
-        if (empty($query)) {
+        $query = trim((string) $request->input('search'));
+        if (empty($query) || strlen($query) > 100) {
             return response()->json([]);
         }
 

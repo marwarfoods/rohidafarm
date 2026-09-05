@@ -89,35 +89,10 @@ class ProductController extends Controller
 
         $infographics = [];
         if ($request->has('existing_infographics')) {
-            $existing = $request->input('existing_infographics', []);
-            if (is_array($existing)) {
-                foreach ($existing as $eImg) {
-                    if (!empty($eImg)) $infographics[] = $eImg;
-                }
-            }
+            $infographics = $this->collectExistingInfographics($request);
         }
-        if ($request->hasFile('infographic_images')) {
-            foreach ($request->file('infographic_images') as $file) {
-                $fileName = time() . '_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('uploads/products/infographics'), $fileName);
-                $infographics[] = '/uploads/products/infographics/' . $fileName;
-            }
-        }
-        if ($request->filled('infographic_urls')) {
-            $raw = $request->input('infographic_urls');
-            $decoded = json_decode($raw, true);
-            if (is_array($decoded)) {
-                foreach ($decoded as $item) {
-                    $path = is_array($item) ? ($item['full_url'] ?? $item['file_path'] ?? reset($item)) : (string)$item;
-                    if ($path) $infographics[] = $path;
-                }
-            } else {
-                $lines = array_filter(array_map('trim', preg_split('/[,\n\r]+/', $raw)));
-                foreach ($lines as $line) {
-                    if ($line) $infographics[] = $line;
-                }
-            }
-        }
+        $infographics = $this->appendUploadedInfographics($request, $infographics);
+        $infographics = $this->appendInfographicUrls($request, $infographics);
 
         $product = Product::create($request->except('image', 'gallery', 'variants', 'slug', 'infographic_images', 'infographic_urls') + [
             'slug' => $slug,
@@ -145,57 +120,13 @@ class ProductController extends Controller
         ]);
 
         // Save gallery images & videos
-        if ($request->has('gallery')) {
-            foreach ($request->input('gallery') as $index => $gItem) {
-                ProductImage::create([
-                    'product_id' => $product->id,
-                    'image_path' => $gItem['image_path'] ?? $gItem,
-                    'video_path' => $gItem['video_path'] ?? null,
-                    'is_primary' => false,
-                    'sort_order' => $index + 1
-                ]);
-            }
-        }
+        $this->saveGalleryItems($request, $product);
 
         // Save variants (weight options) with individual images & galleries
-        if ($request->has('variants')) {
-            foreach ($request->input('variants') as $v) {
-                if (!empty($v['weight'])) {
-                    $galleryImages = [];
-                    if (!empty($v['gallery_images'])) {
-                        $galleryImages = is_array($v['gallery_images']) 
-                            ? array_values(array_filter($v['gallery_images']))
-                            : array_values(array_filter(explode(',', $v['gallery_images'])));
-                    }
-                    ProductVariant::create([
-                        'product_id' => $product->id,
-                        'name' => $product->name . ' - ' . $v['weight'],
-                        'sku' => $product->sku . '-' . Str::slug($v['weight']),
-                        'weight' => $v['weight'],
-                        'image_path' => !empty($v['image_path']) ? $v['image_path'] : null,
-                        'gallery_images' => !empty($galleryImages) ? $galleryImages : null,
-                        'mrp' => $v['mrp'] ?? $product->mrp,
-                        'sale_price' => $v['sale_price'] ?? $product->sale_price,
-                        'stock' => $v['stock'] ?? $product->stock,
-                        'max_cart_qty' => $v['max_cart_qty'] ?? null,
-                    ]);
-                }
-            }
-        }
+        $this->saveVariants($request, $product);
 
         // Save FAQs (question/answer pairs, in submitted order) if custom FAQs are selected
-        if (!$request->has('use_global_faqs') && $request->has('faqs')) {
-            foreach ($request->input('faqs') as $index => $f) {
-                if (!empty($f['question']) && !empty($f['answer'])) {
-                    \App\Models\ProductFaq::create([
-                        'product_id' => $product->id,
-                        'question' => $f['question'],
-                        'answer' => $f['answer'],
-                        'sort_order' => $f['sort_order'] ?? $index,
-                    ]);
-                }
-            }
-        }
+        $this->saveFaqs($request, $product);
 
         self::logActivity('product_create', "Created product {$product->name} (SKU: {$product->sku})", ['product_id' => $product->id]);
 
@@ -270,14 +201,8 @@ class ProductController extends Controller
         ]);
 
         // Infographic / Product Story Images
-        $infographics = [];
         if ($request->has('infographic_form_submitted')) {
-            $existing = $request->input('existing_infographics', []);
-            if (is_array($existing)) {
-                foreach ($existing as $eImg) {
-                    if (!empty($eImg)) $infographics[] = $eImg;
-                }
-            }
+            $infographics = $this->collectExistingInfographics($request);
         } else {
             $infographics = $product->infographic_images ?? [];
             if (!is_array($infographics)) {
@@ -285,31 +210,12 @@ class ProductController extends Controller
             }
         }
 
-        if ($request->hasFile('infographic_images')) {
-            foreach ($request->file('infographic_images') as $file) {
-                $fileName = time() . '_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('uploads/products/infographics'), $fileName);
-                $infographics[] = '/uploads/products/infographics/' . $fileName;
-            }
-        }
-        if ($request->filled('infographic_urls')) {
-            $raw = $request->input('infographic_urls');
-            $decoded = json_decode($raw, true);
-            if (is_array($decoded)) {
-                foreach ($decoded as $item) {
-                    $path = is_array($item) ? ($item['full_url'] ?? $item['file_path'] ?? reset($item)) : (string)$item;
-                    if ($path) $infographics[] = $path;
-                }
-            } else {
-                $lines = array_filter(array_map('trim', preg_split('/[,\n\r]+/', $raw)));
-                foreach ($lines as $line) {
-                    if ($line) $infographics[] = $line;
-                }
-            }
-        }
+        $infographics = $this->appendUploadedInfographics($request, $infographics);
+        $infographics = $this->appendInfographicUrls($request, $infographics);
         $product->update(['infographic_images' => array_values(array_unique($infographics))]);
 
         // Handle image upload simulation or existing gallery path selection
+        $primaryImagePath = null;
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $fileName = time() . '_' . $file->getClientOriginalName();
@@ -318,85 +224,36 @@ class ProductController extends Controller
             // Compress the image in-place
             \App\Services\ImageOptimizerService::optimize(public_path('uploads/products/' . $fileName));
             
-            $imagePath = '/uploads/products/' . $fileName;
-
-            // Remove previous primary
-            ProductImage::where('product_id', $product->id)->update(['is_primary' => false]);
-            
-            ProductImage::create([
-                'product_id' => $product->id,
-                'image_path' => $imagePath,
-                'is_primary' => true,
-                'sort_order' => 0
-            ]);
+            $primaryImagePath = '/uploads/products/' . $fileName;
         } elseif ($request->filled('image')) {
-            $imagePath = $request->input('image');
-            ProductImage::where('product_id', $product->id)->update(['is_primary' => false]);
-            ProductImage::create([
-                'product_id' => $product->id,
-                'image_path' => $imagePath,
-                'is_primary' => true,
-                'sort_order' => 0
-            ]);
+            $primaryImagePath = $request->input('image');
+        } else {
+            $existingPrimary = ProductImage::where('product_id', $product->id)->where('is_primary', true)->first();
+            $primaryImagePath = $existingPrimary ? $existingPrimary->image_path : '/assets/images/products/placeholder.jpg';
         }
 
-        // Delete old variants, non-primary images, and FAQs
+        // Cleanly wipe existing ProductImage records and recreate primary + gallery
+        ProductImage::where('product_id', $product->id)->delete();
+
+        ProductImage::create([
+            'product_id' => $product->id,
+            'image_path' => $primaryImagePath,
+            'is_primary' => true,
+            'sort_order' => 0
+        ]);
+
+        // Delete old variants and FAQs
         ProductVariant::where('product_id', $product->id)->delete();
-        ProductImage::where('product_id', $product->id)->where('is_primary', false)->delete();
         \App\Models\ProductFaq::where('product_id', $product->id)->delete();
 
         // Save new gallery items
-        if ($request->has('gallery')) {
-            foreach ($request->input('gallery') as $index => $gItem) {
-                ProductImage::create([
-                    'product_id' => $product->id,
-                    'image_path' => $gItem['image_path'] ?? $gItem,
-                    'video_path' => $gItem['video_path'] ?? null,
-                    'is_primary' => false,
-                    'sort_order' => $index + 1
-                ]);
-            }
-        }
+        $this->saveGalleryItems($request, $product);
 
         // Save new variants with individual images & galleries
-        if ($request->has('variants')) {
-            foreach ($request->input('variants') as $v) {
-                if (!empty($v['weight'])) {
-                    $galleryImages = [];
-                    if (!empty($v['gallery_images'])) {
-                        $galleryImages = is_array($v['gallery_images']) 
-                            ? array_values(array_filter($v['gallery_images']))
-                            : array_values(array_filter(explode(',', $v['gallery_images'])));
-                    }
-                    ProductVariant::create([
-                        'product_id' => $product->id,
-                        'name' => $product->name . ' - ' . $v['weight'],
-                        'sku' => $product->sku . '-' . Str::slug($v['weight']),
-                        'weight' => $v['weight'],
-                        'image_path' => !empty($v['image_path']) ? $v['image_path'] : null,
-                        'gallery_images' => !empty($galleryImages) ? $galleryImages : null,
-                        'mrp' => $v['mrp'] ?? $product->mrp,
-                        'sale_price' => $v['sale_price'] ?? $product->sale_price,
-                        'stock' => $v['stock'] ?? $product->stock,
-                        'max_cart_qty' => $v['max_cart_qty'] ?? null,
-                    ]);
-                }
-            }
-        }
+        $this->saveVariants($request, $product);
 
         // Save new FAQs (question/answer pairs, in submitted order) if custom FAQs are active
-        if (!$request->has('use_global_faqs') && $request->has('faqs')) {
-            foreach ($request->input('faqs') as $index => $f) {
-                if (!empty($f['question']) && !empty($f['answer'])) {
-                    \App\Models\ProductFaq::create([
-                        'product_id' => $product->id,
-                        'question' => $f['question'],
-                        'answer' => $f['answer'],
-                        'sort_order' => $f['sort_order'] ?? $index,
-                    ]);
-                }
-            }
-        }
+        $this->saveFaqs($request, $product);
 
         self::logActivity('product_update', "Updated product {$product->name}", ['product_id' => $product->id]);
 
@@ -446,7 +303,7 @@ class ProductController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'field' => 'required|string|in:is_active,is_featured,show_on_home,show_on_shop,show_on_category',
+            'field' => 'required|string|in:is_active,is_featured,is_best_seller,is_trending,is_new_arrival,is_organic,is_bilona,show_on_home,show_on_shop,show_on_category',
             'value' => 'required|boolean',
         ]);
 
@@ -708,5 +565,143 @@ class ProductController extends Controller
         self::logActivity('review_manual_create', "Manually created review for product {$product->name}");
 
         return redirect()->route('admin.reviews.index')->with('success', 'Review added successfully.');
+    }
+
+    /**
+     * Read infographic paths kept from the "existing_infographics" input.
+     */
+    private function collectExistingInfographics(Request $request): array
+    {
+        $infographics = [];
+        $existing = $request->input('existing_infographics', []);
+        if (is_array($existing)) {
+            foreach ($existing as $eImg) {
+                if (!empty($eImg)) $infographics[] = $eImg;
+            }
+        }
+        return $infographics;
+    }
+
+    /**
+     * Move freshly uploaded infographic image files and append their paths.
+     */
+    private function appendUploadedInfographics(Request $request, array $infographics): array
+    {
+        if ($request->hasFile('infographic_images')) {
+            foreach ($request->file('infographic_images') as $file) {
+                $fileName = time() . '_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/products/infographics'), $fileName);
+                $infographics[] = '/uploads/products/infographics/' . $fileName;
+            }
+        }
+        return $infographics;
+    }
+
+    /**
+     * Append infographic paths submitted as JSON or newline/comma separated URLs.
+     */
+    private function appendInfographicUrls(Request $request, array $infographics): array
+    {
+        if (!$request->filled('infographic_urls')) {
+            return $infographics;
+        }
+
+        $raw = $request->input('infographic_urls');
+        $decoded = json_decode($raw, true);
+        if (is_array($decoded)) {
+            foreach ($decoded as $item) {
+                $path = is_array($item) ? ($item['full_url'] ?? $item['file_path'] ?? reset($item)) : (string)$item;
+                if ($path) $infographics[] = $path;
+            }
+        } else {
+            $lines = array_filter(array_map('trim', preg_split('/[,\n\r]+/', $raw)));
+            foreach ($lines as $line) {
+                if ($line) $infographics[] = $line;
+            }
+        }
+        return $infographics;
+    }
+
+    /**
+     * Save gallery images/videos for a product from the submitted "gallery" array.
+     */
+    private function saveGalleryItems(Request $request, Product $product): void
+    {
+        if (!$request->has('gallery') || !is_array($request->input('gallery'))) {
+            return;
+        }
+
+        foreach ($request->input('gallery') as $index => $gItem) {
+            $gImagePath = is_array($gItem) ? ($gItem['image_path'] ?? '') : (string)$gItem;
+            $gVideoPath = is_array($gItem) ? ($gItem['video_path'] ?? null) : null;
+            $gSortOrder = is_array($gItem) && isset($gItem['sort_order']) ? (int)$gItem['sort_order'] : ($index + 1);
+
+            if (!empty($gImagePath)) {
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'image_path' => $gImagePath,
+                    'video_path' => $gVideoPath,
+                    'is_primary' => false,
+                    'sort_order' => $gSortOrder
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Save weight-option variants (each with its own image/gallery) for a product.
+     */
+    private function saveVariants(Request $request, Product $product): void
+    {
+        if (!$request->has('variants')) {
+            return;
+        }
+
+        foreach ($request->input('variants') as $v) {
+            if (empty($v['weight'])) {
+                continue;
+            }
+
+            $galleryImages = [];
+            if (!empty($v['gallery_images'])) {
+                $galleryImages = is_array($v['gallery_images'])
+                    ? array_values(array_filter($v['gallery_images']))
+                    : array_values(array_filter(explode(',', $v['gallery_images'])));
+            }
+
+            ProductVariant::create([
+                'product_id' => $product->id,
+                'name' => $product->name . ' - ' . $v['weight'],
+                'sku' => $product->sku . '-' . Str::slug($v['weight']),
+                'weight' => $v['weight'],
+                'image_path' => !empty($v['image_path']) ? $v['image_path'] : null,
+                'gallery_images' => !empty($galleryImages) ? $galleryImages : null,
+                'mrp' => $v['mrp'] ?? $product->mrp,
+                'sale_price' => $v['sale_price'] ?? $product->sale_price,
+                'stock' => $v['stock'] ?? $product->stock,
+                'max_cart_qty' => $v['max_cart_qty'] ?? null,
+            ]);
+        }
+    }
+
+    /**
+     * Save custom FAQ question/answer pairs for a product, unless global FAQs are used.
+     */
+    private function saveFaqs(Request $request, Product $product): void
+    {
+        if ($request->has('use_global_faqs') || !$request->has('faqs')) {
+            return;
+        }
+
+        foreach ($request->input('faqs') as $index => $f) {
+            if (!empty($f['question']) && !empty($f['answer'])) {
+                \App\Models\ProductFaq::create([
+                    'product_id' => $product->id,
+                    'question' => $f['question'],
+                    'answer' => $f['answer'],
+                    'sort_order' => $f['sort_order'] ?? $index,
+                ]);
+            }
+        }
     }
 }

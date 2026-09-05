@@ -61,8 +61,7 @@ class DelhiveryService
         $clientName = \App\Models\Setting::get('delhivery_client_name', $pickupLocation);
 
         // 1. Fetch a waybill number
-        $waybillRes = \Illuminate\Support\Facades\Http::withoutVerifying()
-            ->withHeaders(['Authorization' => 'Token ' . $token])
+        $waybillRes = \Illuminate\Support\Facades\Http::withHeaders(['Authorization' => 'Token ' . $token])
             ->get('https://track.delhivery.com/waybill/api/bulk/json/', [
                 'count' => 1,
                 'cl' => $clientName,
@@ -119,8 +118,7 @@ class DelhiveryService
         ];
 
         // 3. Create the shipment in Delhivery
-        $createRes = \Illuminate\Support\Facades\Http::withoutVerifying()
-            ->withHeaders([
+        $createRes = \Illuminate\Support\Facades\Http::withHeaders([
                 'Authorization' => 'Token ' . $token,
                 'Content-Type' => 'application/x-www-form-urlencoded',
             ])
@@ -204,39 +202,41 @@ class DelhiveryService
     public function getTrackingTimeline(Order $order): array
     {
         $timeline = [];
-
         $shipment = $order->shipment;
-        if (!$shipment) {
-            return [];
-        }
-
+        $courierName = $shipment ? $shipment->courier_name : ($order->tracking_carrier ?: 'Delhivery');
         $created = $order->created_at;
 
         $timeline[] = [
             'status' => 'Order Placed',
+            'activity' => 'Order Placed',
             'description' => 'Your order has been successfully placed.',
             'location' => 'Pune Warehouse',
             'time' => $created->format('d M Y, h:i A'),
+            'date' => $created->format('d M Y, h:i A'),
             'completed' => true
         ];
 
         if ($order->status === 'cancelled') {
             $timeline[] = [
                 'status' => 'Cancelled',
+                'activity' => 'Cancelled',
                 'description' => 'The order has been cancelled.',
                 'location' => 'System',
                 'time' => $order->updated_at->format('d M Y, h:i A'),
+                'date' => $order->updated_at->format('d M Y, h:i A'),
                 'completed' => true
             ];
-            return $timeline;
+            return array_reverse($timeline);
         }
 
         if (in_array($order->status, ['processing', 'shipped', 'delivered'])) {
             $timeline[] = [
                 'status' => 'Packed & Manifested',
-                'description' => 'Package has been sealed and manifest details sent to ' . $shipment->courier_name,
+                'activity' => 'Packed & Manifested',
+                'description' => 'Package has been sealed and manifest details sent to ' . $courierName,
                 'location' => 'Pune Warehouse',
                 'time' => $created->copy()->addHours(4)->format('d M Y, h:i A'),
+                'date' => $created->copy()->addHours(4)->format('d M Y, h:i A'),
                 'completed' => true
             ];
         }

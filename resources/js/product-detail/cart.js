@@ -30,10 +30,6 @@ export function initCart() {
             const totalPrice = unitPrice * qty;
             const totalMrp   = unitMrp * qty;
 
-            if (typeof window.RohidaDebug === 'object') {
-                window.RohidaDebug.log('💰', 'Price Calculate', `Quantity = ${qty} -> Total Price: ₹${totalPrice}`);
-            }
-
             productPrice.classList.add('price-loading-shimmer');
             if (productMrp) productMrp.classList.add('price-loading-shimmer');
 
@@ -60,9 +56,6 @@ export function initCart() {
         btn.addEventListener('click', () => {
             const currentVal = parseInt(qtyInput?.value || mobileQtyInput?.value || 1);
             const v = Math.min(currentVal + 1, 10);
-            if (typeof window.RohidaDebug === 'object') {
-                window.RohidaDebug.log('➕', 'Single Product Qty', `Quantity incremented to ${v}`);
-            }
             syncQty(v);
         });
     });
@@ -71,9 +64,6 @@ export function initCart() {
         btn.addEventListener('click', () => {
             const currentVal = parseInt(qtyInput?.value || mobileQtyInput?.value || 1);
             const v = Math.max(currentVal - 1, 1);
-            if (typeof window.RohidaDebug === 'object') {
-                window.RohidaDebug.log('➖', 'Single Product Qty', `Quantity decremented to ${v}`);
-            }
             syncQty(v);
         });
     });
@@ -81,9 +71,6 @@ export function initCart() {
     qtyInput?.addEventListener('change', function () {
         let v = parseInt(this.value) || 1;
         v = Math.min(Math.max(v, 1), 10);
-        if (typeof window.RohidaDebug === 'object') {
-            window.RohidaDebug.log('🔢', 'Single Product Qty', `Quantity input changed to ${v}`);
-        }
         syncQty(v);
     });
 
@@ -123,10 +110,6 @@ export function initCart() {
         if (hiddenQty) hiddenQty.value = qtyVal;
         if (mobileQty) mobileQty.value = qtyVal;
 
-        if (typeof window.RohidaDebug === 'object') {
-            window.RohidaDebug.log('🚀', 'Direct Buy', `Buy Now clicked! Product Variant: ${activeVariantId}, Qty: ${qtyVal} -> Redirecting to /checkout...`);
-        }
-
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Checkout...';
 
@@ -149,10 +132,6 @@ export function initCart() {
 
             if (!res.ok || data.status === 'error') {
                 throw new Error(data.message || 'Could not add product to cart.');
-            }
-
-            if (typeof window.RohidaDebug === 'object') {
-                window.RohidaDebug.log('✅', 'Direct Buy', 'Item added to cart successfully -> Redirecting to /checkout now!');
             }
 
             // Prevent cart offcanvas drawer from opening on page load
