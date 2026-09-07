@@ -27,15 +27,17 @@
         display: block;
     }
 
-    @media (max-width: 767.98px) {
+    @media (max-width: 991.98px) {
         .hero-banner-card {
             border-radius: 1.5rem;
             border-width: 2px;
         }
         .hero-banner-img {
-            max-height: 480px;
+            width: 100%;
+            height: auto;
             aspect-ratio: 1 / 1;
             object-fit: cover;
+            display: block;
         }
     }
 }

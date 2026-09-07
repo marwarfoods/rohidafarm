@@ -87,7 +87,7 @@
                 <div style="font-size: 0.85rem;" class="text-muted">
                     <span class="d-block"><strong>Invoice Number:</strong> RF-INV-{{ $order->order_number }}</span>
                     <span class="d-block"><strong>Date of Invoice:</strong> {{ $order->created_at->format('d M Y') }}</span>
-                    <span class="d-block"><strong>GSTIN Number:</strong> 27AAAAA1111A1Z1</span>
+                    <span class="d-block"><strong>GSTIN Number:</strong> {{ \App\Models\Setting::get('gst_number', '08FPRPR1916D2ZJ') }}</span>
                 </div>
             </div>
         </div>
@@ -98,12 +98,11 @@
             <div class="col-6">
                 <h6 class="text-uppercase fw-bold text-success-dark font-heading mb-2" style="font-size: 0.85rem; letter-spacing: 0.5px;">Seller Details</h6>
                 <div class="lh-sm" style="font-size: 0.85rem;">
-                    <strong class="text-dark d-block mb-1">RohidaFarm Private Limited</strong>
-                    <span class="text-muted d-block">Plot 45, Sector B, Kothrud</span>
-                    <span class="text-muted d-block">Pune, Maharashtra, 411038</span>
-                    <span class="text-muted d-block">GSTIN: 27AAAAA1111A1Z1</span>
-                    <span class="text-muted d-block mt-2"><i class="bi bi-envelope me-1"></i> care@rohidafarm.com</span>
-                    <span class="text-muted d-block"><i class="bi bi-telephone me-1"></i> +91 98765 43210</span>
+                    <strong class="text-dark d-block mb-1">Rohida Farm</strong>
+                    <span class="text-muted d-block">{{ \App\Models\Setting::get('contact_address', 'Rohida Farm Office : PN-12,KN-974,Vyas Vihar Mandore Jodhpur 342026') }}</span>
+                    <span class="text-muted d-block"><strong>GSTIN:</strong> {{ \App\Models\Setting::get('gst_number', '08FPRPR1916D2ZJ') }}</span>
+                    <span class="text-muted d-block mt-2"><i class="bi bi-envelope me-1"></i> {{ \App\Models\Setting::get('contact_email_1') ?: \App\Models\Setting::get('contact_email', 'care@rohidafarm.com') }}</span>
+                    <span class="text-muted d-block"><i class="bi bi-telephone me-1"></i> {{ \App\Models\Setting::get('contact_mobile_1') ?: \App\Models\Setting::get('contact_phone', '+91 9664223314') }}</span>
                 </div>
             </div>
             

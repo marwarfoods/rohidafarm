@@ -477,6 +477,37 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Initialize Customer Reviews Slider (photo one side, review the other — one per view)
+    const customerReviewsSlider = document.querySelector('.customer-reviews-slider');
+    if (customerReviewsSlider) {
+        const crSlides = customerReviewsSlider.querySelectorAll('.swiper-slide').length;
+        new Swiper(customerReviewsSlider, {
+            loop: crSlides > 1,
+            autoplay: {
+                delay: 6000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+            },
+            slidesPerView: 1.5,
+            spaceBetween: 16,
+            grabCursor: true,
+            navigation: {
+                nextEl: '.customer-reviews-next',
+                prevEl: '.customer-reviews-prev',
+            },
+            pagination: {
+                el: '.customer-reviews-pagination',
+                clickable: true,
+            },
+            breakpoints: {
+                768: {
+                    slidesPerView: 2,
+                    spaceBetween: 24,
+                },
+            },
+        });
+    }
+
     // Intersection Observer for Deferred Lazy Sections
     if ('IntersectionObserver' in window) {
         const lazySections = document.querySelectorAll('.lazy-section');

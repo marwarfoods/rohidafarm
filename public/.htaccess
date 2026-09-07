@@ -18,6 +18,25 @@
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
+    # ── Block direct browser URL bar navigation and external hotlinking to CSS / JS files ──
+    RewriteCond %{HTTP:Sec-Fetch-Dest} ^document$ [NC]
+    RewriteCond %{REQUEST_URI} \.(css|js|map)$ [NC]
+    RewriteRule .* - [F,L]
+
+    RewriteCond %{HTTP:Sec-Fetch-Dest} !^(style|script)$ [NC]
+    RewriteCond %{HTTP_REFERER} !^https?://(www\.)?rohidafarm\.com [NC]
+    RewriteCond %{HTTP_REFERER} !^https?://localhost [NC]
+    RewriteCond %{HTTP_REFERER} !^https?://127\.0\.0\.1 [NC]
+    RewriteCond %{REQUEST_URI} \.(css|js|map)$ [NC]
+    RewriteRule .* - [F,L]
+
+    RewriteCond %{HTTP_REFERER} !^$
+    RewriteCond %{HTTP_REFERER} !^https?://(www\.)?rohidafarm\.com [NC]
+    RewriteCond %{HTTP_REFERER} !^https?://localhost [NC]
+    RewriteCond %{HTTP_REFERER} !^https?://127\.0\.0\.1 [NC]
+    RewriteCond %{REQUEST_URI} \.(css|js|map)$ [NC]
+    RewriteRule .* - [F,L]
+
     # Send Requests To Front Controller...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f

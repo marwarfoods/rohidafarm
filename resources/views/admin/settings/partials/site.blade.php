@@ -56,6 +56,10 @@
             <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Physical Address</label>
             <textarea name="settings[contact_address]" class="form-control bg-light border p-2" rows="2">{{ App\Models\Setting::get('contact_address') }}</textarea>
         </div>
+        <div class="col-md-12">
+            <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">GSTIN Number</label>
+            <input type="text" name="settings[gst_number]" class="form-control bg-light border p-2" value="{{ App\Models\Setting::get('gst_number', '08FPRPR1916D2ZJ') }}" placeholder="e.g. 08FPRPR1916D2ZJ">
+        </div>
         <div class="col-md-4">
             <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Facebook URL</label>
             <input type="url" name="settings[social_facebook]" class="form-control bg-light border p-2" value="{{ App\Models\Setting::get('social_facebook') }}">

@@ -251,6 +251,28 @@ class CustomerController extends Controller
     }
 
     /**
+     * Move multiple selected customers to Trash.
+     */
+    public function bulkDestroy(Request $request)
+    {
+        $ids = collect(explode(',', (string) $request->input('selected_ids')))
+            ->filter(fn ($v) => is_numeric($v))
+            ->map(fn ($v) => (int) $v)
+            ->unique()
+            ->values();
+
+        if ($ids->isEmpty()) {
+            return redirect()->route('admin.customers.index')
+                ->with('error', 'No customers were selected.');
+        }
+
+        $count = User::whereIn('id', $ids)->where('id', '!=', auth()->id())->delete();
+
+        return redirect()->route('admin.customers.index')
+            ->with('success', "{$count} customer(s) moved to Trash.");
+    }
+
+    /**
      * Display trashed / deactivated customers.
      */
     public function trash(Request $request)

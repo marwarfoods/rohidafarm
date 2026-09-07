@@ -60,6 +60,36 @@
   to { transform: rotate(360deg); }
 }
 
+// Submit button loading state — spinner spins beside the text so it's
+// obvious something is happening (text stays visible).
+.btn-loading {
+  position: relative;
+  pointer-events: none;
+
+  &::after {
+    content: '';
+    display: inline-block;
+    width: 0.95em;
+    height: 0.95em;
+    margin-left: 0.55em;
+    vertical-align: -0.15em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+}
+
+// Attention pulse — e.g. Export button once rows are selected
+@keyframes btnPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(36, 132, 67, 0.45); }
+  70%  { box-shadow: 0 0 0 8px rgba(36, 132, 67, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(36, 132, 67, 0); }
+}
+.btn-pulse {
+  animation: btnPulse 1.6s ease-out infinite;
+}
+
 // Toast notification container
 #admin-toast-container {
   position: fixed;

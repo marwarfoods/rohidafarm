@@ -51,6 +51,11 @@
         @include('frontend.home.videos')
     </div>
 
+    {{-- -- 9b. Customer Reviews (photo + testimonial slider) -- --}}
+    <div class="lazy-section">
+        @include('frontend.home.customer-reviews')
+    </div>
+
     {{-- -- 10. Latest Blogs -- --}}
     <div class="lazy-section">
         @include('frontend.home.blogs')

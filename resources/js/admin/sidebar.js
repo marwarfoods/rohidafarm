@@ -79,6 +79,45 @@ export function initSidebar() {
     }
   });
 
+  // ── Menu search / filter (instant, no Enter) ──────────
+  const search = document.getElementById('sidebarSearch');
+  if (search) {
+    const groups = Array.from(sidebar.querySelectorAll('.sidebar-nav'));
+    const titles = Array.from(sidebar.querySelectorAll('.sidebar-section-title'));
+
+    groups.forEach(g => { g.style.display = 'flex'; g.style.flexDirection = 'column'; });
+
+    const applyFilter = () => {
+      const q = search.value.trim().toLowerCase();
+
+      groups.forEach(group => {
+        Array.from(group.children).forEach(li => {
+          const label = (li.querySelector('.sidebar-label')?.textContent || '').toLowerCase();
+          if (!q) {
+            li.hidden = false;
+            li.style.order = '';
+            return;
+          }
+          const match = label.includes(q);
+          li.hidden = !match;
+          li.style.order = label.startsWith(q) ? '-1' : '0';
+        });
+      });
+
+      titles.forEach(title => {
+        const group = title.nextElementSibling;
+        const hasVisible = group && group.classList.contains('sidebar-nav')
+          && Array.from(group.children).some(li => !li.hidden);
+        title.hidden = Boolean(q) && !hasVisible;
+      });
+    };
+
+    search.addEventListener('input', applyFilter);
+    search.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { search.value = ''; applyFilter(); search.blur(); }
+    });
+  }
+
   // Restore on page load
   restoreState();
 

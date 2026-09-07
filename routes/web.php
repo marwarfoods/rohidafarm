@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\ActivityLogController as AdminActivityLogController;
 use App\Http\Controllers\Admin\VideoReviewController;
+use App\Http\Controllers\Admin\CustomerReviewController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\HomepageManageController;
 use App\Http\Controllers\Admin\BlogController as AdminBlogController;
@@ -242,6 +243,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/orders/{id}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.status');
         Route::post('/orders/{id}/cancel', [AdminOrderController::class, 'cancel'])->name('orders.cancel');
         Route::post('/orders/{id}/sync-delhivery', [AdminOrderController::class, 'syncDelhivery'])->name('orders.sync-delhivery');
+        Route::post('/orders/{id}/sync-shiprocket', [AdminOrderController::class, 'syncShiprocket'])->name('orders.sync-shiprocket');
         Route::delete('/orders/{id}/delete', [AdminOrderController::class, 'destroy'])->name('orders.delete');
         Route::post('/orders/{id}/restore', [AdminOrderController::class, 'restore'])->name('orders.restore');
         Route::delete('/orders/{id}/force-delete', [AdminOrderController::class, 'forceDelete'])->name('orders.force-delete');
@@ -284,6 +286,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/settings/smtp/test', [AdminSettingController::class, 'testSmtp'])->name('settings.smtp.test');
         Route::post('/settings/google-oauth/test', [AdminSettingController::class, 'testGoogleOAuth'])->name('settings.google.test');
         Route::post('/settings/turnstile/test', [AdminSettingController::class, 'testTurnstile'])->name('settings.turnstile.test');
+        Route::post('/settings/shiprocket/test', [AdminSettingController::class, 'testShiprocket'])->name('settings.shiprocket.test');
     });
 
     // Audit Logs
@@ -320,6 +323,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('/customers/trash', [AdminCustomerController::class, 'trash'])->name('customers.trash');
         Route::get('/customers/create', [AdminCustomerController::class, 'create'])->name('customers.create');
         Route::post('/customers/store', [AdminCustomerController::class, 'store'])->name('customers.store');
+        Route::delete('/customers/bulk-delete', [AdminCustomerController::class, 'bulkDestroy'])->name('customers.bulk-delete');
         Route::post('/customers/export/csv', [AdminCustomerController::class, 'exportCsv'])->name('customers.export.csv');
         Route::post('/customers/export/pdf', [AdminCustomerController::class, 'exportPdf'])->name('customers.export.pdf');
         Route::get('/customers/{id}', [AdminCustomerController::class, 'show'])->name('customers.show');
@@ -347,6 +351,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/certifications/{id}/edit', [AdminCertificationController::class, 'edit'])->name('certifications.edit');
     Route::post('/certifications/{id}/update', [AdminCertificationController::class, 'update'])->name('certifications.update');
     Route::delete('/certifications/{id}/delete', [AdminCertificationController::class, 'destroy'])->name('certifications.destroy');
+
+    // Customer Reviews (Homepage testimonial slider)
+    Route::get('/customer-reviews', [CustomerReviewController::class, 'index'])->name('customer-reviews.index');
+    Route::get('/customer-reviews/create', [CustomerReviewController::class, 'create'])->name('customer-reviews.create');
+    Route::post('/customer-reviews/store', [CustomerReviewController::class, 'store'])->name('customer-reviews.store');
+    Route::get('/customer-reviews/{id}/edit', [CustomerReviewController::class, 'edit'])->name('customer-reviews.edit');
+    Route::post('/customer-reviews/{id}/update', [CustomerReviewController::class, 'update'])->name('customer-reviews.update');
+    Route::delete('/customer-reviews/{id}/delete', [CustomerReviewController::class, 'destroy'])->name('customer-reviews.delete');
 
     // Instagram Feed Gallery
     Route::get('/instagram-feed', [\App\Http\Controllers\Admin\InstagramFeedController::class, 'index'])->name('instagram-feed.index');

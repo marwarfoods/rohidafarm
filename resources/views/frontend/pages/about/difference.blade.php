@@ -10,7 +10,7 @@
         <div class="row g-4 mt-2 justify-content-center">
 
             <!-- Card 1: Purity -->
-            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+            <div class="col-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
                 <div class="about-card philosophy-card text-center d-flex flex-column align-items-center justify-content-center h-100">
                     <div class="philosophy-icon-wrap mx-auto">
                         <img src="{{ asset('images/svgs/Rohida Farm Web Vector 04.svg') }}" alt="Purity">
@@ -20,7 +20,7 @@
             </div>
 
             <!-- Card 2: Tradition -->
-            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+            <div class="col-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
                 <div class="about-card philosophy-card text-center d-flex flex-column align-items-center justify-content-center h-100">
                     <div class="philosophy-icon-wrap mx-auto">
                         <img src="{{ asset('images/svgs/Rohida Farm Web Vector 03.svg') }}" alt="Tradition">
@@ -30,7 +30,7 @@
             </div>
 
             <!-- Card 3: Farm-Rooted -->
-            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+            <div class="col-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
                 <div class="about-card philosophy-card text-center d-flex flex-column align-items-center justify-content-center h-100">
                     <div class="philosophy-icon-wrap mx-auto">
                         <img src="{{ asset('images/svgs/Rohida Farm Web Vector 06.svg') }}" alt="Farm-Rooted">
@@ -40,7 +40,7 @@
             </div>
 
             <!-- Card 4: Trust, Made Visible -->
-            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
+            <div class="col-6 col-lg-3" data-aos="fade-up" data-aos-delay="400">
                 <div class="about-card philosophy-card text-center d-flex flex-column align-items-center justify-content-center h-100">
                     <div class="philosophy-icon-wrap mx-auto">
                         <img src="{{ asset('images/svgs/Rohida Farm Web Vector 10.svg') }}" alt="Trust, Made Visible">

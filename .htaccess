@@ -2,9 +2,28 @@
     RewriteEngine On
 
     # Prevent direct access to sensitive files
-    <FilesMatch "(^\.env$|^\.env\.|^\.git|^composer\.(json|lock)$|^package(-lock)?\.json$|\.(xml|md|log|ini|sh|sql)$)">
+    <FilesMatch "(^\.env$|^\.env\.|^\.git|^composer\.(json|lock)$|^package(-lock)?\.json$|\.(xml|md|log|ini|sh|sql|map)$)">
         Require all denied
     </FilesMatch>
+
+    # Block direct browser URL bar navigation and external hotlinking to CSS / JS files
+    RewriteCond %{HTTP:Sec-Fetch-Dest} ^document$ [NC]
+    RewriteCond %{REQUEST_URI} \.(css|js|map)$ [NC]
+    RewriteRule .* - [F,L]
+
+    RewriteCond %{HTTP:Sec-Fetch-Dest} !^(style|script)$ [NC]
+    RewriteCond %{HTTP_REFERER} !^https?://(www\.)?rohidafarm\.com [NC]
+    RewriteCond %{HTTP_REFERER} !^https?://localhost [NC]
+    RewriteCond %{HTTP_REFERER} !^https?://127\.0\.0\.1 [NC]
+    RewriteCond %{REQUEST_URI} \.(css|js|map)$ [NC]
+    RewriteRule .* - [F,L]
+
+    RewriteCond %{HTTP_REFERER} !^$
+    RewriteCond %{HTTP_REFERER} !^https?://(www\.)?rohidafarm\.com [NC]
+    RewriteCond %{HTTP_REFERER} !^https?://localhost [NC]
+    RewriteCond %{HTTP_REFERER} !^https?://127\.0\.0\.1 [NC]
+    RewriteCond %{REQUEST_URI} \.(css|js|map)$ [NC]
+    RewriteRule .* - [F,L]
 
     # Forward all traffic to the public directory
     RewriteCond %{REQUEST_URI} !^/public/

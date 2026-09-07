@@ -146,6 +146,26 @@
             @endif
         </div>
     @else
+        {{-- Bulk action bar — appears when rows are selected --}}
+        <div id="customerBulkBar" class="d-none align-items-center gap-2 px-4 py-2 border-bottom bg-success-subtle">
+            <span class="fw-semibold text-success" style="font-size: 0.85rem;">
+                <i class="bi bi-check2-square me-1"></i><span id="customerBulkCount">0</span> selected
+            </span>
+            <button type="button" class="btn btn-sm btn-success rounded-3 fw-semibold" onclick="submitExport('csv')">
+                <i class="bi bi-download me-1"></i> Export Selected
+            </button>
+            <button type="button" class="btn btn-sm btn-danger rounded-3 fw-semibold" id="customerBulkDeleteBtn">
+                <i class="bi bi-trash3 me-1"></i> Delete Selected
+            </button>
+            <button type="button" class="btn btn-sm btn-link text-muted text-decoration-none" id="customerBulkClear">Clear</button>
+        </div>
+
+        <form id="customerBulkDeleteForm" method="POST" action="{{ route('admin.customers.bulk-delete') }}" class="d-none">
+            @csrf
+            @method('DELETE')
+            <input type="hidden" name="selected_ids" id="customerBulkDeleteIds">
+        </form>
+
         <div class="table-responsive">
             <table class="table align-middle mb-0">
                 <thead>
@@ -285,9 +305,47 @@ function confirmDelete(id, name) {
     new bootstrap.Modal(document.getElementById('deleteModal')).show();
 }
 
+const customerCheckboxes = () => Array.from(document.querySelectorAll('.customer-checkbox'));
+const customerSelectedIds = () => customerCheckboxes().filter(cb => cb.checked).map(cb => cb.value);
+
+function refreshCustomerBulkBar() {
+    const ids = customerSelectedIds();
+    const bar = document.getElementById('customerBulkBar');
+    const exportBtn = document.querySelector('.dropdown-toggle.btn-primary');
+    document.getElementById('customerBulkCount').textContent = ids.length;
+    if (ids.length > 0) {
+        bar.classList.remove('d-none');
+        bar.classList.add('d-flex');
+        exportBtn?.classList.add('btn-pulse');
+    } else {
+        bar.classList.add('d-none');
+        bar.classList.remove('d-flex');
+        exportBtn?.classList.remove('btn-pulse');
+    }
+}
+
 document.getElementById('selectAllCustomers')?.addEventListener('change', function() {
-    const checkboxes = document.querySelectorAll('.customer-checkbox');
-    checkboxes.forEach(cb => cb.checked = this.checked);
+    customerCheckboxes().forEach(cb => cb.checked = this.checked);
+    refreshCustomerBulkBar();
+});
+
+document.addEventListener('change', function(e) {
+    if (e.target.classList.contains('customer-checkbox')) refreshCustomerBulkBar();
+});
+
+document.getElementById('customerBulkClear')?.addEventListener('click', function() {
+    customerCheckboxes().forEach(cb => cb.checked = false);
+    const all = document.getElementById('selectAllCustomers');
+    if (all) all.checked = false;
+    refreshCustomerBulkBar();
+});
+
+document.getElementById('customerBulkDeleteBtn')?.addEventListener('click', function() {
+    const ids = customerSelectedIds();
+    if (ids.length === 0) return;
+    if (!confirm(`Move ${ids.length} selected customer(s) to Trash?`)) return;
+    document.getElementById('customerBulkDeleteIds').value = ids.join(',');
+    document.getElementById('customerBulkDeleteForm').submit();
 });
 
 function submitExport(type) {

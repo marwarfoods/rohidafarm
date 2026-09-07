@@ -109,7 +109,9 @@
                 <td class="text-end px-4 py-3">
                     <div class="d-flex gap-2 justify-content-end">
                         @if(auth()->user()->hasPermission('orders-view'))
-                        <a href="{{ route('admin.orders.show', $ord->id) }}" class="btn btn-sm btn-premium-outline px-3 py-1 rounded-3">Manage</a>
+                        <a href="{{ route('admin.orders.show', $ord->id) }}" class="btn btn-sm btn-premium px-3 py-1 rounded-3 d-inline-flex align-items-center gap-1 fw-semibold">
+                            <i class="bi bi-gear-fill"></i> Manage
+                        </a>
                         @endif
                         @if(auth()->user()->hasPermission('orders-delete'))
                         <button type="submit" class="btn btn-sm btn-outline-danger px-3 py-1 rounded-3" form="deleteForm{{ $ord->id }}">

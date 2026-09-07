@@ -39,7 +39,7 @@
                        muted 
                        loop 
                        preload="auto"
-                       style="object-fit: cover; display: block; width: 100%; min-height: 280px; max-height: 560px;">
+                       style="object-fit: cover; display: block; width: 100%; min-height: 340px; max-height: 720px;">
                     <source src="{{ $storyVideo }}" type="video/mp4">
                     Your browser does not support HTML5 video.
                 </video>
@@ -108,7 +108,7 @@
     cursor: pointer;
     transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.3s ease;
     aspect-ratio: 16 / 9;
-    max-height: 540px;
+    max-height: 700px;
     width: 100%;
 }
 
@@ -149,7 +149,7 @@
     .story-video-card {
         border-radius: 1.5rem;
         aspect-ratio: 4 / 3;
-        max-height: 380px;
+        max-height: 480px;
     }
     .story-feature-card {
         border-radius: 1.25rem;

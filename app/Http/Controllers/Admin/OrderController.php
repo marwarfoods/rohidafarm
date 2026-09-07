@@ -123,6 +123,28 @@ class OrderController extends Controller
     }
 
     /**
+     * Manually push order to Shiprocket.
+     */
+    public function syncShiprocket($id)
+    {
+        $order = Order::with(['items.product', 'items.variant', 'user'])->findOrFail($id);
+
+        try {
+            $shipment = app(\App\Services\ShiprocketService::class)->createShipment($order);
+
+            $msg = '✅ Order pushed to Shiprocket! SR Order ID: ' . $shipment->delhivery_order_id;
+            if ($shipment->awb_code) {
+                $msg .= ' · AWB: ' . $shipment->awb_code;
+            }
+
+            return back()->with('success', $msg);
+        } catch (\Exception $e) {
+            \Log::error('Manual Shiprocket Sync Failed', ['order_id' => $id, 'error' => $e->getMessage()]);
+            return back()->with('error', '❌ Shiprocket sync failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Soft delete an order.
      */
     public function destroy($id)

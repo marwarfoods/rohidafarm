@@ -136,12 +136,22 @@ class OrderService
                 'location' => 'System'
             ]);
 
-            // 7. Trigger Delhivery shipment creation
-            try {
-                $this->delhiveryService->createShipment($order);
-            } catch (\Exception $e) {
-                logger()->error('Delhivery shipment creation failed: ' . $e->getMessage());
-                $order->update(['shipment_status' => 'Shipment Failed - Needs Manual Booking']);
+            // 7. Trigger courier shipment creation — Shiprocket if enabled, else Delhivery
+            $shiprocket = app(\App\Services\ShiprocketService::class);
+            if ($shiprocket->isConfigured()) {
+                try {
+                    $shiprocket->createShipment($order);
+                } catch (\Exception $e) {
+                    logger()->error('Shiprocket order creation failed: ' . $e->getMessage());
+                    $order->update(['shipment_status' => 'Shipment Failed - Needs Manual Booking']);
+                }
+            } else {
+                try {
+                    $this->delhiveryService->createShipment($order);
+                } catch (\Exception $e) {
+                    logger()->error('Delhivery shipment creation failed: ' . $e->getMessage());
+                    $order->update(['shipment_status' => 'Shipment Failed - Needs Manual Booking']);
+                }
             }
 
             // 8. Log activity

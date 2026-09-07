@@ -85,7 +85,7 @@
                                         <form action="{{ route('cart.add') }}" method="POST" class="add-to-cart-form m-0 flex-shrink-0">
                                             @csrf
                                             <input type="hidden" name="product_id" value="{{ $addon->id }}">
-                                            <input type="hidden" name="variant_id" value="{{ $addon->variants->first()?->id }}">
+                                            <input type="hidden" name="variant_id" value="{{ ($addon->variants->firstWhere('stock', '>', 0) ?? $addon->variants->first())?->id }}">
                                             <input type="hidden" name="quantity" value="1">
                                             <button type="submit" class="btn btn-sm rounded-pill px-3 py-1.5 text-white fw-bold shadow-2xs" style="font-size: 0.8rem; background-color: #174C38; border-color: #174C38; color: #ffffff !important; min-width: 60px;">
                                                 + Add
@@ -217,7 +217,7 @@
                                             <form action="{{ route('cart.add') }}" method="POST" class="add-to-cart-form m-0 flex-shrink-0">
                                                 @csrf
                                                 <input type="hidden" name="product_id" value="{{ $addon->id }}">
-                                                <input type="hidden" name="variant_id" value="{{ $addon->variants->first()?->id }}">
+                                                <input type="hidden" name="variant_id" value="{{ ($addon->variants->firstWhere('stock', '>', 0) ?? $addon->variants->first())?->id }}">
                                                 <input type="hidden" name="quantity" value="1">
                                                 <button type="submit" class="btn btn-sm rounded-pill px-3 py-1.5 text-white fw-bold shadow-2xs" style="font-size: 0.8rem; background-color: #174C38; border-color: #174C38; color: #ffffff !important; min-width: 60px;">
                                                     + Add

@@ -248,4 +248,50 @@ class SettingController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Test the Shiprocket configuration (auth + pickup location).
+     * Requires HTTPS — meant to be run on the live/production site.
+     */
+    public function testShiprocket(Request $request)
+    {
+        if (!$request->secure()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Shiprocket testing requires HTTPS. Deploy to your live site and run this test there.'
+            ], 400);
+        }
+
+        $email = trim($request->input('shiprocket_email') ?: Setting::get('shiprocket_email', ''));
+        $password = $request->input('shiprocket_password') ?: Setting::get('shiprocket_password', '');
+
+        if (empty($email) || empty($password)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Enter your Shiprocket account email and password first, then save settings.'
+            ], 400);
+        }
+
+        try {
+            $result = app(\App\Services\ShiprocketService::class)->testConnection($email, $password);
+
+            $message = '✅ Authenticated with Shiprocket successfully.';
+            if (!empty($result['pickup_locations'])) {
+                $message .= ' Pickup locations found: ' . implode(', ', $result['pickup_locations']) . '.';
+            }
+            if ($result['configured_pickup'] && !$result['pickup_ok']) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => "Login works, but the pickup location \"{$result['configured_pickup']}\" was not found in your Shiprocket account. Use one of: " . implode(', ', $result['pickup_locations'])
+                ], 422);
+            }
+
+            return response()->json(['status' => 'success', 'message' => $message]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Shiprocket test failed: ' . $e->getMessage()
+            ], 422);
+        }
+    }
 }

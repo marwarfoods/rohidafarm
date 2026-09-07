@@ -6,6 +6,7 @@ use App\Models\Banner;
 use App\Models\Blog;
 use App\Models\Category;
 use App\Models\Certification;
+use App\Models\CustomerReview;
 use App\Models\InstagramFeed;
 use App\Models\Product;
 use App\Models\ProductReview;
@@ -65,6 +66,10 @@ class HomeController extends Controller
         $videoReviews = VideoReview::with('product:id,name,slug,sale_price,mrp')
             ->where('is_active', true)->orderBy('sort_order')->get();
 
+        // ── Customer Reviews (testimonial slider) ─────────────────────
+        $customerReviews = CustomerReview::with('product:id,name,slug')
+            ->where('is_active', true)->orderBy('sort_order')->orderBy('id')->get();
+
         // ── Native Ingredients ────────────────────────────────────────
         $nativeIngredients = \App\Models\NativeIngredient::where('is_active', true)
             ->orderBy('sort_order')->get();
@@ -106,6 +111,7 @@ class HomeController extends Controller
             'blogs',
             'reviews',
             'videoReviews',
+            'customerReviews',
             'seo',
             'nativeIngredients',
             'bilonaSteps',

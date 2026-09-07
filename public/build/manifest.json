@@ -24,7 +24,7 @@
     "isEntry": true
   },
   "resources/js/admin.js": {
-    "file": "assets/admin-a9BgZtvI.js",
+    "file": "assets/admin-LSA5Ulmh.js",
     "name": "admin",
     "src": "resources/js/admin.js",
     "isEntry": true,
@@ -42,7 +42,7 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-W6t4fowv.js",
+    "file": "assets/app-BI9EFVb5.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -59,7 +59,7 @@
     "isEntry": true
   },
   "resources/js/home.js": {
-    "file": "assets/home-Cn754Jla.js",
+    "file": "assets/home-Bqnf7fDK.js",
     "name": "home",
     "src": "resources/js/home.js",
     "isEntry": true
@@ -95,7 +95,7 @@
     "isEntry": true
   },
   "resources/sass/about.scss": {
-    "file": "assets/about-DwPwKqRR.css",
+    "file": "assets/about-1a8vrB5k.css",
     "name": "about",
     "names": [
       "about.css"
@@ -104,7 +104,7 @@
     "isEntry": true
   },
   "resources/sass/admin.scss": {
-    "file": "assets/admin-CKPOH20V.css",
+    "file": "assets/admin-BLZkfcej.css",
     "name": "admin",
     "names": [
       "admin.css"
@@ -126,7 +126,7 @@
     "isEntry": true
   },
   "resources/sass/app.scss": {
-    "file": "assets/app-Cc4xsRhV.css",
+    "file": "assets/app-BIEV7HEI.css",
     "name": "app",
     "names": [
       "app.css"

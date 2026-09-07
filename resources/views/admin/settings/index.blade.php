@@ -323,6 +323,49 @@
                 });
             }
 
+            // Shiprocket Configuration Test
+            const btnTestShiprocket = document.getElementById('btnTestShiprocket');
+            if (btnTestShiprocket) {
+                btnTestShiprocket.addEventListener('click', function () {
+                    const email = (document.getElementById('shiprocketEmail')?.value || '').trim();
+                    const password = document.getElementById('shiprocketPassword')?.value || '';
+                    const resultDiv = document.getElementById('shiprocketTestResult');
+
+                    btnTestShiprocket.disabled = true;
+                    btnTestShiprocket.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Testing with Shiprocket...';
+                    resultDiv.className = 'mt-3 alert alert-info';
+                    resultDiv.classList.remove('d-none');
+                    resultDiv.textContent = 'Authenticating with Shiprocket...';
+
+                    fetch('{{ route("admin.settings.shiprocket.test") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ shiprocket_email: email, shiprocket_password: password })
+                    })
+                    .then(res => res.json().then(data => ({ status: res.status, body: data })))
+                    .then(res => {
+                        btnTestShiprocket.disabled = false;
+                        btnTestShiprocket.innerHTML = '<i class="bi bi-plug me-1"></i> Test Configuration';
+                        if (res.status === 200 && res.body.status === 'success') {
+                            resultDiv.className = 'mt-3 alert alert-success fw-bold';
+                            resultDiv.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>' + res.body.message;
+                        } else {
+                            resultDiv.className = 'mt-3 alert alert-danger fw-bold';
+                            resultDiv.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>' + (res.body.message || 'Shiprocket test failed.');
+                        }
+                    })
+                    .catch(() => {
+                        btnTestShiprocket.disabled = false;
+                        btnTestShiprocket.innerHTML = '<i class="bi bi-plug me-1"></i> Test Configuration';
+                        resultDiv.className = 'mt-3 alert alert-danger fw-bold';
+                        resultDiv.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i> Connection test failed.';
+                    });
+                });
+            }
+
             // Global FAQs Repeater
             const btnAddGlobalFaq = document.getElementById('btnAddGlobalFaq');
             const globalFaqsContainer = document.getElementById('globalFaqsContainer');

@@ -15,6 +15,12 @@
         </div>
     </a>
 
+    {{-- Menu search --}}
+    <div class="sidebar-search">
+        <i class="bi bi-search"></i>
+        <input type="text" id="sidebarSearch" placeholder="Search menu..." autocomplete="off" spellcheck="false">
+    </div>
+
     {{-- Nav scroll area --}}
     <div class="sidebar-scroll">
 
@@ -179,6 +185,13 @@
                    class="sidebar-nav-link {{ Route::is('admin.certifications.*') ? 'active' : '' }}">
                     <i class="bi bi-patch-check sidebar-icon"></i>
                     <span class="sidebar-label">Certifications</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.customer-reviews.index') }}"
+                   class="sidebar-nav-link {{ Route::is('admin.customer-reviews.*') ? 'active' : '' }}">
+                    <i class="bi bi-chat-heart sidebar-icon"></i>
+                    <span class="sidebar-label">Customer Reviews</span>
                 </a>
             </li>
             <li>

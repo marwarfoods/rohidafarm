@@ -273,49 +273,68 @@ document.addEventListener('DOMContentLoaded', function () {
         
         e.preventDefault();
         const formData = new FormData(form);
-        const productId = formData.get('product_id');
-        const variantId = formData.get('variant_id');
-        const qty       = formData.get('quantity') || 1;
         const isInsideOffcanvas = Boolean(form.closest('#cartOffcanvas'));
 
-        if (isInsideOffcanvas) {
-            sessionStorage.setItem('open_cart_drawer', '1');
-        }
-        
+        // Read CSRF token defensively — prefer the page <meta>, fall back to the
+        // form's own hidden @csrf field (Swiper clones the "Hot Choices" slides,
+        // so the token must be resolved from whatever node actually submitted).
+        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfField = form.querySelector('input[name="_token"]');
+        const csrfToken = (csrfMeta && csrfMeta.getAttribute('content')) || (csrfField && csrfField.value) || '';
+
+        const submitBtn = form.querySelector('[type="submit"]');
+        const submitBtnHtml = submitBtn ? submitBtn.innerHTML : null;
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '...'; }
+
+        const restoreBtn = function () {
+            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = submitBtnHtml; }
+        };
+
         fetch(form.action, {
             method: 'POST',
             body: formData,
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json'
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
             }
         })
-        .then(res => {
-            if (res.ok) {
-                if (isInsideOffcanvas) {
-                    window.location.reload();
-                    return;
-                }
-
-                reloadCartDrawer(function() {
-                    hideCartSkeleton();
-                });
-
-                // Trigger Top Add-Ons Modal ("✔ Added to Cart!")
-                const addonsModalEl = document.getElementById('addToCartAddonsModal');
-                if (addonsModalEl) {
-                    const addonsModal = bootstrap.Modal.getOrCreateInstance(addonsModalEl);
-                    addonsModal.show();
-                } else {
-                    sessionStorage.setItem('open_cart_drawer', '1');
-                    window.location.reload();
-                }
-            } else {
+        .then(res => res.json().catch(() => ({})).then(data => ({ ok: res.ok, data })))
+        .then(({ ok, data }) => {
+            if (!ok) {
+                restoreBtn();
                 hideCartSkeleton();
-                res.json().then(data => alert(data.message || 'Stock limits reached.'));
+                alert((data && data.message) || 'Could not add this item to the cart.');
+                return;
+            }
+
+            // Item is in the cart now. Add-ons added from inside the drawer
+            // refresh the drawer in place (same as a normal quantity change)
+            // instead of doing a full page reload.
+            if (isInsideOffcanvas) {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '✓ Added';
+                    setTimeout(function () { submitBtn.innerHTML = submitBtnHtml; }, 1400);
+                }
+                reloadCartDrawer(function () { hideCartSkeleton(); });
+                return;
+            }
+
+            restoreBtn();
+            reloadCartDrawer(function () { hideCartSkeleton(); });
+
+            // Trigger Top Add-Ons Modal ("✔ Added to Cart!")
+            const addonsModalEl = document.getElementById('addToCartAddonsModal');
+            if (addonsModalEl) {
+                bootstrap.Modal.getOrCreateInstance(addonsModalEl).show();
+            } else {
+                sessionStorage.setItem('open_cart_drawer', '1');
+                window.location.reload();
             }
         })
-        .catch(err => {
+        .catch(() => {
+            restoreBtn();
             hideCartSkeleton();
             form.submit();
         });

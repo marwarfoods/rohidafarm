@@ -68,23 +68,21 @@
         transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease, border-color 0.35s ease;
 
         .philosophy-icon-wrap {
-            width: 115px;
-            height: 115px;
-            border-radius: 50%;
-            background: rgba(139, 90, 43, 0.05);
-            border: 1.5px solid rgba(139, 90, 43, 0.18);
+            width: 140px;
+            height: 140px;
+            background: transparent;
+            border: none;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 1.25rem;
-            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
             overflow: hidden;
 
             img {
-                width: 76px;
-                height: 76px;
+                width: 104px;
+                height: 104px;
                 object-fit: contain;
-                transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+                border-radius: 18px;
             }
         }
 
@@ -96,25 +94,6 @@
             transition: color 0.3s ease;
         }
 
-        &:hover {
-            transform: translateY(-8px);
-            border-color: #8B5A2B;
-            box-shadow: 0 20px 42px rgba(139, 90, 43, 0.12);
-
-            .philosophy-icon-wrap {
-                background: rgba(139, 90, 43, 0.12);
-                border-color: #8B5A2B;
-                transform: scale(1.08);
-
-                img {
-                    transform: scale(1.06);
-                }
-            }
-
-            .philosophy-title {
-                color: #8B5A2B;
-            }
-        }
     }
 
     /* Shared heading / paragraph tokens for story-style sections */

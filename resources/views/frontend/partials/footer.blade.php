@@ -156,6 +156,10 @@
                         <i class="bi bi-shield-check text-success"></i> FSSAI Certified
                     </div>
                     <span class="d-none d-md-inline" style="color:#d9c9ae;">|</span>
+                    <div class="d-flex align-items-center gap-1" style="font-size:0.75rem;color:#5c5044;">
+                        <i class="bi bi-patch-check text-success"></i> GSTIN: {{ App\Models\Setting::get('gst_number', '08FPRPR1916D2ZJ') }}
+                    </div>
+                    <span class="d-none d-md-inline" style="color:#d9c9ae;">|</span>
                     <div class="d-none d-md-flex align-items-center gap-1" style="font-size:0.75rem;color:#5c5044;">
                         <i class="bi bi-truck text-success"></i> Free Shipping ₹499+
                     </div>

@@ -2,13 +2,15 @@
 @push('preload')
     @if(isset($sliders) && $sliders->isNotEmpty())
         @php $firstSlide = $sliders->first(); @endphp
-        <link rel="preload" as="image" href="{{ asset($firstSlide->image_path) }}" fetchpriority="high">
         @if($firstSlide->mobile_image_path)
-            <link rel="preload" as="image" href="{{ asset($firstSlide->mobile_image_path) }}" media="(max-width: 767px)" fetchpriority="high">
+            <link rel="preload" as="image" href="{{ asset($firstSlide->mobile_image_path) }}" media="(max-width: 991.98px)" fetchpriority="high">
+            <link rel="preload" as="image" href="{{ asset($firstSlide->image_path) }}" media="(min-width: 992px)" fetchpriority="high">
+        @else
+            <link rel="preload" as="image" href="{{ asset($firstSlide->image_path) }}" fetchpriority="high">
         @endif
     @else
-        <link rel="preload" as="image" href="{{ file_exists(public_path('images/home-image-pc.png')) ? asset('images/home-image-pc.png') : asset('images/baner-1.png') }}" fetchpriority="high">
-        <link rel="preload" as="image" href="{{ file_exists(public_path('images/home-image-mobile.png')) ? asset('images/home-image-mobile.png') : asset('images/baner-1.png') }}" media="(max-width: 767px)" fetchpriority="high">
+        <link rel="preload" as="image" href="{{ file_exists(public_path('images/home-image-mobile.png')) ? asset('images/home-image-mobile.png') : asset('images/baner-1.png') }}" media="(max-width: 991.98px)" fetchpriority="high">
+        <link rel="preload" as="image" href="{{ file_exists(public_path('images/home-image-pc.png')) ? asset('images/home-image-pc.png') : asset('images/baner-1.png') }}" media="(min-width: 992px)" fetchpriority="high">
     @endif
 @endpush
 
@@ -31,11 +33,11 @@
                                     <a href="{{ $slide->button_url }}" class="d-block w-100">
                                         <picture>
                                             @if($slide->mobile_image_path)
-                                                <source media="(max-width: 767px)" srcset="{{ asset($slide->mobile_image_path) }}">
+                                                <source media="(max-width: 991.98px)" srcset="{{ asset($slide->mobile_image_path) }}">
                                             @endif
-                                            <img src="{{ asset($slide->image_path) }}" 
+                                            <source media="(min-width: 992px)" srcset="{{ asset($slide->image_path) }}">
+                                            <img src="{{ asset($slide->mobile_image_path ?: $slide->image_path) }}" 
                                                  class="w-100 d-block hero-banner-img"
-                                                 width="1920" height="540"
                                                  alt="{{ $slide->title ?? 'RohidaFarm Premium Banner' }}"
                                                  fetchpriority="high"
                                                  loading="eager"
@@ -46,9 +48,10 @@
                                     <div class="w-100">
                                         <picture>
                                             @if($slide->mobile_image_path)
-                                                <source media="(max-width: 767px)" srcset="{{ asset($slide->mobile_image_path) }}">
+                                                <source media="(max-width: 991.98px)" srcset="{{ asset($slide->mobile_image_path) }}">
                                             @endif
-                                            <img src="{{ asset($slide->image_path) }}" 
+                                            <source media="(min-width: 992px)" srcset="{{ asset($slide->image_path) }}">
+                                            <img src="{{ asset($slide->mobile_image_path ?: $slide->image_path) }}" 
                                                  class="w-100 d-block hero-banner-img"
                                                  alt="{{ $slide->title ?? 'RohidaFarm Premium Banner' }}"
                                                  fetchpriority="high"
@@ -69,9 +72,10 @@
                 <div class="position-relative w-100">
                     <picture>
                         @if(file_exists(public_path('images/home-image-mobile.png')))
-                            <source media="(max-width: 767px)" srcset="{{ asset('images/home-image-mobile.png') }}">
+                            <source media="(max-width: 991.98px)" srcset="{{ asset('images/home-image-mobile.png') }}">
                         @endif
-                        <img src="{{ file_exists(public_path('images/home-image-pc.png')) ? asset('images/home-image-pc.png') : asset('images/baner-1.png') }}" 
+                        <source media="(min-width: 992px)" srcset="{{ file_exists(public_path('images/home-image-pc.png')) ? asset('images/home-image-pc.png') : asset('images/baner-1.png') }}">
+                        <img src="{{ file_exists(public_path('images/home-image-mobile.png')) ? asset('images/home-image-mobile.png') : (file_exists(public_path('images/home-image-pc.png')) ? asset('images/home-image-pc.png') : asset('images/baner-1.png')) }}" 
                              class="w-100 d-block hero-banner-img"
                              alt="RohidaFarm Pure Traditional Organic Ghee Banner"
                              fetchpriority="high"

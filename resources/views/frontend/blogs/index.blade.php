@@ -5,10 +5,7 @@
 <section class="py-5 text-center" style="background-color: var(--cream-bg, #FFF9F1); border-bottom: 1px solid var(--border-color);">
     <div class="container py-4" data-aos="fade-up">
         <span class="text-uppercase fw-bold text-success" style="font-size: 0.78rem; letter-spacing: 2px;">Organic Living Journal</span>
-        <h1 class="display-4 font-heading fw-bold text-dark mt-2 mb-3">Healthy Living Blog</h1>
-        <p class="text-muted mx-auto" style="max-width: 600px; font-size: 1.1rem;">
-            Explore Ayurvedic insights, natural cooking secrets, and chemical-free recipes from our experts.
-        </p>
+        <h1 class="display-4 font-heading fw-bold text-dark mt-2 mb-0">Healthy Living Blog</h1>
     </div>
 </section>
 
