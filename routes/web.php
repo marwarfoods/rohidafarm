@@ -193,6 +193,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/media/store', [MediaController::class, 'store'])->name('media.store');
         Route::get('/media/ajax-list', [MediaController::class, 'listAjax'])->name('media.ajax');
         Route::post('/media/url-import', [MediaController::class, 'storeFromUrl'])->name('media.url');
+        Route::post('/media/direct-url', [MediaController::class, 'storeDirectUrl'])->name('media.direct-url');
         Route::delete('/media/{id}/delete', [MediaController::class, 'destroy'])->name('media.delete');
         Route::post('/media/compress-all', [MediaController::class, 'compressAll'])->name('media.compress-all');
         Route::post('/media/bulk-compress', [MediaController::class, 'bulkCompress'])->name('media.bulk-compress');

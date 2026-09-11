@@ -9,6 +9,9 @@
     let currentFolder = 'all';
     let currentSearch = '';
     let searchDebounceTimer = null;
+    let galleryAbortController = null;
+
+    const getCsrfToken = () => document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
     // Define function globally immediately so page inline scripts don't hit race conditions
     window.initMediaPicker = function(inputSelector, previewSelector = null, type = 'image', multiple = null) {
@@ -81,15 +84,21 @@
 
         // Switch to gallery tab by default when opening
         const galleryTabBtn = document.getElementById('gallery-tab');
-        if (galleryTabBtn && typeof bootstrap !== 'undefined') {
-            const tab = bootstrap.Tab.getOrCreateInstance(galleryTabBtn);
-            tab.show();
+        if (galleryTabBtn && typeof bootstrap !== 'undefined' && bootstrap.Tab) {
+            bootstrap.Tab.getOrCreateInstance(galleryTabBtn).show();
         }
 
         const modalEl = document.getElementById('mediaPickerModal');
         if (modalEl) {
-            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-            modal.show();
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                bootstrap.Modal.getOrCreateInstance(modalEl).show();
+            } else {
+                window.addEventListener('load', () => {
+                    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                        bootstrap.Modal.getOrCreateInstance(modalEl).show();
+                    }
+                }, { once: true });
+            }
         }
     }
 
@@ -243,25 +252,55 @@
         const container = document.getElementById('galleryGridContainer');
         if (!container) return;
 
-        fetch(nextMediaPageUrl)
-            .then(res => res.json())
+        if (!append) {
+            if (galleryAbortController) {
+                galleryAbortController.abort();
+            }
+            galleryAbortController = new AbortController();
+
+            container.innerHTML = `
+                <div class="col-12 text-center py-5 text-muted">
+                    <div class="spinner-border text-success" role="status" style="width: 2rem; height: 2rem;"></div>
+                    <div class="small mt-2 fw-semibold">Loading media...</div>
+                </div>
+            `;
+        }
+
+        const loadMoreBtn = document.getElementById('btnLoadMoreMedia');
+        if (loadMoreBtn && append) {
+            loadMoreBtn.disabled = true;
+            loadMoreBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Loading...';
+        }
+
+        const currentSignal = galleryAbortController ? galleryAbortController.signal : undefined;
+
+        fetch(nextMediaPageUrl, { signal: currentSignal })
+            .then(res => {
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.json();
+            })
             .then(response => {
                 if (response.status === 'success') {
                     const items = response.data;
                     nextMediaPageUrl = response.next_page_url;
 
-                    if (items.length === 0 && !append) {
-                        container.innerHTML = '<div class="col-12 text-center py-4 text-muted">No files found in gallery.</div>';
-                        return;
+                    if (!append) {
+                        container.innerHTML = '';
                     }
 
-                    const loadMoreBtn = document.getElementById('btnLoadMoreMedia');
                     if (loadMoreBtn) {
+                        loadMoreBtn.disabled = false;
+                        loadMoreBtn.innerHTML = 'Load More';
                         if (nextMediaPageUrl) {
                             loadMoreBtn.classList.remove('d-none');
                         } else {
                             loadMoreBtn.classList.add('d-none');
                         }
+                    }
+
+                    if (items.length === 0 && !append) {
+                        container.innerHTML = '<div class="col-12 text-center py-5 text-muted"><i class="bi bi-images fs-3 d-block mb-2"></i>No files found in gallery.</div>';
+                        return;
                     }
 
                     items.forEach(item => {
@@ -270,9 +309,9 @@
                         
                         let previewHtml = '';
                         if (item.file_type === 'video') {
-                            previewHtml = `<div class="bg-dark rounded-3 d-flex align-items-center justify-content-center text-white" style="height: 100px;"><i class="bi bi-play-btn fs-2"></i></div>`;
+                            previewHtml = `<div class="bg-dark rounded-3 d-flex align-items-center justify-content-center text-white" style="height: 115px;"><i class="bi bi-play-btn fs-2"></i></div>`;
                         } else {
-                            previewHtml = `<img src="${item.full_url}" class="rounded-3 img-fluid object-fit-cover w-100" style="height: 100px; border: 1px solid #ECE7DD;" loading="lazy">`;
+                            previewHtml = `<img src="${item.full_url}" class="rounded-3 img-fluid object-fit-cover w-100" style="height: 115px; border: 1px solid #ECE7DD;" loading="lazy">`;
                         }
 
                         const normPath = item.file_path.startsWith('http') || item.file_path.startsWith('/')
@@ -287,7 +326,7 @@
                                     <i class="bi bi-check-lg"></i>
                                 </div>
                                 ${previewHtml}
-                                <div class="small text-truncate mt-1 text-muted text-center" style="font-size: 0.7rem;">${item.filename}</div>
+                                <div class="small text-truncate mt-1 text-muted text-center" style="font-size: 0.72rem;">${item.filename}</div>
                             </div>
                         `;
 
@@ -309,6 +348,16 @@
 
                         container.appendChild(col);
                     });
+                }
+            })
+            .catch(err => {
+                if (err.name === 'AbortError') return;
+                if (!append) {
+                    container.innerHTML = '<div class="col-12 text-center py-4 text-muted"><i class="bi bi-exclamation-circle text-danger me-1"></i>Unable to load media files. Please refresh.</div>';
+                }
+                if (loadMoreBtn) {
+                    loadMoreBtn.disabled = false;
+                    loadMoreBtn.innerHTML = 'Load More';
                 }
             });
     }
@@ -362,7 +411,99 @@
             });
         }
 
-        // URL Import
+        // Direct URL (External Link without local download)
+        const directUrlInput = document.getElementById('pickerDirectUrlInput');
+        const directUrlPreviewContainer = document.getElementById('directUrlPreviewContainer');
+        const directUrlPreviewImage = document.getElementById('directUrlPreviewImage');
+        const directUrlPreviewVideo = document.getElementById('directUrlPreviewVideo');
+        const directUrlBtn = document.getElementById('btnUseDirectUrl');
+
+        if (directUrlInput) {
+            directUrlInput.addEventListener('input', function() {
+                const url = this.value.trim();
+                if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+                    const isVideo = /\.(mp4|webm|mov|avi|mkv)(\?.*)?$/i.test(url);
+                    if (isVideo) {
+                        if (directUrlPreviewVideo) {
+                            directUrlPreviewVideo.src = url;
+                            directUrlPreviewVideo.classList.remove('d-none');
+                        }
+                        if (directUrlPreviewImage) directUrlPreviewImage.classList.add('d-none');
+                    } else {
+                        if (directUrlPreviewImage) {
+                            directUrlPreviewImage.src = url;
+                            directUrlPreviewImage.classList.remove('d-none');
+                        }
+                        if (directUrlPreviewVideo) directUrlPreviewVideo.classList.add('d-none');
+                    }
+                    if (directUrlPreviewContainer) directUrlPreviewContainer.classList.remove('d-none');
+                } else {
+                    if (directUrlPreviewContainer) directUrlPreviewContainer.classList.add('d-none');
+                    if (directUrlPreviewImage) directUrlPreviewImage.src = '';
+                    if (directUrlPreviewVideo) directUrlPreviewVideo.src = '';
+                }
+            });
+        }
+
+        if (directUrlBtn) {
+            directUrlBtn.addEventListener('click', function() {
+                if (!directUrlInput) return;
+                const url = directUrlInput.value.trim();
+                if (!url || (!url.startsWith('http://') && !url.startsWith('https://'))) {
+                    notify('error', 'Please enter a valid HTTP or HTTPS URL.');
+                    return;
+                }
+
+                const btn = this;
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Saving...';
+                btn.disabled = true;
+
+                fetch('/admin/media/direct-url', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken(),
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ url: url })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    btn.innerHTML = originalHtml;
+                    btn.disabled = false;
+
+                    if (data.status === 'success') {
+                        directUrlInput.value = '';
+                        if (directUrlPreviewContainer) directUrlPreviewContainer.classList.add('d-none');
+
+                        notify('success', 'Direct URL applied successfully.');
+
+                        selectedMediaItems = [{
+                            path: data.media.file_path || url,
+                            fullUrl: data.media.full_url || url,
+                            filename: data.media.filename || 'Direct URL'
+                        }];
+                        confirmAndApplySelection();
+                    } else {
+                        notify('error', data.message || 'Failed to save direct URL.');
+                    }
+                })
+                .catch(err => {
+                    btn.innerHTML = originalHtml;
+                    btn.disabled = false;
+                    // Graceful fallback: directly apply URL into target input even if fetch fails
+                    selectedMediaItems = [{
+                        path: url,
+                        fullUrl: url,
+                        filename: 'Direct URL'
+                    }];
+                    confirmAndApplySelection();
+                });
+            });
+        }
+
+        // URL Import (Local Download)
         const importBtn = document.getElementById('btnImportFromUrl');
         const urlInput = document.getElementById('pickerUrlInput');
         const urlPreviewContainer = document.getElementById('urlPreviewContainer');
@@ -395,7 +536,8 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        'X-CSRF-TOKEN': getCsrfToken(),
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify({ url: url })
                 })
@@ -447,7 +589,7 @@
 
                 const xhr = new XMLHttpRequest();
                 xhr.open('POST', '/admin/media/store', true);
-                xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="csrf-token"]').content);
+                xhr.setRequestHeader('X-CSRF-TOKEN', getCsrfToken());
                 xhr.setRequestHeader('Accept', 'application/json');
 
                 xhr.upload.onprogress = function(e) {
@@ -460,18 +602,22 @@
                 xhr.onload = function() {
                     if (progressContainer) progressContainer.classList.add('d-none');
                     if (xhr.status === 200) {
-                        const response = JSON.parse(xhr.responseText);
-                        if (response.status === 'success') {
-                            const fullUrl = window.location.origin + '/' + response.media.file_path.replace(/^\//, '');
-                            notify('success', 'Image uploaded successfully.');
-                            selectedMediaItems = [{
-                                path: response.media.file_path,
-                                fullUrl: fullUrl,
-                                filename: response.media.file_name || 'Uploaded Asset'
-                            }];
-                            confirmAndApplySelection();
-                        } else {
-                            notify('error', response.message || 'Upload failed.');
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.status === 'success') {
+                                const fullUrl = window.location.origin + '/' + response.media.file_path.replace(/^\//, '');
+                                notify('success', 'Image uploaded successfully.');
+                                selectedMediaItems = [{
+                                    path: response.media.file_path,
+                                    fullUrl: fullUrl,
+                                    filename: response.media.file_name || 'Uploaded Asset'
+                                }];
+                                confirmAndApplySelection();
+                            } else {
+                                notify('error', response.message || 'Upload failed.');
+                            }
+                        } catch (parseErr) {
+                            notify('error', 'Upload failed: Invalid server response.');
                         }
                     } else {
                         notify('error', 'Upload failed. Check file type and size.');

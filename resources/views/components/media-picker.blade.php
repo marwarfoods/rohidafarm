@@ -7,6 +7,7 @@
         'sliders' => \App\Models\MediaItem::where('file_path', 'like', '%uploads/sliders/%')->where('file_type', 'image')->count(),
         'reviews' => \App\Models\MediaItem::where('file_path', 'like', '%uploads/reviews/%')->where('file_type', 'image')->count(),
         'settings' => \App\Models\MediaItem::where('file_path', 'like', '%uploads/settings/%')->where('file_type', 'image')->count(),
+        'direct-urls' => \App\Models\MediaItem::where('file_path', 'like', 'http%')->orWhereNotNull('url')->count(),
         'videos' => \App\Models\MediaItem::where('file_type', 'video')->count(),
         'unsplash' => \App\Models\MediaItem::whereNotNull('url')->count(),
     ];
@@ -36,8 +37,13 @@
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-semibold" id="direct-url-tab" data-bs-toggle="tab" data-bs-target="#tab-direct-url" type="button" role="tab" aria-controls="tab-direct-url" aria-selected="false">
+                            <i class="bi bi-globe2 me-1 text-primary"></i>Direct URL
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
                         <button class="nav-link fw-semibold" id="url-tab" data-bs-toggle="tab" data-bs-target="#tab-url" type="button" role="tab" aria-controls="tab-url" aria-selected="false">
-                            <i class="bi bi-link-45deg me-1"></i>Insert from URL
+                            <i class="bi bi-link-45deg me-1"></i>Import from URL
                         </button>
                     </li>
                 </ul>
@@ -95,6 +101,12 @@
                                         </button>
                                     </li>
                                     <li>
+                                        <button type="button" class="media-picker-folder-link w-100 text-start" data-folder="direct-urls">
+                                            <i class="bi bi-globe2 me-2 text-primary"></i>Direct URLs
+                                            <span class="float-end text-muted small">{{ $pickerCounts['direct-urls'] }}</span>
+                                        </button>
+                                    </li>
+                                    <li>
                                         <button type="button" class="media-picker-folder-link w-100 text-start" data-folder="unsplash">
                                             <i class="bi bi-folder-fill me-2"></i>From Unsplash
                                             <span class="float-end text-muted small">{{ $pickerCounts['unsplash'] }}</span>
@@ -120,12 +132,50 @@
                                     <i class="bi bi-search position-absolute text-muted" style="left: 14px; top: 50%; transform: translateY(-50%);"></i>
                                     <input type="text" id="mediaPickerSearchInput" class="form-control ps-5 bg-white border shadow-none" placeholder="Search files by name..." style="border-color: #ECE7DD !important;">
                                 </div>
-                                <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 bg-white p-3 rounded-4 border overflow-y-auto flex-grow-1" id="galleryGridContainer" style="border-color: #ECE7DD !important;">
+                                <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 row-cols-xxl-7 g-3 bg-white p-3 rounded-4 border overflow-y-auto flex-grow-1" id="galleryGridContainer" style="border-color: #ECE7DD !important;">
                                     <!-- items loaded dynamically -->
                                 </div>
                                 <div class="text-center mt-3">
                                     <button type="button" class="btn btn-sm btn-outline-success px-4 py-2 rounded-pill d-none" id="btnLoadMoreMedia">Load More</button>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Direct URL (External Link without local storage) -->
+                    <div class="tab-pane fade py-3 w-100" id="tab-direct-url" role="tabpanel" aria-labelledby="direct-url-tab">
+                        <div class="bg-white p-4 rounded-4 border" style="border-color: #ECE7DD !important;">
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill font-heading fw-bold" style="font-size: 0.78rem;">
+                                    <i class="bi bi-cloud-check me-1"></i>Zero Local Storage
+                                </span>
+                                <span class="text-muted small">Serves directly from external CDN/host (e.g. Cloudinary, Imgur, AWS S3, etc.)</span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold text-dark">External Media / Direct Image URL</label>
+                                <input type="url" id="pickerDirectUrlInput" class="form-control bg-light border p-2 shadow-none font-monospace" placeholder="https://res.cloudinary.com/... or https://example.com/image.jpg" style="font-size: 0.88rem;" required>
+                                <div class="form-text text-muted mb-2" style="font-size: 0.75rem;">
+                                    <i class="bi bi-info-circle me-1"></i>Paste the direct public URL. The file will <strong>not</strong> be downloaded to your server, keeping storage at 0 MB.
+                                </div>
+                                
+                                <div id="directUrlPreviewContainer" class="mt-3 text-center d-none p-3 border rounded-3 bg-light">
+                                    <div class="mb-2 small text-muted fw-semibold"><i class="bi bi-eye me-1"></i>Live Preview:</div>
+                                    <img id="directUrlPreviewImage" src="" class="img-fluid rounded-3 mx-auto border shadow-sm" style="max-height: 180px; object-fit: contain; background: #fff;" onerror="this.classList.add('d-none'); document.getElementById('directUrlPreviewError').classList.remove('d-none');" onload="this.classList.remove('d-none'); document.getElementById('directUrlPreviewError').classList.add('d-none');">
+                                    <video id="directUrlPreviewVideo" src="" class="w-100 rounded-3 mx-auto border shadow-sm d-none" style="max-height: 180px;" controls></video>
+                                    <div id="directUrlPreviewError" class="alert alert-warning py-1 px-2 mt-2 mb-0 d-none small">
+                                        <i class="bi bi-exclamation-triangle me-1"></i>Could not preview image. Please check the URL.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-2 mt-3">
+                                <button type="button" id="btnUseDirectUrl" class="btn btn-primary px-4 py-2 rounded-pill font-heading fw-semibold">
+                                    <i class="bi bi-check2-circle me-1"></i>Use Direct URL
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary px-3 py-2 rounded-pill" onclick="document.getElementById('pickerDirectUrlInput').value=''; document.getElementById('directUrlPreviewContainer').classList.add('d-none');">
+                                    Clear
+                                </button>
                             </div>
                         </div>
                     </div>

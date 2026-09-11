@@ -10,7 +10,7 @@
 </div>
 
 <p class="email-text text-center">
-    <small>This password reset link will expire in 60 minutes.</small>
+    <small>This password reset link will expire in 10 minutes.</small>
 </p>
 
 <p class="email-text">If you did not request a password reset, no further action is required.</p>

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Setting;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class TurnstileService
 {
@@ -32,7 +33,13 @@ class TurnstileService
             return true;
         }
 
+        // On localhost/local development environment, allow bypass if Cloudflare domain doesn't match
+        if (app()->environment('local') && in_array(request()->getHost(), ['127.0.0.1', 'localhost', '::1'])) {
+            return true;
+        }
+
         if (empty($token)) {
+            Log::warning('Turnstile verification: Empty token received from ' . request()->ip() . ' on ' . request()->path());
             return false;
         }
 
@@ -42,17 +49,40 @@ class TurnstileService
         }
 
         try {
-            $response = Http::asForm()->timeout(5)->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+            $payload = [
                 'secret' => $secretKey,
                 'response' => $token,
-                'remoteip' => $ip ?: request()->ip(),
-            ]);
+            ];
+
+            // Only pass remoteip if it is a valid public IP (avoid internal/proxy IPs that cause Cloudflare mismatch)
+            $clientIp = $ip ?: request()->ip();
+            if ($clientIp && filter_var($clientIp, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                $payload['remoteip'] = $clientIp;
+            }
+
+            $response = Http::asForm()->timeout(6)->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', $payload);
+
+            if ($response->serverError()) {
+                Log::warning('Cloudflare Turnstile server error (' . $response->status() . '). Failing open to not block user.');
+                return true;
+            }
 
             $result = $response->json();
-            return !empty($result['success']) && $result['success'] === true;
+            $success = !empty($result['success']) && $result['success'] === true;
+
+            if (!$success) {
+                $errorCodes = $result['error-codes'] ?? [];
+                Log::warning('Turnstile verification failed', [
+                    'errors' => $errorCodes,
+                    'path' => request()->path(),
+                    'ip' => request()->ip(),
+                ]);
+            }
+
+            return $success;
         } catch (\Exception $e) {
-            logger()->error('Turnstile verification exception: ' . $e->getMessage());
-            // Fail open or closed depending on configuration; fallback to true on network timeouts to not block legitimate users
+            Log::error('Turnstile verification exception: ' . $e->getMessage());
+            // Fail open on network timeouts/exceptions so legitimate users are never locked out
             return true;
         }
     }

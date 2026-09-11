@@ -61,25 +61,21 @@
     cursor: pointer;
 }
 
-/* ── Enlarged Media Picker Modal ── */
+/* ── Enlarged Media Picker Modal (Nearly Full-Width with slight side gaps) ── */
 .media-picker-dialog {
-    max-width: 1140px;
-    width: 95vw;
-    /* Bootstrap's .modal has overflow-y:auto by default — if the dialog's total
-       rendered height ever exceeds the viewport, the WHOLE dialog (including the
-       header/tabs) scrolls as one unit instead of just the inner grid. Capping
-       height relative to the viewport here guarantees it always fits. */
-    max-height: calc(100vh - 3.5rem);
+    max-width: calc(100vw - 36px) !important;
+    width: calc(100vw - 36px) !important;
+    margin: 1rem auto !important;
+    max-height: calc(100vh - 2rem) !important;
 }
 .media-picker-content {
-    height: calc(100vh - 3.5rem);
-    max-height: 800px;
+    height: calc(100vh - 2rem) !important;
+    max-height: 94vh !important;
     overflow: hidden;
 }
 
 /* Nested flex children default to min-height:auto, which stops them shrinking
-   below their content's natural size — that's what let the grid balloon the
-   whole modal taller than its box. min-height:0 down the whole chain lets each
+   below their content's natural size. min-height:0 down the whole chain lets each
    level actually respect the height budget from its parent instead. */
 .media-picker-content .modal-body,
 #mediaPickerTabsContent,
@@ -96,7 +92,8 @@
     overflow: hidden;
 }
 #tab-upload,
-#tab-url {
+#tab-url,
+#tab-direct-url {
     overflow-y: auto;
 }
 .media-picker-gallery-pane {
@@ -106,8 +103,8 @@
 
 /* ── Folder Sidebar ── */
 .media-picker-sidebar {
-    width: 220px;
-    min-width: 220px;
+    width: 240px;
+    min-width: 240px;
     overflow-y: auto;
 }
 .media-picker-folder-link {

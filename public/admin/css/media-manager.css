@@ -1,0 +1,24 @@
+/**
+ * RohidaFarm - Media Manager Page Stylesheet
+ * Separated cleanly from admin/media/index.blade.php
+ */
+
+/* Selection checkbox styling */
+.media-card .media-select-checkbox:checked {
+    background-color: #1a6b36 !important;
+    border-color: #1a6b36 !important;
+}
+
+/* Upload progress per-file list */
+.upload-progress-row {
+    background: #ffffff;
+    border: 1px solid #ECE7DD;
+    padding: 0.65rem 0.85rem;
+    border-radius: 0.5rem;
+}
+
+/* Modal preview boxes */
+#directUrlPagePreviewImage,
+#directUrlPagePreviewVideo {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}

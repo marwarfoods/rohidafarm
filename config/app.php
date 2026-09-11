@@ -54,6 +54,8 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'logo_url' => env('APP_LOGO_URL', 'https://rohidafarm.com/uploads/settings/1784952930_3f5d3de0-6a71-45fd-a69e-69d37fa08e63.webp'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

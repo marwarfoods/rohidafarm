@@ -63,6 +63,11 @@ class MediaController extends Controller
                 case 'videos':
                     $query->where('file_type', 'video');
                     break;
+                case 'direct-urls':
+                    $query->where(function($q) {
+                        $q->where('file_path', 'like', 'http%')->orWhereNotNull('url');
+                    });
+                    break;
                 case 'unsplash':
                     $query->whereNotNull('url');
                     break;
@@ -83,6 +88,7 @@ class MediaController extends Controller
             'sliders' => MediaItem::where('file_path', 'like', '%uploads/sliders/%')->where('file_type', 'image')->count(),
             'reviews' => MediaItem::where('file_path', 'like', '%uploads/reviews/%')->where('file_type', 'image')->count(),
             'settings' => MediaItem::where('file_path', 'like', '%uploads/settings/%')->where('file_type', 'image')->count(),
+            'direct-urls' => MediaItem::where('file_path', 'like', 'http%')->orWhereNotNull('url')->count(),
             'videos' => MediaItem::where('file_type', 'video')->count(),
             'unsplash' => MediaItem::whereNotNull('url')->count(),
             'built-in' => $builtInImages->count(),
@@ -367,6 +373,11 @@ class MediaController extends Controller
             case 'videos':
                 $query->where('file_type', 'video');
                 break;
+            case 'direct-urls':
+                $query->where(function($q) {
+                    $q->where('file_path', 'like', 'http%')->orWhereNotNull('url');
+                });
+                break;
             case 'unsplash':
                 $query->whereNotNull('url');
                 break;
@@ -386,6 +397,8 @@ class MediaController extends Controller
             // Use the external URL if stored, otherwise build from APP_URL + file_path
             if (!empty($item->url) && filter_var($item->url, FILTER_VALIDATE_URL)) {
                 $data['full_url'] = $item->url;
+            } elseif (Str::startsWith($item->file_path, ['http://', 'https://'])) {
+                $data['full_url'] = $item->file_path;
             } else {
                 $cleanPath = ltrim($item->file_path, '/');
                 $data['full_url'] = asset($cleanPath);
@@ -485,6 +498,65 @@ class MediaController extends Controller
     }
 
     /**
+     * Store direct external URL without downloading assets locally.
+     * Serves directly from external host (Cloudinary, CDN, external server).
+     */
+    public function storeDirectUrl(Request $request)
+    {
+        $request->validate([
+            'url' => 'required|url',
+            'filename' => 'nullable|string|max:255',
+            'file_type' => 'nullable|string|in:image,video'
+        ]);
+
+        $url = trim($request->input('url'));
+        $customName = trim($request->input('filename') ?: '');
+
+        // Determine file type
+        $fileType = $request->input('file_type');
+        if (!$fileType) {
+            $pathOnly = parse_url($url, PHP_URL_PATH) ?? '';
+            $ext = strtolower(pathinfo($pathOnly, PATHINFO_EXTENSION));
+            if (in_array($ext, ['mp4', 'webm', 'mov', 'avi', 'mkv'])) {
+                $fileType = 'video';
+            } else {
+                $fileType = 'image';
+            }
+        }
+
+        // Determine a friendly filename
+        if (empty($customName)) {
+            $pathOnly = parse_url($url, PHP_URL_PATH) ?? '';
+            $base = basename($pathOnly);
+            $cleanBase = preg_replace('/[?#].*$/', '', $base);
+            $customName = $cleanBase ?: ('direct_' . time() . ($fileType === 'video' ? '.mp4' : '.jpg'));
+        }
+
+        // Reuse existing record or create new
+        $media = MediaItem::where('file_path', $url)->orWhere('url', $url)->first();
+
+        if (!$media) {
+            $media = MediaItem::create([
+                'filename' => $customName,
+                'file_path' => $url,
+                'file_type' => $fileType,
+                'file_size' => 0, // 0 bytes on local storage
+                'url' => $url
+            ]);
+            self::logActivity('media_direct_url', "Added direct external URL media: {$url}");
+        }
+
+        $itemData = $media->toArray();
+        $itemData['full_url'] = $url;
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Direct URL added successfully.',
+            'media' => $itemData
+        ]);
+    }
+
+    /**
      * Delete media item.
      */
     public function destroy($id)
@@ -492,7 +564,7 @@ class MediaController extends Controller
         $media = MediaItem::findOrFail($id);
 
         try {
-            if ($media->file_path && file_exists(public_path($media->file_path))) {
+            if ($media->file_path && !Str::startsWith($media->file_path, ['http://', 'https://']) && file_exists(public_path($media->file_path))) {
                 @unlink(public_path($media->file_path));
             }
 
@@ -631,7 +703,7 @@ class MediaController extends Controller
         $count = 0;
 
         foreach ($mediaItems as $media) {
-            if ($media->file_path && file_exists(public_path($media->file_path))) {
+            if ($media->file_path && !Str::startsWith($media->file_path, ['http://', 'https://']) && file_exists(public_path($media->file_path))) {
                 @unlink(public_path($media->file_path));
             }
             $media->delete();

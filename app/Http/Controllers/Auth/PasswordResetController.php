@@ -73,7 +73,25 @@ class PasswordResetController extends Controller
      */
     public function showResetForm(Request $request, $token)
     {
-        return view('frontend.auth.reset-password', ['token' => $token, 'email' => $request->email]);
+        $email = $request->query('email', $request->input('email'));
+
+        if (!$email || !$token) {
+            return redirect()->route('login')->with('error', 'This password reset link is invalid or has expired.');
+        }
+
+        $record = DB::table('password_reset_tokens')->where('email', $email)->first();
+
+        if (!$record || !Hash::check($token, $record->token)) {
+            return redirect()->route('login')->with('error', 'This password reset link is invalid or has already been used.');
+        }
+
+        // Check if token is older than 10 minutes
+        if (\Carbon\Carbon::parse($record->created_at)->diffInMinutes(now()) >= 10) {
+            DB::table('password_reset_tokens')->where('email', $email)->delete();
+            return redirect()->route('login')->with('error', 'This password reset link has expired (valid for 10 minutes only). Please request a new one.');
+        }
+
+        return view('frontend.auth.reset-password', ['token' => $token, 'email' => $email]);
     }
 
     /**
@@ -91,26 +109,28 @@ class PasswordResetController extends Controller
         $record = DB::table('password_reset_tokens')->where('email', $request->email)->first();
 
         if (!$record || !Hash::check($request->token, $record->token)) {
-            return back()->withErrors(['email' => 'This password reset token is invalid or expired.']);
+            return redirect()->route('login')->with('error', 'This password reset link is invalid or has already been used.');
         }
 
-        // Check if token is older than 60 minutes
-        if (now()->diffInMinutes($record->created_at) > 60) {
-            return back()->withErrors(['email' => 'This password reset token is invalid or expired.']);
+        // Check if token is older than 10 minutes
+        if (\Carbon\Carbon::parse($record->created_at)->diffInMinutes(now()) >= 10) {
+            DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+            return redirect()->route('login')->with('error', 'This password reset link has expired (valid for 10 minutes only). Please request a new one.');
         }
 
         $user = User::where('email', $request->email)->first();
 
         if (!$user) {
-            return back()->withErrors(['email' => 'We could not find a user with that email address.']);
+            return redirect()->route('login')->with('error', 'We could not find an active account with that email address.');
         }
 
         $user->forceFill([
             'password' => Hash::make($request->password)
         ])->save();
 
+        // One-time use: Delete immediately so this reset link can never be used again
         DB::table('password_reset_tokens')->where('email', $user->email)->delete();
 
-        return redirect()->route('login')->with('success', 'Your password has been reset! Please login.');
+        return redirect()->route('login')->with('success', 'Your password has been reset successfully! Please login with your new password.');
     }
 }

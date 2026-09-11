@@ -30,8 +30,8 @@
             <!-- Header -->
             <tr>
                 <td class="email-header" style="background-color: #ffffff; padding: 25px; text-align: center; border-bottom: 3px solid #1a4f3b;">
-                    <a href="{{ config('app.url') }}" style="display:inline-block; text-decoration:none;">
-                        <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'RohidaFarm') }}" style="height: 55px; object-fit: contain;">
+                    <a href="{{ config('app.url', 'https://rohidafarm.com') }}" style="display:inline-block; text-decoration:none;">
+                        <img src="{{ config('app.logo_url', 'https://rohidafarm.com/uploads/settings/1784952930_3f5d3de0-6a71-45fd-a69e-69d37fa08e63.webp') }}" alt="{{ config('app.name', 'RohidaFarm') }}" style="height: 55px; max-width: 220px; object-fit: contain;">
                     </a>
                 </td>
             </tr>
