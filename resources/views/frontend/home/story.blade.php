@@ -10,7 +10,7 @@
     <div class="position-absolute top-0 start-0 w-100 h-100"
          style="background: rgba(250, 247, 238, 0.90); z-index: 0; pointer-events: none;"></div>
 
-    <div class="container-fluid px-3 px-sm-4 px-md-5 position-relative" style="z-index: 1;">
+    <div class="container-fluid px-3 px-sm-4 px-md-5 position-relative" style="max-width: 1536px; margin-left: auto; margin-right: auto; z-index: 1;">
 
         <!-- ── Top Section Header ── -->
         <div class="text-center mb-3 mb-md-4" data-aos="fade-up">
@@ -109,6 +109,9 @@
     transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.3s ease;
     aspect-ratio: 16 / 9;
     max-height: 700px;
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
     width: 100%;
 }
 

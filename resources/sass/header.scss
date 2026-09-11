@@ -1,6 +1,16 @@
 .header-main-container {
     transition: var(--transition-smooth);
     z-index: 1024;
+
+    .navbar > .container-fluid {
+        max-width: 1440px;
+        margin: 0 auto;
+    }
+
+    .dropdown-menu .container {
+        max-width: 1440px;
+        margin: 0 auto;
+    }
 }
 
 .mobile-menu-tabs {

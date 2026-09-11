@@ -82,7 +82,7 @@
     </div>
 
     <!-- Marquee Container -->
-    <div class="insta-marquee-wrapper overflow-hidden py-2 position-relative">
+    <div class="insta-marquee-wrapper overflow-hidden py-2 position-relative mx-auto" style="max-width: 1536px;">
         
         <!-- Edge Fades -->
         <div class="position-absolute top-0 start-0 h-100" style="width: 60px; background: linear-gradient(to right, #fafbfc, rgba(250,251,252,0)); z-index: 10; pointer-events: none;"></div>

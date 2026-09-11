@@ -59,7 +59,7 @@
     "isEntry": true
   },
   "resources/js/home.js": {
-    "file": "assets/home-Bqnf7fDK.js",
+    "file": "assets/home-kH6ZA6yN.js",
     "name": "home",
     "src": "resources/js/home.js",
     "isEntry": true
@@ -126,7 +126,7 @@
     "isEntry": true
   },
   "resources/sass/app.scss": {
-    "file": "assets/app-BIEV7HEI.css",
+    "file": "assets/app-BFbujVZ0.css",
     "name": "app",
     "names": [
       "app.css"
@@ -139,7 +139,7 @@
     ]
   },
   "resources/sass/header.scss": {
-    "file": "assets/header-DN1PSsMe.css",
+    "file": "assets/header-DJvCw1_7.css",
     "name": "header",
     "names": [
       "header.css"
@@ -166,7 +166,7 @@
     "isEntry": true
   },
   "resources/sass/product-detail.scss": {
-    "file": "assets/product-detail-CFk75QX8.css",
+    "file": "assets/product-detail-C1OC9ax9.css",
     "name": "product-detail",
     "names": [
       "product-detail.css"

@@ -49,7 +49,7 @@
 
     {{-- Main Product Detail Container --}}
     <section class="py-4 py-lg-5" style="background: url('{{ asset('images/vectors/bg11.png') }}') top left repeat, var(--cream-bg);">
-        <div class="product-detail-container">
+        <div class="product-detail-container" style="max-width: 1440px; margin-left: auto; margin-right: auto;">
             {{-- Skeleton & Product Main Info (Gallery & Description) --}}
             @include('frontend.shop.partials.product-main')
 

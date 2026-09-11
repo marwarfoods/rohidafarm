@@ -477,20 +477,25 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Initialize Customer Reviews Slider (photo one side, review the other — one per view)
+    // Initialize Customer Reviews Slider (photo one side, review the other)
     const customerReviewsSlider = document.querySelector('.customer-reviews-slider');
     if (customerReviewsSlider) {
         const crSlides = customerReviewsSlider.querySelectorAll('.swiper-slide').length;
         new Swiper(customerReviewsSlider, {
             loop: crSlides > 1,
             autoplay: {
-                delay: 6000,
+                delay: 5000,
                 disableOnInteraction: false,
                 pauseOnMouseEnter: true,
             },
-            slidesPerView: 1.5,
+            speed: 550,
+            slidesPerView: 1.3, // 1.3 on mobile: 1 full card + 30% peek of next card
             spaceBetween: 16,
             grabCursor: true,
+            simulateTouch: true,
+            allowTouchMove: true,
+            touchRatio: 1.2,
+            touchAngle: 45,
             navigation: {
                 nextEl: '.customer-reviews-next',
                 prevEl: '.customer-reviews-prev',

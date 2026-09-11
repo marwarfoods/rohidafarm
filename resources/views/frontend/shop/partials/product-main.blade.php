@@ -1,6 +1,6 @@
 <!-- ═══════════════ SKELETON LOADER ═══════════════ -->
 <div id="productSkeleton" class="position-fixed top-0 start-0 w-100 h-100 bg-white d-flex align-items-center justify-content-center" style="z-index: 9999; transition: opacity 0.5s ease;">
-    <div class="product-detail-container py-5">
+    <div class="product-detail-container py-5" style="max-width: 1440px; margin-left: auto; margin-right: auto;">
         <div class="row g-4">
             <!-- Left: image skeleton -->
             <div class="col-md-6">

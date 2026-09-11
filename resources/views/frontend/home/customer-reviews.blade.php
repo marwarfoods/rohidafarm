@@ -1,5 +1,14 @@
 @php
     $customerReviews = $customerReviews ?? collect();
+    $displayReviews = $customerReviews;
+    if ($customerReviews->count() > 1 && $customerReviews->count() < 6) {
+        $multiplier = (int) ceil(6 / $customerReviews->count());
+        $extended = collect();
+        for ($i = 0; $i < $multiplier; $i++) {
+            $extended = $extended->concat($customerReviews);
+        }
+        $displayReviews = $extended;
+    }
 @endphp
 
 @if($customerReviews->isNotEmpty())
@@ -14,7 +23,7 @@
 
         <div class="swiper customer-reviews-slider" data-aos="fade-up">
             <div class="swiper-wrapper">
-                @foreach($customerReviews as $cr)
+                @foreach($displayReviews as $cr)
                     @php
                         $crImage = $cr->image_path ? asset($cr->image_path) : asset('images/baner-1.png');
                         $productUrl = $cr->product ? route('shop.show', $cr->product->slug) : null;

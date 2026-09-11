@@ -2,7 +2,7 @@
     style="background: url('{{ asset('images/vectors/bg6.png') }}') center center / cover no-repeat;">
     <div class="position-absolute top-0 start-0 w-100 h-100"
          style="background: rgba(255, 255, 255, 0.55); z-index: 0; pointer-events: none;"></div>
-    <div class="container-fluid px-md-5 px-1 position-relative" style="max-width: 1720px; z-index: 1;">
+    <div class="container-fluid px-md-5 px-1 position-relative" style="max-width: 1536px; margin-left: auto; margin-right: auto; z-index: 1;">
         <div class="text-center mb-md-5 mb-4" data-aos="fade-up">
             <h2 class="display-5 font-heading fw-bold mt-1 mb-1">Buy More &amp; Save More</h2>
             <span class="text-uppercase fw-bold text-success" style="font-size: 0.75rem; letter-spacing: 2px;">Explore All Our Products</span>

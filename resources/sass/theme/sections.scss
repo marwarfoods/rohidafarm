@@ -5,6 +5,12 @@
     background-color: #FAF7EE;
     position: relative;
 
+    .container-fluid {
+        max-width: 1536px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
     .hero-banner-card {
         background: #FFFFFF;
         border: 2px solid #5C3D2E;
@@ -13,6 +19,9 @@
         box-shadow: 0 10px 30px rgba(92, 61, 46, 0.08);
         position: relative;
         transition: box-shadow 0.3s ease;
+        max-width: 1440px;
+        margin-left: auto;
+        margin-right: auto;
 
         &:hover {
             box-shadow: 0 14px 36px rgba(92, 61, 46, 0.12);
@@ -23,6 +32,7 @@
         width: 100%;
         height: auto;
         max-height: 540px;
+        aspect-ratio: 16 / 6;
         object-fit: cover;
         display: block;
     }
@@ -67,6 +77,12 @@
 .bilona-kasutam-section {
     background-color: #FAF7EE;
     position: relative;
+
+    .bilona-inner-wrapper {
+        max-width: 1536px;
+        margin-left: auto;
+        margin-right: auto;
+    }
 
     .bilona-left-panel {
         height: 100%;
@@ -225,6 +241,18 @@
 .story-kasutam-section {
     background-color: #FAF7EE;
     position: relative;
+
+    .container-fluid {
+        max-width: 1536px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .story-video-card {
+        max-width: 1440px;
+        margin-left: auto;
+        margin-right: auto;
+    }
     
     .story-img-card {
         position: relative;

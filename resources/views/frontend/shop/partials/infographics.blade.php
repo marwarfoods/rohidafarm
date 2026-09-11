@@ -8,7 +8,7 @@
 
 @if(is_array($infographics) && count($infographics) > 0)
     <div class="product-story-infographics-wrapper my-3 my-md-4">
-        <div class="container-fluid px-2 px-md-3" style="max-width: 100%;">
+        <div class="container-fluid px-2 px-md-3" style="max-width: 1440px; margin-left: auto; margin-right: auto;">
             <div class="row justify-content-center g-0">
                 <div class="col-12 col-xl-11">
                     <div class="d-flex flex-column gap-1 align-items-center">

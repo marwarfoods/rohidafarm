@@ -1,6 +1,5 @@
-<!-- Page Breadcrumb (Hidden on Mobile) -->
 <section class="py-2 bg-light border-bottom d-none d-md-block">
-    <div class="product-detail-container">
+    <div class="product-detail-container" style="max-width: 1440px; margin-left: auto; margin-right: auto;">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0 flex-wrap" style="font-size: 0.82rem; row-gap: 0; column-gap: 0;">
                 <li class="breadcrumb-item"><a href="{{ route('home') }}" class="text-success text-decoration-none">Home</a></li>

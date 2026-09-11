@@ -7,7 +7,7 @@
 
 <header class="navbar-sticky bg-white border-bottom header-main-container shadow-sm">
     <nav class="navbar navbar-expand-lg py-1">
-        <div class="container-fluid px-lg-5">
+        <div class="container-fluid px-lg-5" style="max-width: 1440px; margin-left: auto; margin-right: auto;">
             
             <!-- ── Mobile View Layout (Hamburger Left, Centered Logo, Search & Cart Right) ── -->
             <div class="d-flex d-lg-none justify-content-between align-items-center w-100 px-1 py-1">
@@ -60,7 +60,7 @@
                                 Shop
                             </a>
                             <div class="dropdown-menu border-0 p-4 rounded-0 shadow-lg w-100 start-0 end-0 mt-0" style="background-color: var(--white); border-top: 3px solid var(--primary-green) !important;">
-                                <div class="container position-relative px-5">
+                                <div class="container position-relative px-5" style="max-width: 1440px; margin: 0 auto;">
                                     @php
                                         $megaMenuCategories = \App\Models\Category::where('is_active', true)->orderBy('name')->get();
                                     @endphp
