@@ -4,7 +4,7 @@
     style="background-color: #FAF7EE;">
 
     <div class="bilona-inner-wrapper position-relative mx-auto"
-         style="max-width: 1536px; background: url('{{ asset('images/vectors/full-tree.png') }}') left bottom / cover no-repeat; min-height: 480px;">
+         style="max-width: 1536px; background: url('{{ asset('images/vectors/proses.PNG') }}') -180px bottom / cover no-repeat; min-height: 480px;">
 
         {{-- Dynamic gradient overlay: crystal clear on left on PC, smooth soft cream on right for readable cards --}}
         <div class="position-absolute top-0 start-0 w-100 h-100 bilona-split-overlay"
@@ -66,6 +66,20 @@
 </section>
 
 <style>
+    .bilona-inner-wrapper {
+        background-position: -80px bottom !important;
+    }
+    @media (min-width: 768px) {
+        .bilona-inner-wrapper {
+            background-position: -150px bottom !important;
+        }
+    }
+    @media (min-width: 1200px) {
+        .bilona-inner-wrapper {
+            background-position: -220px bottom !important;
+        }
+    }
+
     .bilona-split-overlay {
         background: rgba(250, 247, 238, 0.92);
     }
