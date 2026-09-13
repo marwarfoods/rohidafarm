@@ -190,26 +190,25 @@
     }
 }
 
-// Category Page Banner — 1440x432 on PC / desktop; responsive on mobile
+// Category Page Banner — full fit responsive (recommended 1440x432, completely uncropped)
 .category-banner {
     width: 100%;
     max-width: 1440px;
     margin-left: auto;
     margin-right: auto;
-    height: 160px;
+    height: auto;
     border-radius: 0 0 0.75rem 0.75rem;
 
-    .category-banner-overlay {
-        background: rgba(0, 0, 0, 0.08);
+    img {
+        width: 100%;
+        height: auto;
+        display: block;
+        border-radius: inherit;
     }
 
-    @media (min-width: 768px) {
-        height: 432px;
-        aspect-ratio: 1440 / 432;
-
-        .category-banner-overlay {
-            background: rgba(0, 0, 0, 0.08);
-        }
+    .category-banner-overlay {
+        background: rgba(0, 0, 0, 0.04);
+        pointer-events: none;
     }
 }
 

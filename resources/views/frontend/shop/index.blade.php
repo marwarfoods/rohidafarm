@@ -24,7 +24,7 @@
             <!-- Category Banner (full image, subtle overlay, no text) -->
             @if($activeCategory->banner_image)
                 <div class="position-relative overflow-hidden mb-4 category-banner">
-                    <img src="{{ asset($activeCategory->banner_image) }}" alt="{{ $activeCategory->name }}" class="w-100 h-100 object-fit-cover" style="display:block;">
+                    <img src="{{ asset($activeCategory->banner_image) }}" alt="{{ $activeCategory->name }}" class="w-100 h-auto" style="display:block;">
                     <div class="position-absolute top-0 start-0 w-100 h-100 category-banner-overlay"></div>
                 </div>
             @endif
