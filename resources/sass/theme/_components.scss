@@ -190,8 +190,12 @@
     }
 }
 
-// Category Page Banner — full width on all sizes; shorter + lighter overlay on mobile
+// Category Page Banner — 1440x432 on PC / desktop; responsive on mobile
 .category-banner {
+    width: 100%;
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
     height: 160px;
     border-radius: 0 0 0.75rem 0.75rem;
 
@@ -200,10 +204,11 @@
     }
 
     @media (min-width: 768px) {
-        height: 400px;
+        height: 432px;
+        aspect-ratio: 1440 / 432;
 
         .category-banner-overlay {
-            background: rgba(0, 0, 0, 0.15);
+            background: rgba(0, 0, 0, 0.08);
         }
     }
 }

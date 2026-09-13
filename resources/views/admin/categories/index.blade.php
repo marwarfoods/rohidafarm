@@ -62,7 +62,7 @@
                     <div id="categoryBannerPreview" class="border rounded-3 p-1 bg-light text-center d-flex align-items-center justify-content-center overflow-hidden" style="height: 90px;">
                         <span class="text-muted" style="font-size: 0.75rem;">No banner selected</span>
                     </div>
-                    <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">Shown at 100% width × 400px height (cropped to fit) on the category page — recommended size 1600×400px.</small>
+                    <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">Shown at 1440×432px on PC on the category page — recommended size 1440×432px.</small>
                 </div>
 
                 <div class="mb-3">
@@ -239,7 +239,7 @@
                         <div id="editCatBannerPreview" class="border rounded-3 p-1 bg-light text-center d-flex align-items-center justify-content-center overflow-hidden" style="height: 90px;">
                             <span class="text-muted" style="font-size: 0.75rem;">No banner selected</span>
                         </div>
-                        <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">Shown at 100% width × 400px height (cropped to fit) on the category page — recommended size 1600×400px.</small>
+                        <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">Shown at 1440×432px on PC on the category page — recommended size 1440×432px.</small>
                     </div>
 
                     <div class="mb-3">
