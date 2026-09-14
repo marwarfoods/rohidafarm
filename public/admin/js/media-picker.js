@@ -580,6 +580,8 @@
 
                 const formData = new FormData();
                 formData.append('file', file);
+                const compressCheckbox = document.getElementById('pickerCompressQuality');
+                formData.append('compress', compressCheckbox ? (compressCheckbox.checked ? '1' : '0') : '1');
 
                 const progressContainer = document.getElementById('uploadProgressBarContainer');
                 const progressBar = document.getElementById('uploadProgressBar');
@@ -605,19 +607,25 @@
                         try {
                             const response = JSON.parse(xhr.responseText);
                             if (response.status === 'success') {
-                                const fullUrl = window.location.origin + '/' + response.media.file_path.replace(/^\//, '');
-                                notify('success', 'Image uploaded successfully.');
+                                const fullUrl = response.media.url && response.media.url.startsWith('http')
+                                    ? response.media.url
+                                    : window.location.origin + '/' + response.media.file_path.replace(/^\//, '');
+                                const msg = response.quality_mode && response.quality_mode.includes('Original')
+                                    ? `💎 Uploaded in 100% Original Quality (${response.final_size})`
+                                    : (response.is_compressed ? `🗜️ Uploaded & Compressed (${response.final_size}, saved ${response.saved_percent})` : 'Image uploaded successfully.');
+                                notify('success', msg);
                                 selectedMediaItems = [{
                                     path: response.media.file_path,
                                     fullUrl: fullUrl,
-                                    filename: response.media.file_name || 'Uploaded Asset'
+                                    filename: response.media.filename || response.media.file_name || 'Uploaded Asset'
                                 }];
                                 confirmAndApplySelection();
                             } else {
                                 notify('error', response.message || 'Upload failed.');
                             }
                         } catch (parseErr) {
-                            notify('error', 'Upload failed: Invalid server response.');
+                            console.error('Media upload parse error:', parseErr);
+                            notify('error', 'Upload failed: ' + (parseErr.message || 'Invalid server response.'));
                         }
                     } else {
                         notify('error', 'Upload failed. Check file type and size.');

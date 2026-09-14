@@ -369,3 +369,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/instagram-feed/{id}/update', [\App\Http\Controllers\Admin\InstagramFeedController::class, 'update'])->name('instagram-feed.update');
     Route::delete('/instagram-feed/{id}/delete', [\App\Http\Controllers\Admin\InstagramFeedController::class, 'destroy'])->name('instagram-feed.destroy');
 });
+
+// Fallback route for all undefined URLs
+Route::fallback(function () {
+    return response()->view('errors.404', [], 404);
+});

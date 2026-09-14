@@ -285,28 +285,84 @@ class MediaController extends Controller
                 mkdir(public_path($folder), 0777, true);
             }
             
+            $targetFilePath = public_path($folder . '/' . $filename);
             $file->move(public_path($folder), $filename);
-            
-            // Compress image in-place if supported
+            $originalSize = filesize($targetFilePath);
+            $origKB = round($originalSize / 1024, 2);
+
+            // Compress image in-place if supported and requested (default true)
+            $shouldCompress = $request->has('compress') ? filter_var($request->input('compress'), FILTER_VALIDATE_BOOLEAN) : true;
+            $savedPercent = 0;
+            $savedKB = 0;
+            $finalSize = $originalSize;
+
             if ($fileType === 'image') {
-                \App\Services\ImageOptimizerService::optimize(public_path($folder . '/' . $filename));
+                if ($shouldCompress) {
+                    \App\Services\ImageOptimizerService::optimize($targetFilePath);
+                    clearstatcache(true, $targetFilePath);
+                    $finalSize = filesize($targetFilePath);
+                    $savedBytes = max(0, $originalSize - $finalSize);
+                    $savedKB = round($savedBytes / 1024, 2);
+                    $savedPercent = $originalSize > 0 ? round(($savedBytes / $originalSize) * 100, 1) : 0;
+                    $finalKB = round($finalSize / 1024, 2);
+
+                    $consoleLog = PHP_EOL . "=======================================================" . PHP_EOL
+                        . "🗜️  [IMAGE UPLOAD: COMPRESSION ENABLED]" . PHP_EOL
+                        . "📁 File          : {$originalName}" . PHP_EOL
+                        . "📏 Original Size : {$origKB} KB" . PHP_EOL
+                        . "📉 Compressed    : {$finalKB} KB" . PHP_EOL
+                        . "💾 Space Saved   : {$savedPercent}% (-{$savedKB} KB)" . PHP_EOL
+                        . "📍 Saved Path    : /{$folder}/{$filename}" . PHP_EOL
+                        . "=======================================================" . PHP_EOL;
+                } else {
+                    $finalSize = $originalSize;
+                    $finalKB = $origKB;
+
+                    $consoleLog = PHP_EOL . "=======================================================" . PHP_EOL
+                        . "💎  [IMAGE UPLOAD: 100% ORIGINAL QUALITY PRESERVED]" . PHP_EOL
+                        . "📁 File          : {$originalName}" . PHP_EOL
+                        . "⚡ Compress Option: OFF (Unchecked by Admin)" . PHP_EOL
+                        . "💎 Quality Mode  : 100% Original Lossless (Zero quality loss / No resize)" . PHP_EOL
+                        . "📏 File Size     : {$finalKB} KB" . PHP_EOL
+                        . "📍 Saved Path    : /{$folder}/{$filename}" . PHP_EOL
+                        . "=======================================================" . PHP_EOL;
+                }
+            } else {
+                $finalSize = $originalSize;
+                $finalKB = $origKB;
+                $consoleLog = PHP_EOL . "=======================================================" . PHP_EOL
+                    . "🎬  [MEDIA UPLOAD: {$fileType}]" . PHP_EOL
+                    . "📁 File       : {$originalName}" . PHP_EOL
+                    . "📏 Size       : {$finalKB} KB" . PHP_EOL
+                    . "📍 Path       : /{$folder}/{$filename}" . PHP_EOL
+                    . "=======================================================" . PHP_EOL;
             }
-            
+
+            // Print directly to terminal console (php artisan serve) and application logs
+            @file_put_contents('php://stderr', $consoleLog);
+            \Illuminate\Support\Facades\Log::info($consoleLog);
+
             $media = MediaItem::create([
                 'filename' => $originalName,
                 'file_path' => '/' . $folder . '/' . $filename,
                 'file_type' => $fileType,
-                'file_size' => filesize(public_path($folder . '/' . $filename)),
+                'file_size' => $finalSize,
             ]);
-
-            \Illuminate\Support\Facades\Log::info("📤 MEDIA UPLOAD SAVED — id={$media->id} file_path={$media->file_path} original_name={$originalName} folder={$folder}");
 
             self::logActivity('media_upload', "Uploaded media file {$originalName}");
 
             if ($request->expectsJson()) {
                 return response()->json([
                     'status' => 'success',
-                    'media' => $media
+                    'media' => $media,
+                    'is_compressed' => ($fileType === 'image' && $shouldCompress),
+                    'quality_mode' => ($fileType === 'image' && $shouldCompress) ? 'Compressed' : '100% Original Quality',
+                    'original_size' => $origKB . ' KB',
+                    'final_size' => $finalKB . ' KB',
+                    'saved_percent' => ($fileType === 'image' && $shouldCompress) ? ($savedPercent . '%') : '0%',
+                    'message' => ($fileType === 'image' && $shouldCompress) 
+                        ? "Image compressed ({$finalKB} KB, saved {$savedPercent}%)" 
+                        : "Image uploaded in full original quality ({$finalKB} KB)"
                 ]);
             }
 

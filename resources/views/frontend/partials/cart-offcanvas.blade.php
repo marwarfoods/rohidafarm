@@ -50,7 +50,7 @@
             <div class="text-center py-4 w-100">
                 <img src="{{ asset('images/emtycart.png') }}" alt="Empty Cart" class="mb-3 img-fluid" style="max-width: 150px;">
                 <h4 class="font-heading fw-bold mt-2" style="color: #174C38;">Your Cart is Empty</h4>
-                <p class="text-muted mb-4" style="font-size: 0.85rem;">Discover our pure A2 Bilona ghee, cold-pressed oils, and organic wild honey.</p>
+                <p class="text-muted mb-4" style="font-size: 0.85rem;">Discover our pure A2 Bilona ghee, wood-pressed oils, and organic wild honey.</p>
                 <a href="{{ route('shop.index') }}" class="btn rounded-pill px-4 py-2.5 text-white fw-bold font-heading text-uppercase shadow-sm" style="background-color: #174C38; font-size: 0.8rem; color: #ffffff !important;">Explore Catalog</a>
             </div>
 

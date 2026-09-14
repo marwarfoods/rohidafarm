@@ -43,7 +43,7 @@
             ['img' => asset('images/baner-1.png'), 'likes' => '3.6k', 'comments' => '210', 'caption' => 'Danedar granular texture of pure Ghee 🧈✨', 'link' => $instaUrl],
             ['img' => 'https://images.unsplash.com/photo-1589927986089-35812388d1f4?q=80&w=400&auto=format&fit=crop', 'likes' => '1.8k', 'comments' => '88', 'caption' => 'Slow wood-fire flame clarification 🪵🔥', 'link' => $instaUrl],
             ['img' => 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?q=80&w=400&auto=format&fit=crop', 'likes' => '2.2k', 'comments' => '115', 'caption' => 'Earthenware storage for rich aroma 🏺🍯', 'link' => $instaUrl],
-            ['img' => 'https://images.unsplash.com/photo-1471193945509-9ad0617afabf?q=80&w=400&auto=format&fit=crop', 'likes' => '3.3k', 'comments' => '201', 'caption' => 'Pure Groundnut Oil cold pressed naturally 🥜💛', 'link' => $instaUrl],
+            ['img' => 'https://images.unsplash.com/photo-1471193945509-9ad0617afabf?q=80&w=400&auto=format&fit=crop', 'likes' => '3.3k', 'comments' => '201', 'caption' => 'Pure Groundnut Oil wood-pressed naturally 🥜💛', 'link' => $instaUrl],
             ['img' => asset('images/home-image-pc.png'), 'likes' => '4.0k', 'comments' => '290', 'caption' => 'Pure Vedic tradition in every drop 🌿✨', 'link' => $instaUrl],
             ['img' => 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?q=80&w=400&auto=format&fit=crop', 'likes' => '2.5k', 'comments' => '150', 'caption' => '100% Chemical-free natural wellness 🍯🌿', 'link' => $instaUrl]
         ];

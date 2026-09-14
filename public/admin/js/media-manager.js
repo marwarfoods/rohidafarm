@@ -59,6 +59,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 const formData = new FormData();
                 formData.append('file', files[index]);
+                const compressCheck = document.getElementById('galleryCompressCheck');
+                formData.append('compress', compressCheck ? (compressCheck.checked ? '1' : '0') : '1');
 
                 const xhr = new XMLHttpRequest();
                 xhr.open('POST', '/admin/media/store', true);

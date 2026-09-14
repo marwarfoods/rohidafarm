@@ -79,8 +79,10 @@ class ProductController extends Controller
             $fileName = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('uploads/products'), $fileName);
             
-            // Compress the image in-place
-            \App\Services\ImageOptimizerService::optimize(public_path('uploads/products/' . $fileName));
+            // Compress the image in-place if requested (default true)
+            if ($request->has('compress') ? filter_var($request->input('compress'), FILTER_VALIDATE_BOOLEAN) : true) {
+                \App\Services\ImageOptimizerService::optimize(public_path('uploads/products/' . $fileName));
+            }
             
             $imagePath = '/uploads/products/' . $fileName;
         } elseif ($request->filled('image')) {
@@ -221,8 +223,10 @@ class ProductController extends Controller
             $fileName = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('uploads/products'), $fileName);
             
-            // Compress the image in-place
-            \App\Services\ImageOptimizerService::optimize(public_path('uploads/products/' . $fileName));
+            // Compress the image in-place if requested (default true)
+            if ($request->has('compress') ? filter_var($request->input('compress'), FILTER_VALIDATE_BOOLEAN) : true) {
+                \App\Services\ImageOptimizerService::optimize(public_path('uploads/products/' . $fileName));
+            }
             
             $primaryImagePath = '/uploads/products/' . $fileName;
         } elseif ($request->filled('image')) {

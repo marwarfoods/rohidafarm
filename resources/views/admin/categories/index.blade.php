@@ -15,7 +15,7 @@
                 @csrf
                 <div class="mb-3">
                     <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Category Name *</label>
-                    <input type="text" name="name" class="form-control bg-light border p-2" placeholder="e.g. Cold Pressed Oils" required>
+                    <input type="text" name="name" class="form-control bg-light border p-2" placeholder="e.g. Wood-Pressed Oil" required>
                 </div>
                 
                 <div class="mb-3">

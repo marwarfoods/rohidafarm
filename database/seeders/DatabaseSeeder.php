@@ -123,9 +123,9 @@ class DatabaseSeeder extends Seeder
                 ]
             ],
             [
-                'name' => 'Cold Pressed Oil',
+                'name' => 'Wood-Pressed Oil',
                 'slug' => 'cold-pressed-oil',
-                'description' => '100% natural, wood-pressed and chemical-free cold-pressed oils.',
+                'description' => '100% natural, wood-pressed and chemical-free oils.',
                 'sub' => [
                     ['name' => 'Mustard Oil', 'slug' => 'mustard-oil'],
                     ['name' => 'Groundnut Oil', 'slug' => 'groundnut-oil'],
@@ -326,7 +326,7 @@ class DatabaseSeeder extends Seeder
             'is_best_seller' => true,
             'is_new_arrival' => false,
             'short_description' => 'Wood-pressed groundnut oil, 100% natural, chemical-free, and unrefined.',
-            'description' => 'Cold-pressed under low temperature using traditional wooden ghani machines, preserving all natural nutrition, aroma, and properties of groundnuts.',
+            'description' => 'Wood-pressed under low temperature using traditional wooden ghani machines, preserving all natural nutrition, aroma, and properties of groundnuts.',
             'benefits' => '• Packed with heart-healthy monounsaturated fats\n• Good source of Vitamin E antioxidants\n• Enhances metabolism',
             'ingredients' => '100% Premium Organic Groundnuts.',
             'nutrition_facts' => 'Total Fat: 14g (per tablespoon)\nSaturated: 2.3g\nMonounsaturated: 6.2g\nPolyunsaturated: 4.3g',
@@ -593,7 +593,7 @@ class DatabaseSeeder extends Seeder
                 ['title' => 'Shop', 'url' => '/shop', 'children' => [
                     ['title' => 'Cow Ghee', 'url' => '/shop?category=ghee&subcategory=cow-ghee'],
                     ['title' => 'Buffalo Ghee', 'url' => '/shop?category=ghee&subcategory=buffalo-ghee'],
-                    ['title' => 'Cold Pressed Oils', 'url' => '/shop?category=cold-pressed-oil'],
+                    ['title' => 'Wood-Pressed Oil', 'url' => '/shop?category=cold-pressed-oil'],
                     ['title' => 'Wild Forest Honey', 'url' => '/shop?category=honey'],
                 ]],
                 ['title' => 'Our Story', 'url' => '/about'],

@@ -58,6 +58,17 @@
                             <p class="text-muted mb-4" style="font-size: 0.85rem;">or click to browse from your computer (Images or Videos max 200MB)</p>
                             <input type="file" id="pickerLocalFileInput" class="d-none">
                             <button type="button" class="btn btn-premium px-4 py-2 rounded-pill" onclick="document.getElementById('pickerLocalFileInput').click()">Browse Files</button>
+                            <div class="mt-3">
+                                <div class="form-check form-switch d-inline-flex align-items-center gap-2">
+                                    <input class="form-check-input m-0" type="checkbox" id="pickerCompressQuality" checked style="cursor: pointer;">
+                                    <label class="form-check-label text-dark fw-semibold mb-0" for="pickerCompressQuality" style="font-size: 0.84rem; cursor: pointer;">
+                                        Compress this quality
+                                    </label>
+                                </div>
+                                <div class="text-muted small mt-1" style="font-size: 0.75rem;">
+                                    Default is checked. Uncheck if you want to upload in full original quality without compression.
+                                </div>
+                            </div>
                             <div class="progress mt-3 d-none" id="uploadProgressBarContainer" style="height: 6px;">
                                 <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" id="uploadProgressBar" role="progressbar" style="width: 0%;"></div>
                             </div>

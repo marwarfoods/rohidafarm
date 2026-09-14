@@ -19,7 +19,7 @@
             <!-- Modal Body -->
             <div class="modal-body p-4 p-md-5">
                 <p class="text-muted mb-4" style="font-size: 0.95rem; line-height: 1.6;">
-                    At <strong>Rohida Farm</strong>, we believe purity is non-negotiable. Every batch of our A2 Bilona Ghee, Cold-Pressed Oils, and Raw Honey undergoes rigorous testing at NABL-accredited laboratories for chemical residue, heavy metals, fatty acid profile, and A2 Beta-Casein authentication.
+                    At <strong>Rohida Farm</strong>, we believe purity is non-negotiable. Every batch of our A2 Bilona Ghee, Wood-Pressed Oils, and Raw Honey undergoes rigorous testing at NABL-accredited laboratories for chemical residue, heavy metals, fatty acid profile, and A2 Beta-Casein authentication.
                 </p>
 
                 <!-- Certification Badges Grid inside modal -->

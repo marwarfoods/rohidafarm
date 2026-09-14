@@ -21,9 +21,17 @@
         <button type="button" class="btn btn-outline-secondary px-4 py-2 rounded-pill font-heading" id="btnImportUrl" style="border-width: 2px; font-weight: 600;">
             <i class="bi bi-link-45deg me-1"></i>Import from URL
         </button>
-        <button type="button" class="btn btn-premium px-4 py-2 rounded-pill font-heading" onclick="document.getElementById('galleryPageFileInput').click()">
-            <i class="bi bi-upload me-2"></i>Upload File
-        </button>
+        <div class="d-inline-flex flex-column align-items-end">
+            <button type="button" class="btn btn-premium px-4 py-2 rounded-pill font-heading" onclick="document.getElementById('galleryPageFileInput').click()">
+                <i class="bi bi-upload me-2"></i>Upload File
+            </button>
+            <div class="form-check form-switch mt-1 me-1">
+                <input class="form-check-input" type="checkbox" id="galleryCompressCheck" checked style="cursor: pointer;">
+                <label class="form-check-label text-muted fw-semibold" for="galleryCompressCheck" style="cursor: pointer; font-size: 0.74rem;">
+                    Compress this quality
+                </label>
+            </div>
+        </div>
     </div>
     <input type="file" id="galleryPageFileInput" class="d-none" multiple>
 </div>
