@@ -15,6 +15,7 @@
             <thead class="bg-light text-muted" style="font-size: 0.85rem; font-family: 'DM Sans', sans-serif;">
                 <tr>
                     <th scope="col" class="border-0 px-4">Reviewer Name</th>
+                    <th scope="col" class="border-0">Thumbnail</th>
                     <th scope="col" class="border-0">Video File</th>
                     <th scope="col" class="border-0">Linked Product</th>
                     <th scope="col" class="border-0">Status</th>
@@ -26,6 +27,20 @@
                 @forelse($videoReviews as $item)
                     <tr>
                         <td class="px-4 py-3 fw-bold text-dark">{{ $item->reviewer_name }}</td>
+                        <td class="py-3">
+                            <div class="admin-table-video-thumb position-relative rounded-3 overflow-hidden border shadow-sm bg-black" style="width: 54px; height: 54px; cursor: pointer;" title="Hover to preview video">
+                                @if($item->thumbnail_path)
+                                    <img src="{{ asset($item->thumbnail_path) }}" alt="Thumbnail" class="thumb-img w-100 h-100 object-fit-cover">
+                                    <video src="{{ asset($item->video_path) }}#t=0.1" class="thumb-video position-absolute top-0 start-0 w-100 h-100 object-fit-cover d-none" muted playsinline preload="metadata"></video>
+                                    <span class="play-badge position-absolute bottom-0 end-0 bg-dark bg-opacity-75 text-white px-1 rounded-top-start" style="font-size: 0.6rem; line-height: 1.2;"><i class="bi bi-play-fill"></i></span>
+                                @else
+                                    <video src="{{ asset($item->video_path) }}#t=0.1" class="thumb-video w-100 h-100 object-fit-cover" muted playsinline preload="metadata"></video>
+                                    <div class="play-badge position-absolute top-50 start-50 translate-middle bg-dark bg-opacity-75 text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; pointer-events: none; transition: opacity 0.2s;">
+                                        <i class="bi bi-play-fill" style="font-size: 0.85rem; margin-left: 1px;"></i>
+                                    </div>
+                                @endif
+                            </div>
+                        </td>
                         <td class="py-3">
                             <a href="{{ asset($item->video_path) }}" target="_blank" class="btn btn-sm btn-outline-secondary px-3"><i class="bi bi-play-circle me-1"></i> View Video</a>
                         </td>
@@ -57,7 +72,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center py-5 text-muted">
+                        <td colspan="7" class="text-center py-5 text-muted">
                             <i class="bi bi-play-btn display-4 d-block mb-3"></i>
                             No video reviews added yet.
                         </td>
@@ -73,3 +88,38 @@
     @endif
 </div>
 @endsection
+
+@push('admin_scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.admin-table-video-thumb').forEach(wrap => {
+        const video = wrap.querySelector('video');
+        const img = wrap.querySelector('.thumb-img');
+        const badge = wrap.querySelector('.play-badge');
+        if (!video) return;
+
+        wrap.addEventListener('mouseenter', () => {
+            if (img) img.classList.add('d-none');
+            video.classList.remove('d-none');
+            video.muted = true;
+            const p = video.play();
+            if (p) {
+                p.then(() => {
+                    if (badge) badge.style.opacity = '0';
+                }).catch(() => {});
+            }
+        });
+
+        wrap.addEventListener('mouseleave', () => {
+            video.pause();
+            try { video.currentTime = 0.1; } catch (e) {}
+            if (img) {
+                img.classList.remove('d-none');
+                video.classList.add('d-none');
+            }
+            if (badge) badge.style.opacity = '1';
+        });
+    });
+});
+</script>
+@endpush

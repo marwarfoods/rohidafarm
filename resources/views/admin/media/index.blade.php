@@ -120,9 +120,12 @@
 
                             <div class="thumbnail-wrapper">
                                 @if($media->file_type === 'video')
-                                    <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-dark text-white">
-                                        <i class="bi bi-play-btn fs-1 text-danger"></i>
-                                        <span class="badge bg-danger position-absolute bottom-0 start-0 m-2">Video</span>
+                                    <div class="w-100 h-100 position-relative bg-black overflow-hidden gallery-video-card">
+                                        <video src="{{ asset($media->file_path) }}#t=0.1" class="w-100 h-100 object-fit-cover" muted playsinline preload="metadata" style="pointer-events: none;"></video>
+                                        <div class="position-absolute top-50 start-50 translate-middle bg-dark bg-opacity-75 text-white rounded-circle d-flex align-items-center justify-content-center gallery-video-play-badge" style="width: 38px; height: 38px; pointer-events: none; transition: opacity 0.2s; z-index: 2;">
+                                            <i class="bi bi-play-fill fs-4" style="margin-left: 2px;"></i>
+                                        </div>
+                                        <span class="badge bg-danger position-absolute bottom-0 start-0 m-2" style="z-index: 5;">Video</span>
                                     </div>
                                 @else
                                     <img src="{{ asset($media->file_path) }}" class="w-100 h-100 object-fit-cover" loading="lazy">
@@ -272,5 +275,29 @@
 
 @push('admin_scripts')
     <script src="{{ asset('admin/js/media-manager.js') }}?v={{ @filemtime(public_path('admin/js/media-manager.js')) }}"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.gallery-video-card').forEach(card => {
+            const v = card.querySelector('video');
+            const badge = card.querySelector('.gallery-video-play-badge');
+            if (!v) return;
+            const parentCard = card.closest('.media-card');
+            if (parentCard) {
+                parentCard.addEventListener('mouseenter', () => {
+                    v.muted = true;
+                    const p = v.play();
+                    if (p) {
+                        p.then(() => { if (badge) badge.style.opacity = '0'; }).catch(() => {});
+                    }
+                });
+                parentCard.addEventListener('mouseleave', () => {
+                    v.pause();
+                    try { v.currentTime = 0.1; } catch (e) {}
+                    if (badge) badge.style.opacity = '1';
+                });
+            }
+        });
+    });
+    </script>
 @endpush
 @endsection

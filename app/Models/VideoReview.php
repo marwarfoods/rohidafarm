@@ -10,6 +10,7 @@ class VideoReview extends Model
     protected $fillable = [
         'reviewer_name',
         'video_path',
+        'thumbnail_path',
         'product_id',
         'is_active',
         'sort_order',

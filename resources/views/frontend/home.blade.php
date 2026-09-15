@@ -47,9 +47,11 @@
     </div>
 
     {{-- -- 9. Customer Love & Video Reviews -- --}}
-    <div class="lazy-section">
-        @include('frontend.home.videos')
-    </div>
+    @if(isset($videoReviews) && $videoReviews->isNotEmpty())
+        <div class="lazy-section">
+            @include('frontend.home.videos')
+        </div>
+    @endif
 
     {{-- -- 9b. Customer Reviews (photo + testimonial slider) -- --}}
     <div class="lazy-section">

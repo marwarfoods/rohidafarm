@@ -188,17 +188,34 @@
                 }
             }));
 
-            // Dispatch standard change event for backward compatibility
+            // Dispatch change and input events
+            activeTargetInput.dispatchEvent(new Event('input', { bubbles: true }));
             activeTargetInput.dispatchEvent(new Event('change', { bubbles: true }));
 
             // Update single preview container if present
             if (activePreviewContainer && selectedMediaItems.length > 0) {
-                const previewSrc = selectedMediaItems[0].fullUrl || (selectedMediaItems[0].path.startsWith('http') ? selectedMediaItems[0].path : window.location.origin + selectedMediaItems[0].path);
+                const itemPath = selectedMediaItems[0].path;
+                const previewSrc = selectedMediaItems[0].fullUrl || (itemPath.startsWith('http') ? itemPath : (window.location.origin + (itemPath.startsWith('/') ? '' : '/') + itemPath));
+                const isVideo = (currentMediaTypeFilter === 'video') || /\.(mp4|webm|mov|ogg|m4v)(\?.*)?$/i.test(itemPath);
+
                 if (activePreviewContainer.tagName === 'IMG') {
                     activePreviewContainer.src = previewSrc;
                     activePreviewContainer.style.display = 'block';
-                } else if (currentMediaTypeFilter === 'video') {
-                    activePreviewContainer.innerHTML = `<video src="${previewSrc}" class="w-100 rounded-3 mt-2" style="max-height: 150px;" controls></video>`;
+                } else if (isVideo) {
+                    activePreviewContainer.innerHTML = `
+                        <div class="video-preview-card position-relative rounded-3 overflow-hidden border shadow-sm mt-2 bg-black" style="max-width: 320px;">
+                            <video src="${previewSrc}#t=0.1" class="w-100" style="max-height: 180px; display: block;" controls preload="metadata" muted playsinline></video>
+                            <div class="small text-white-50 p-1 text-center bg-dark" style="font-size: 0.72rem;">
+                                <i class="bi bi-play-circle me-1"></i>Hover or click to play preview
+                            </div>
+                        </div>
+                    `;
+                    const v = activePreviewContainer.querySelector('video');
+                    const card = activePreviewContainer.querySelector('.video-preview-card');
+                    if (v && card) {
+                        card.addEventListener('mouseenter', () => { v.muted = true; const p = v.play(); if (p) p.catch(() => {}); });
+                        card.addEventListener('mouseleave', () => { v.pause(); try { v.currentTime = 0.1; } catch (e) {} });
+                    }
                 } else {
                     activePreviewContainer.innerHTML = `<img src="${previewSrc}" class="rounded-3 mt-2 img-fluid border" style="max-height: 120px; object-fit: cover;">`;
                 }
@@ -308,8 +325,17 @@
                         col.className = 'col';
                         
                         let previewHtml = '';
-                        if (item.file_type === 'video') {
-                            previewHtml = `<div class="bg-dark rounded-3 d-flex align-items-center justify-content-center text-white" style="height: 115px;"><i class="bi bi-play-btn fs-2"></i></div>`;
+                        const isVideo = (item.file_type === 'video') || /\.(mp4|webm|mov|ogg|m4v)(\?.*)?$/i.test(item.file_path);
+                        if (isVideo) {
+                            previewHtml = `
+                                <div class="video-item-preview-box position-relative rounded-3 overflow-hidden bg-black" style="height: 115px; border: 1px solid #ECE7DD;">
+                                    <video src="${item.full_url}#t=0.1" preload="metadata" muted playsinline class="w-100 h-100 object-fit-cover" style="pointer-events: none;"></video>
+                                    <div class="video-picker-play-badge position-absolute top-50 start-50 translate-middle bg-dark bg-opacity-75 text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; pointer-events: none; transition: opacity 0.2s;">
+                                        <i class="bi bi-play-fill fs-5" style="margin-left: 2px;"></i>
+                                    </div>
+                                    <span class="badge bg-danger position-absolute bottom-0 start-0 m-1" style="font-size: 0.6rem; pointer-events: none;">Video</span>
+                                </div>
+                            `;
                         } else {
                             previewHtml = `<img src="${item.full_url}" class="rounded-3 img-fluid object-fit-cover w-100" style="height: 115px; border: 1px solid #ECE7DD;" loading="lazy">`;
                         }
@@ -331,6 +357,25 @@
                         `;
 
                         const card = col.querySelector('.gallery-picker-item');
+                        const vidEl = col.querySelector('video');
+                        const playBadge = col.querySelector('.video-picker-play-badge');
+
+                        if (vidEl) {
+                            card.addEventListener('mouseenter', function() {
+                                vidEl.muted = true;
+                                const p = vidEl.play();
+                                if (p) {
+                                    p.then(() => {
+                                        if (playBadge) playBadge.style.opacity = '0';
+                                    }).catch(() => {});
+                                }
+                            });
+                            card.addEventListener('mouseleave', function() {
+                                vidEl.pause();
+                                try { vidEl.currentTime = 0.1; } catch (e) {}
+                                if (playBadge) playBadge.style.opacity = '1';
+                            });
+                        }
                         card.addEventListener('click', function() {
                             toggleItemSelection({
                                 path: this.getAttribute('data-path'),

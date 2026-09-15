@@ -252,34 +252,39 @@ document.addEventListener('DOMContentLoaded', function () {
         videoCards.forEach((card, index) => {
             const cardVideo = card.querySelector('video');
             const playBtn = card.querySelector('.play-overlay-btn');
+            const customThumb = card.querySelector('.video-custom-thumbnail');
 
             if (cardVideo) {
                 cardVideo.muted = true;
 
-                // Force the browser to decode & paint the first frame as a thumbnail.
-                // Mobile browsers (iOS Safari, some Android Chrome) leave the video
-                // element black with only preload="metadata" — nudging currentTime
-                // forward after metadata loads makes them render a real frame.
-                const paintFirstFrame = () => {
-                    if (cardVideo.readyState >= 1) {
-                        cardVideo.currentTime = 0.1;
-                    }
-                };
-                cardVideo.addEventListener('loadedmetadata', paintFirstFrame);
-                if (cardVideo.readyState >= 1) paintFirstFrame();
+                // Force browser to paint first frame only if no custom thumbnail image exists
+                if (!customThumb) {
+                    const paintFirstFrame = () => {
+                        if (cardVideo.readyState >= 1) {
+                            cardVideo.currentTime = 0.1;
+                        }
+                    };
+                    cardVideo.addEventListener('loadedmetadata', paintFirstFrame);
+                    if (cardVideo.readyState >= 1) paintFirstFrame();
+                }
 
                 card.addEventListener('mouseenter', () => {
                     const playPromise = cardVideo.play();
                     if (playPromise !== undefined) {
                         playPromise.then(() => {
                             if (playBtn) playBtn.style.opacity = '0';
+                            if (customThumb) customThumb.style.opacity = '0';
                         }).catch(() => { });
                     }
                 });
 
                 card.addEventListener('mouseleave', () => {
                     cardVideo.pause();
+                    try {
+                        cardVideo.currentTime = 0;
+                    } catch (err) {}
                     if (playBtn) playBtn.style.opacity = '1';
+                    if (customThumb) customThumb.style.opacity = '1';
                 });
             }
 
@@ -308,8 +313,13 @@ document.addEventListener('DOMContentLoaded', function () {
             videoCards.forEach(c => {
                 const v = c.querySelector('video');
                 const p = c.querySelector('.play-overlay-btn');
-                if (v) v.pause();
+                const t = c.querySelector('.video-custom-thumbnail');
+                if (v) {
+                    v.pause();
+                    try { v.currentTime = 0; } catch (e) {}
+                }
                 if (p) p.style.opacity = '1';
+                if (t) t.style.opacity = '1';
             });
 
             const container = lightbox.querySelector('.lightbox-container');

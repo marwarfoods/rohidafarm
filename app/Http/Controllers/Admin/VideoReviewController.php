@@ -38,6 +38,8 @@ class VideoReviewController extends Controller
         $request->validate([
             'reviewer_name' => 'required|string|max:255',
             'video' => 'required', // Can be file or path string
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'thumbnail_path' => 'nullable|string|max:500',
             'product_id' => 'nullable|exists:products,id',
             'sort_order' => 'nullable|integer|min:0',
         ]);
@@ -52,9 +54,24 @@ class VideoReviewController extends Controller
             $videoPath = $request->input('video');
         }
 
+        $thumbnailPath = null;
+        if ($request->hasFile('thumbnail')) {
+            $thumbDir = public_path('uploads/videos/thumbnails');
+            if (!file_exists($thumbDir)) {
+                mkdir($thumbDir, 0755, true);
+            }
+            $thumbFile = $request->file('thumbnail');
+            $thumbName = time() . '_thumb_' . $thumbFile->getClientOriginalName();
+            $thumbFile->move($thumbDir, $thumbName);
+            $thumbnailPath = '/uploads/videos/thumbnails/' . $thumbName;
+        } elseif ($request->filled('thumbnail_path')) {
+            $thumbnailPath = $request->input('thumbnail_path');
+        }
+
         $videoReview = VideoReview::create([
             'reviewer_name' => $request->input('reviewer_name'),
             'video_path' => $videoPath,
+            'thumbnail_path' => $thumbnailPath,
             'product_id' => $request->input('product_id'),
             'is_active' => $request->has('is_active'),
             'sort_order' => $request->input('sort_order', 0),
@@ -85,6 +102,8 @@ class VideoReviewController extends Controller
         $request->validate([
             'reviewer_name' => 'required|string|max:255',
             'video' => 'nullable', // Can be file or path string
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'thumbnail_path' => 'nullable|string|max:500',
             'product_id' => 'nullable|exists:products,id',
             'sort_order' => 'nullable|integer|min:0',
         ]);
@@ -99,7 +118,9 @@ class VideoReviewController extends Controller
         if ($request->hasFile('video')) {
             // Delete old file if exists
             if ($videoReview->video_path && file_exists(public_path($videoReview->video_path))) {
-                @unlink(public_path($videoReview->video_path));
+                if (str_starts_with($videoReview->video_path, '/uploads/videos/')) {
+                    @unlink(public_path($videoReview->video_path));
+                }
             }
 
             $file = $request->file('video');
@@ -108,9 +129,42 @@ class VideoReviewController extends Controller
             $data['video_path'] = '/uploads/videos/' . $fileName;
         } elseif ($request->filled('video')) {
             if ($videoReview->video_path && file_exists(public_path($videoReview->video_path)) && $videoReview->video_path !== $request->input('video')) {
-                @unlink(public_path($videoReview->video_path));
+                if (str_starts_with($videoReview->video_path, '/uploads/videos/')) {
+                    @unlink(public_path($videoReview->video_path));
+                }
             }
             $data['video_path'] = $request->input('video');
+        }
+
+        if ($request->hasFile('thumbnail')) {
+            if ($videoReview->thumbnail_path && file_exists(public_path($videoReview->thumbnail_path))) {
+                if (str_starts_with($videoReview->thumbnail_path, '/uploads/videos/thumbnails/')) {
+                    @unlink(public_path($videoReview->thumbnail_path));
+                }
+            }
+
+            $thumbDir = public_path('uploads/videos/thumbnails');
+            if (!file_exists($thumbDir)) {
+                mkdir($thumbDir, 0755, true);
+            }
+            $thumbFile = $request->file('thumbnail');
+            $thumbName = time() . '_thumb_' . $thumbFile->getClientOriginalName();
+            $thumbFile->move($thumbDir, $thumbName);
+            $data['thumbnail_path'] = '/uploads/videos/thumbnails/' . $thumbName;
+        } elseif ($request->filled('thumbnail_path')) {
+            if ($videoReview->thumbnail_path && file_exists(public_path($videoReview->thumbnail_path)) && $videoReview->thumbnail_path !== $request->input('thumbnail_path')) {
+                if (str_starts_with($videoReview->thumbnail_path, '/uploads/videos/thumbnails/')) {
+                    @unlink(public_path($videoReview->thumbnail_path));
+                }
+            }
+            $data['thumbnail_path'] = $request->input('thumbnail_path');
+        } elseif ($request->has('remove_thumbnail') && $request->boolean('remove_thumbnail')) {
+            if ($videoReview->thumbnail_path && file_exists(public_path($videoReview->thumbnail_path))) {
+                if (str_starts_with($videoReview->thumbnail_path, '/uploads/videos/thumbnails/')) {
+                    @unlink(public_path($videoReview->thumbnail_path));
+                }
+            }
+            $data['thumbnail_path'] = null;
         }
 
         $videoReview->update($data);
@@ -129,7 +183,16 @@ class VideoReviewController extends Controller
 
         // Delete video file
         if ($videoReview->video_path && file_exists(public_path($videoReview->video_path))) {
-            @unlink(public_path($videoReview->video_path));
+            if (str_starts_with($videoReview->video_path, '/uploads/videos/')) {
+                @unlink(public_path($videoReview->video_path));
+            }
+        }
+
+        // Delete thumbnail file
+        if ($videoReview->thumbnail_path && file_exists(public_path($videoReview->thumbnail_path))) {
+            if (str_starts_with($videoReview->thumbnail_path, '/uploads/videos/thumbnails/')) {
+                @unlink(public_path($videoReview->thumbnail_path));
+            }
         }
 
         $reviewer = $videoReview->reviewer_name;

@@ -1,3 +1,4 @@
+@if(isset($videoReviews) && $videoReviews->isNotEmpty())
 <!-- Featured Videos Section -->
 <section class="py-5 position-relative overflow-hidden"
     style="background: url('{{ asset('images/vectors/bg7.png') }}') center center / cover no-repeat;">
@@ -22,7 +23,7 @@
 
         <div class="swiper video-reviews-slider overflow-visible" data-aos="fade-up">
             <div class="swiper-wrapper">
-                @forelse($videoReviews as $vid)
+                @foreach($videoReviews as $vid)
                     @php
                         $avatar = $vid->product && $vid->product->primaryImage ? asset($vid->product->primaryImage->image_path) : asset('images/baner-1.png');
                         $pPrice = $vid->product ? $vid->product->sale_price : 0;
@@ -34,11 +35,24 @@
                              style="border-color: var(--border-color) !important; cursor: pointer;"
                              data-index="{{ $loop->index }}"
                              data-video="{{ asset($vid->video_path) }}"
+                             data-thumbnail="{{ $vid->thumbnail_path ? asset($vid->thumbnail_path) : '' }}"
                              data-reviewer="{{ $vid->reviewer_name }}"
                              data-product="{{ $vid->product ? $vid->product->name : 'Verified Buyer' }}"
                              data-buy-url="{{ $vid->product ? route('shop.show', $vid->product->slug) : '' }}">
                             <div class="position-relative" style="height: 380px;">
-                                <video src="{{ asset($vid->video_path) }}" class="w-100 h-100 object-fit-cover rounded-top-4" muted playsinline preload="metadata" style="background-color: #000; pointer-events: none;" aria-label="Customer video review"></video>
+                                <video src="{{ asset($vid->video_path) }}" 
+                                       @if($vid->thumbnail_path) poster="{{ asset($vid->thumbnail_path) }}" @endif
+                                       class="w-100 h-100 object-fit-cover rounded-top-4" 
+                                       muted playsinline preload="metadata" 
+                                       style="background-color: #000; pointer-events: none;" 
+                                       aria-label="Customer video review"></video>
+                                @if($vid->thumbnail_path)
+                                    <img src="{{ asset($vid->thumbnail_path) }}" 
+                                         alt="{{ $vid->reviewer_name }}" 
+                                         class="video-custom-thumbnail position-absolute top-0 start-0 w-100 h-100 object-fit-cover rounded-top-4" 
+                                         style="transition: opacity 0.35s ease; pointer-events: none; z-index: 1;" 
+                                         loading="lazy">
+                                @endif
                                 <div class="play-overlay-btn position-absolute top-50 start-50 translate-middle bg-white bg-opacity-75 rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; pointer-events: none; transition: opacity 0.3s ease; z-index: 2;">
                                     <i class="bi bi-play-fill text-dark fs-2" style="margin-left: 3px;"></i>
                                 </div>
@@ -71,35 +85,7 @@
                             </div>
                         </div>
                     </div>
-                @empty
-                    <!-- Placeholder Videos -->
-                    <div class="swiper-slide h-auto" style="width: 280px;">
-                        <div class="video-card-wrapper position-relative rounded-4 overflow-hidden border shadow-sm h-100 bg-light d-flex flex-column" 
-                             style="border-color: var(--border-color) !important; cursor: pointer;"
-                             data-index="0"
-                             data-video="https://assets.mixkit.co/videos/preview/mixkit-pouring-honey-from-a-wooden-spoon-42358-large.mp4"
-                             data-reviewer="Sita Devi"
-                             data-product="Pure Ghee"
-                             data-buy-url="">
-                            <div class="position-relative" style="height: 380px;">
-                                <video src="https://assets.mixkit.co/videos/preview/mixkit-pouring-honey-from-a-wooden-spoon-42358-large.mp4" class="w-100 h-100 object-fit-cover rounded-top-4" muted playsinline preload="metadata" style="background-color: #000; pointer-events: none;" aria-label="Customer video review"></video>
-                                <div class="play-overlay-btn position-absolute top-50 start-50 translate-middle bg-white bg-opacity-75 rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; pointer-events: none; transition: opacity 0.3s ease; z-index: 2;">
-                                    <i class="bi bi-play-fill text-dark fs-2" style="margin-left: 3px;"></i>
-                                </div>
-                            </div>
-                            <div class="p-3 bg-white rounded-bottom-4 flex-grow-1 d-flex flex-column justify-content-between" style="min-height: 120px;">
-                                <div class="d-flex align-items-center gap-2 mb-3">
-                                    <img src="{{ asset('images/baner-1.png') }}" class="rounded-circle border" width="44" height="44" style="object-fit: cover; flex-shrink: 0;" loading="lazy" decoding="async" alt="Sita Devi">
-                                    <div>
-                                        <h6 class="fw-bold font-heading text-dark m-0 fs-6">Sita Devi</h6>
-                                        <small class="text-muted d-block">Pure Ghee User</small>
-                                    </div>
-                                </div>
-                                <button class="btn btn-secondary w-100 py-2 rounded-3 text-uppercase btn-video-buy" disabled style="font-size: 0.75rem;">Buy Now</button>
-                            </div>
-                        </div>
-                    </div>
-                @endforelse
+                @endforeach
             </div>
             <div class="swiper-pagination d-block mt-4"></div>
         </div>
@@ -151,3 +137,4 @@
         <i class="bi bi-chevron-right" aria-hidden="true"></i>
     </button>
 </div>
+@endif

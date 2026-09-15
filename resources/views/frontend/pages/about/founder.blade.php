@@ -20,7 +20,7 @@
 
                 <div class="col-lg-6" data-aos="fade-left">
                     <div class="founder-visual">
-                        <img src="{{ asset('images/svgs/Rohida Farm Web Vector 05.svg') }}" alt="Rohida Farm Founder's Vision" loading="lazy">
+                        <img src="{{ asset('images/vectors/raja-patel.png') }}" alt="Rohida Farm Founder - Raja Patel" loading="lazy">
                     </div>
                 </div>
 

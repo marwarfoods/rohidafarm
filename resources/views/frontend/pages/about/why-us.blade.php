@@ -5,7 +5,7 @@
 
             <div class="col-lg-7" data-aos="fade-right">
                 <div class="sustainability-visual">
-                    <img src="{{ asset('images/svgs/Rohida Farm Web Vector 13.svg') }}" alt="Sustainability at Rohida Farm" loading="lazy">
+                    <img src="{{ asset('images/vectors/about-cow.png') }}" alt="Rohida Farm - Indigenous Tharparkar Cow" loading="lazy">
                 </div>
             </div>
 

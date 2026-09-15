@@ -39,13 +39,11 @@
 
             <div class="col-md-6">
                 <div class="mb-3">
-                    <label for="videoInput" class="form-label fw-bold text-dark">Video Review Asset</label>
-                    <input type="text" class="form-control rounded-3 @error('video') is-invalid @enderror" id="videoInput" name="video" value="{{ old('video', $videoReview->video_path) }}" required placeholder="/uploads/videos/review.mp4">
-                    <div id="videoPreviewContainer" class="mt-2">
-                        @if($videoReview->video_path)
-                            <video src="{{ asset($videoReview->video_path) }}" class="w-100 rounded-3 mt-2" style="max-height: 150px;" controls></video>
-                        @endif
-                    </div>
+                    <label for="videoInput" class="form-label fw-bold text-dark">Video Review Asset <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control rounded-3 @error('video') is-invalid @enderror media-picker-input" id="videoInput" name="video" value="{{ old('video', $videoReview->video_path) }}" required placeholder="Select from Media Library or enter video URL...">
+                    <div class="mt-2 text-muted" style="font-size: 0.78rem;"><i class="bi bi-info-circle me-1"></i>Or upload a new video file to replace:</div>
+                    <input type="file" name="video_file" class="form-control rounded-3 mt-1" accept="video/mp4,video/webm,video/quicktime" onchange="previewVideoFile(this)">
+                    <div id="videoPreviewContainer" class="mt-2"></div>
                     @error('video')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -59,6 +57,42 @@
                     @error('sort_order')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-dark">
+                        Thumbnail / Poster Image <small class="text-muted fw-normal">(Optional — shown before video plays & returns on mouse leave, just like Instagram)</small>
+                    </label>
+                    <div class="row g-3 align-items-start">
+                        <div class="col-md-7">
+                            <input type="text" class="form-control rounded-3 @error('thumbnail_path') is-invalid @enderror media-picker-input" id="thumbnailInput" name="thumbnail_path" value="{{ old('thumbnail_path', $videoReview->thumbnail_path) }}" placeholder="Select from Media Library or paste image URL...">
+                            <div class="mt-2 text-muted" style="font-size: 0.78rem;"><i class="bi bi-info-circle me-1"></i>Or upload a new image directly (JPEG, PNG, WEBP max 5MB):</div>
+                            <input type="file" name="thumbnail" class="form-control rounded-3 mt-1" accept="image/*" onchange="previewThumbnail(this)">
+                            @if($videoReview->thumbnail_path)
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" name="remove_thumbnail" value="1" id="removeThumbnail">
+                                    <label class="form-check-label text-danger small" for="removeThumbnail">Remove existing thumbnail image</label>
+                                </div>
+                            @endif
+                            @error('thumbnail')
+                                <div class="text-danger small mt-1">{{ $message }}</div>
+                            @enderror
+                            @error('thumbnail_path')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-md-5">
+                            <div id="thumbnailPreviewContainer" class="border rounded-3 p-2 bg-light text-center d-flex align-items-center justify-content-center" style="min-height: 120px;">
+                                @if($videoReview->thumbnail_path)
+                                    <img src="{{ asset($videoReview->thumbnail_path) }}" class="rounded-3 img-fluid border" style="max-height: 150px; object-fit: contain;">
+                                @else
+                                    <span class="text-muted small">No thumbnail selected (will fallback to video frame)</span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -80,7 +114,85 @@
 @push('admin_scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        initMediaPicker('#videoInput', '#videoPreviewContainer', 'video');
+        if (typeof initMediaPicker === 'function') {
+            initMediaPicker('#videoInput', '#videoPreviewContainer', 'video');
+            initMediaPicker('#thumbnailInput', '#thumbnailPreviewContainer', 'image');
+        }
+
+        const videoInput = document.getElementById('videoInput');
+        if (videoInput) {
+            videoInput.addEventListener('input', function() {
+                renderVideoPreview(this.value);
+            });
+            videoInput.addEventListener('change', function() {
+                renderVideoPreview(this.value);
+            });
+            videoInput.addEventListener('media-picker:selected', function(e) {
+                if (e.detail && e.detail.paths && e.detail.paths[0]) {
+                    renderVideoPreview(e.detail.paths[0]);
+                }
+            });
+            if (videoInput.value) {
+                renderVideoPreview(videoInput.value);
+            }
+        }
     });
+
+    function renderVideoPreview(url) {
+        const container = document.getElementById('videoPreviewContainer');
+        if (!container) return;
+        if (!url || !url.trim()) {
+            container.innerHTML = '';
+            return;
+        }
+        const cleanUrl = url.trim();
+        const src = cleanUrl.startsWith('http') || cleanUrl.startsWith('blob:')
+            ? cleanUrl
+            : (window.location.origin + (cleanUrl.startsWith('/') ? '' : '/') + cleanUrl);
+
+        container.innerHTML = `
+            <div class="video-preview-card position-relative rounded-3 overflow-hidden border shadow-sm mt-2 bg-black" style="max-width: 320px;">
+                <video src="${src}#t=0.1" class="w-100" style="max-height: 180px; display: block;" controls preload="metadata" muted playsinline></video>
+                <div class="small text-white-50 p-1 text-center bg-dark" style="font-size: 0.72rem;">
+                    <i class="bi bi-play-circle me-1"></i>Hover or click to play preview
+                </div>
+            </div>
+        `;
+
+        const v = container.querySelector('video');
+        const card = container.querySelector('.video-preview-card');
+        if (v && card) {
+            card.addEventListener('mouseenter', () => {
+                v.muted = true;
+                const p = v.play();
+                if (p) p.catch(() => {});
+            });
+            card.addEventListener('mouseleave', () => {
+                v.pause();
+                try { v.currentTime = 0.1; } catch (e) {}
+            });
+        }
+    }
+
+    function previewVideoFile(input) {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+        const fileUrl = URL.createObjectURL(file);
+        renderVideoPreview(fileUrl);
+        const textInput = document.getElementById('videoInput');
+        if (textInput && !textInput.value) {
+            textInput.value = '/uploads/videos/' + file.name;
+        }
+    }
+
+    function previewThumbnail(input) {
+        const container = document.querySelector('#thumbnailPreviewContainer');
+        if (!container || !input.files || !input.files[0]) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+            container.innerHTML = `<img src="${e.target.result}" class="rounded-3 img-fluid border" style="max-height: 150px; object-fit: contain;">`;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
 </script>
 @endpush

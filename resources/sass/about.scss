@@ -164,6 +164,7 @@
             color: #8B5A2B;
             position: relative;
             display: inline-block;
+
             &::after {
                 content: "";
                 position: absolute;
@@ -215,6 +216,7 @@
         border: 1px solid #8B5A2B;
         font-weight: 600;
         transition: all 0.3s ease;
+
         &:hover {
             background-color: #724720;
             color: #FFFFFF;
@@ -229,6 +231,7 @@
         border: 1.5px solid #8B5A2B;
         font-weight: 600;
         transition: all 0.3s ease;
+
         &:hover {
             background-color: #8B5A2B;
             color: #FFFFFF;
@@ -332,7 +335,7 @@
     .story-block {
         padding: 2.5rem 0;
 
-        & + .story-block {
+        &+.story-block {
             border-top: 1px dashed #EAE1D0;
         }
     }
@@ -439,8 +442,13 @@
 }
 
 @keyframes about-marquee-scroll {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
 }
 
 /* 6. Sustainability Section */
@@ -578,10 +586,17 @@
         justify-content: center;
 
         img {
-            width: 100%;
-            max-height: 340px;
+            width: auto;
+            max-width: 100%;
+            height: auto;
+            max-height: 460px;
             object-fit: contain;
-            filter: drop-shadow(0 16px 30px rgba(0, 0, 0, 0.25));
+            border-radius: 20px;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+
+            @media (max-width: 768px) {
+                max-height: 380px;
+            }
         }
     }
 }
