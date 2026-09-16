@@ -1,6 +1,7 @@
 <!-- ── Our Roots & Heritage (The Rohida Farm Journey & Traditional Values) ── -->
 @php
-    $storyVideo = \App\Models\Setting::get('home_story_video') ?: asset('images/videos/about-us.mp4');
+    $rawStoryVideo = \App\Models\Setting::get('home_story_video') ?: 'https://res.cloudinary.com/debmxiph/video/upload/v1789550013/about-us.mp4';
+    $storyVideo = str_starts_with($rawStoryVideo, 'http') ? $rawStoryVideo : asset($rawStoryVideo);
 @endphp
 
 <section class="py-4 py-md-5 story-kasutam-section position-relative overflow-hidden" id="our-story"

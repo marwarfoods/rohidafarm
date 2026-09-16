@@ -40,11 +40,21 @@ class Cart extends Model
     }
 
     /**
+     * Helper to get unit price of cart item.
+     */
+    public function getUnitPriceAttribute(): float
+    {
+        if ($this->variant && (float)$this->variant->sale_price > 0) {
+            return (float) $this->variant->sale_price;
+        }
+        return (float) ($this->product?->sale_price ?? 0);
+    }
+
+    /**
      * Helper to get subtotal of cart item.
      */
     public function getSubtotalAttribute(): float
     {
-        $price = $this->variant ? $this->variant->sale_price : $this->product->sale_price;
-        return $price * $this->quantity;
+        return (float) ($this->unit_price * $this->quantity);
     }
 }

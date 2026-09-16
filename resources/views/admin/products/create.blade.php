@@ -419,13 +419,29 @@
                         <div class="text-muted" style="font-size:0.75rem;">Display in main /shop all products listing.</div>
                     </div>
 
-                    <div class="form-check form-switch mb-1">
+                    <div class="form-check form-switch mb-3">
                         <input class="form-check-input" type="checkbox" name="show_on_category" id="show_on_category" value="1"
                                {{ old('show_on_category', '1') ? 'checked' : '' }}>
                         <label class="form-check-label fw-semibold text-dark" for="show_on_category" style="font-size:0.85rem;">
                             Show on Category Page
                         </label>
                         <div class="text-muted" style="font-size:0.75rem;">Display when browsing this product's category or subcategory page.</div>
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" name="show_in_save_more" id="show_in_save_more" value="1"
+                               {{ old('show_in_save_more') ? 'checked' : '' }}>
+                        <label class="form-check-label fw-semibold text-dark" for="show_in_save_more" style="font-size:0.85rem;">
+                            Show in Buy More &amp; Save More Section
+                        </label>
+                        <div class="text-muted" style="font-size:0.75rem;">Display in the 'Buy More &amp; Save More' section on the Homepage.</div>
+                    </div>
+
+                    <div class="border-top pt-3 mt-3">
+                        <label class="form-label fw-semibold text-dark" style="font-size:0.85rem;">Display Order / Position (Sort Order)</label>
+                        <input type="number" name="sort_order" class="form-control border p-2"
+                               placeholder="e.g. 1, 2, 3..." value="{{ old('sort_order', 0) }}" min="0">
+                        <div class="form-text mt-1" style="font-size: 0.75rem;">Lower numbers appear first (e.g. 1, 2, 3). Products with 0 appear after numbered items.</div>
                     </div>
                 </div>
             </div>

@@ -34,6 +34,18 @@
             <small class="text-muted d-block mt-1">Example: <code>{"Maharashtra": 5, "Gujarat": 12}</code></small>
         </div>
         
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Standard Delivery / Shipping Charge (₹)</label>
+            <input type="number" step="0.01" name="settings[default_delivery_charge]" class="form-control bg-light border p-2" value="{{ App\Models\Setting::get('default_delivery_charge', 100) }}" placeholder="100">
+            <small class="text-muted d-block mt-1">Applied when cart subtotal is below the free delivery target.</small>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Free Delivery Minimum Order Amount (₹)</label>
+            <input type="number" step="0.01" name="settings[free_shipping_threshold]" class="form-control bg-light border p-2" value="{{ App\Models\Setting::get('free_shipping_threshold', 999) }}" placeholder="999">
+            <small class="text-muted d-block mt-1">Orders with subtotal equal to or above this target get FREE shipping.</small>
+        </div>
+
         <div class="col-md-12 mb-3">
             <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Blocked Pincodes (Comma separated)</label>
             <textarea name="settings[blocked_pincodes]" class="form-control bg-light border p-2" rows="2" placeholder="e.g. 302012, 400001">{{ App\Models\Setting::get('blocked_pincodes') }}</textarea>

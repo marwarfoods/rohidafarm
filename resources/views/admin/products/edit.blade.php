@@ -153,6 +153,7 @@
                                 {{-- Accordion Body --}}
                                 <div id="variantCollapse_{{ $index }}" class="collapse show">
                                     <div class="card-body p-3">
+                                        <input type="hidden" name="variants[{{ $index }}][id]" value="{{ $v->id }}">
                                         {{-- Row 1: Weight, MRP, Sale Price, Stock, Max Cart Qty --}}
                                         <div class="row g-3 mb-3">
                                             <div class="col-md-3">
@@ -612,13 +613,29 @@
                         <div class="text-muted" style="font-size:0.75rem;">Display in main /shop all products listing.</div>
                     </div>
 
-                    <div class="form-check form-switch mb-1">
+                    <div class="form-check form-switch mb-3">
                         <input class="form-check-input" type="checkbox" name="show_on_category" id="show_on_category" value="1"
                                {{ old('show_on_category', $product->show_on_category ?? true) ? 'checked' : '' }}>
                         <label class="form-check-label fw-semibold text-dark" for="show_on_category" style="font-size:0.85rem;">
                             Show on Category Page
                         </label>
                         <div class="text-muted" style="font-size:0.75rem;">Display when browsing this product's category or subcategory page.</div>
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" name="show_in_save_more" id="show_in_save_more" value="1"
+                               {{ old('show_in_save_more', $product->show_in_save_more ?? false) ? 'checked' : '' }}>
+                        <label class="form-check-label fw-semibold text-dark" for="show_in_save_more" style="font-size:0.85rem;">
+                            Show in Buy More &amp; Save More Section
+                        </label>
+                        <div class="text-muted" style="font-size:0.75rem;">Display in the 'Buy More &amp; Save More' section on the Homepage.</div>
+                    </div>
+
+                    <div class="border-top pt-3 mt-3">
+                        <label class="form-label fw-semibold text-dark" style="font-size:0.85rem;">Display Order / Position (Sort Order)</label>
+                        <input type="number" name="sort_order" class="form-control border p-2"
+                               placeholder="e.g. 1, 2, 3..." value="{{ old('sort_order', $product->sort_order ?? 0) }}" min="0">
+                        <div class="form-text mt-1" style="font-size: 0.75rem;">Lower numbers appear first (e.g. 1, 2, 3). Products with 0 appear after numbered items.</div>
                     </div>
                 </div>
             </div>
@@ -760,6 +777,43 @@
                     });
                     infographicInput.value = '';
                 }
+            });
+        }
+
+        // Two-way sync between sidebar sale price / MRP and first variant's pricing
+        const sidebarSalePrice = document.querySelector('input[name="sale_price"]');
+        const sidebarMrp = document.querySelector('input[name="mrp"]');
+        const firstVariantPrice = document.querySelector('.variant-price-input');
+        const firstVariantMrp = document.querySelector('input[name="variants[0][mrp]"]');
+
+        if (sidebarSalePrice && firstVariantPrice) {
+            sidebarSalePrice.addEventListener('input', function() {
+                const allVariantPrices = document.querySelectorAll('.variant-price-input');
+                if (allVariantPrices.length === 1 || !firstVariantPrice.dataset.manuallyEdited) {
+                    firstVariantPrice.value = this.value;
+                }
+            });
+
+            firstVariantPrice.addEventListener('input', function() {
+                this.dataset.manuallyEdited = 'true';
+                const allVariantPrices = document.querySelectorAll('.variant-price-input');
+                if (allVariantPrices.length === 1) {
+                    sidebarSalePrice.value = this.value;
+                }
+            });
+        }
+
+        if (sidebarMrp && firstVariantMrp) {
+            sidebarMrp.addEventListener('input', function() {
+                const allVariantMrps = document.querySelectorAll('input[name*="[mrp]"]');
+                if (allVariantMrps.length <= 2 || !firstVariantMrp.dataset.manuallyEdited) {
+                    firstVariantMrp.value = this.value;
+                }
+            });
+
+            firstVariantMrp.addEventListener('input', function() {
+                this.dataset.manuallyEdited = 'true';
+                sidebarMrp.value = this.value;
             });
         }
     });

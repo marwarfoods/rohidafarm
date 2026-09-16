@@ -68,6 +68,9 @@ class OrderService
                 $discountAmount += abs($totals['payment_adj']);
             }
 
+            $isFreeOrder = ($totals['total'] <= 0 || $paymentMethod === 'free');
+            $paymentStatus = ($paymentMethod === 'wallet' || $isFreeOrder) ? 'paid' : 'pending';
+
             // 3. Create the order
             $order = Order::create([
                 'user_id' => $user->id,
@@ -78,9 +81,9 @@ class OrderService
                 'shipping_charges' => $shippingCharges,
                 'coupon_code' => $totals['coupon'] ? $totals['coupon']->code : null,
                 'discount_amount' => $discountAmount,
-                'total' => $totals['total'],
-                'payment_method' => $paymentMethod,
-                'payment_status' => $paymentMethod === 'wallet' ? 'paid' : 'pending',
+                'total' => max(0, $totals['total']),
+                'payment_method' => $isFreeOrder ? 'free' : $paymentMethod,
+                'payment_status' => $paymentStatus,
                 'shipping_name' => $shippingData['name'],
                 'shipping_phone' => $shippingData['phone'],
                 'shipping_address_line1' => $shippingData['address_line1'],
@@ -90,8 +93,8 @@ class OrderService
                 'shipping_postal_code' => $shippingData['postal_code'],
                 'shipping_country' => $shippingData['country'] ?? 'India',
                 'estimated_delivery' => now()->addDays(5),
-                'advance_amount' => $totals['cod_advance'] ?? 0,
-                'cod_due_amount' => $totals['cod_due'] ?? 0,
+                'advance_amount' => $isFreeOrder ? 0 : ($totals['cod_advance'] ?? 0),
+                'cod_due_amount' => $isFreeOrder ? 0 : ($totals['cod_due'] ?? 0),
             ]);
 
             // 4. Create order items & deduct stock

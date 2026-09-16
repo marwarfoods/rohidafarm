@@ -1,3 +1,4 @@
+@if(isset($allProducts) && $allProducts->isNotEmpty())
 <section class="py-md-5 py-3 position-relative overflow-hidden"
     style="background: url('{{ asset('images/vectors/bg6.png') }}') center center / cover no-repeat;">
     <div class="position-absolute top-0 start-0 w-100 h-100"
@@ -25,6 +26,7 @@
         @endif
     </div>
 </section>
+@endif
 
 @push('scripts')
 <script>

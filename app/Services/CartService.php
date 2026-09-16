@@ -18,36 +18,47 @@ class CartService
     public function getItems()
     {
         if (Auth::check()) {
-            $items = Cart::with(['product.images', 'variant'])
+            $items = Cart::with(['product.images', 'product.variants', 'variant'])
                 ->where('user_id', Auth::id())
-                ->get();
+                ->get()
+                ->filter(fn($item) => $item->product !== null);
             
             foreach ($items as $item) {
                 $item->cart_id = $item->id;
+                // If variant_id is set but variant is missing/deleted, fallback to first available variant
+                if ($item->variant_id && !$item->variant && $item->product->variants->isNotEmpty()) {
+                    $fallbackVariant = $item->product->variants->first();
+                    $item->variant_id = $fallbackVariant->id;
+                    $item->setRelation('variant', $fallbackVariant);
+                    Cart::where('id', $item->id)->update(['variant_id' => $fallbackVariant->id]);
+                }
             }
             
-            return $items;
+            return $items->values();
         }
 
         $sessionCart = Session::get('cart', []);
         $items = collect();
 
         foreach ($sessionCart as $key => $item) {
-            $product = Product::with('images')->find($item['product_id']);
+            $product = Product::with(['images', 'variants'])->find($item['product_id']);
             if (!$product) continue;
             
             $variant = null;
             if (!empty($item['variant_id'])) {
                 $variant = ProductVariant::find($item['variant_id']);
             }
+            if (!$variant && $product->variants->isNotEmpty()) {
+                $variant = $product->variants->first();
+            }
 
             $cartItem = new Cart([
                 'product_id' => $item['product_id'],
-                'variant_id' => $item['variant_id'],
+                'variant_id' => $variant?->id ?? ($item['variant_id'] ?? null),
                 'quantity' => $item['quantity'],
-                'product' => $product,
-                'variant' => $variant
             ]);
+            $cartItem->setRelation('product', $product);
+            $cartItem->setRelation('variant', $variant);
             $cartItem->cart_id = $key;
             $items->push($cartItem);
         }
@@ -209,11 +220,30 @@ class CartService
         if (!Auth::check()) return;
 
         $sessionCart = Session::get('cart', []);
+        $savedCoupon = Session::get('applied_coupon');
+
         foreach ($sessionCart as $item) {
-            $this->add($item['product_id'], $item['variant_id'], $item['quantity']);
+            $existing = Cart::where('user_id', Auth::id())
+                ->where('product_id', $item['product_id'])
+                ->where('variant_id', $item['variant_id'] ?? null)
+                ->first();
+
+            if ($existing) {
+                $existing->update(['quantity' => $item['quantity']]);
+            } else {
+                Cart::create([
+                    'user_id'    => Auth::id(),
+                    'product_id' => $item['product_id'],
+                    'variant_id' => $item['variant_id'] ?? null,
+                    'quantity'   => $item['quantity'],
+                ]);
+            }
         }
 
         Session::forget('cart');
+        if ($savedCoupon) {
+            Session::put('applied_coupon', $savedCoupon);
+        }
     }
 
     /**
@@ -258,18 +288,21 @@ class CartService
         $items = $this->getItems();
         $eligibleSubtotal = 0.00;
 
+        $targetType = strtolower(trim($coupon->target_type ?? 'all'));
+        $targetIds = is_array($coupon->target_ids) ? array_map('strval', $coupon->target_ids) : [];
+
         foreach ($items as $item) {
             $isEligible = false;
-            if ($coupon->target_type === 'all') {
+            if ($targetType === 'all' || empty($targetType)) {
                 $isEligible = true;
-            } elseif ($coupon->target_type === 'products') {
-                $isEligible = in_array($item->product_id, $coupon->target_ids ?? []);
-            } elseif ($coupon->target_type === 'categories') {
-                $isEligible = in_array($item->product->category_id, $coupon->target_ids ?? []);
+            } elseif ($targetType === 'products') {
+                $isEligible = in_array((string)$item->product_id, $targetIds, true);
+            } elseif ($targetType === 'categories') {
+                $isEligible = $item->product && in_array((string)$item->product->category_id, $targetIds, true);
             }
 
             if ($isEligible) {
-                $price = $item->variant ? $item->variant->sale_price : $item->product->sale_price;
+                $price = $item->unit_price;
                 $eligibleSubtotal += $price * $item->quantity;
             }
         }
@@ -278,7 +311,7 @@ class CartService
             throw new \Exception("This coupon is not applicable to any products in your cart.");
         }
 
-        if ($eligibleSubtotal < $coupon->min_amount) {
+        if ($eligibleSubtotal < (float)$coupon->min_amount) {
             throw new \Exception("Minimum eligible cart value of ₹{$coupon->min_amount} required.");
         }
 
@@ -315,7 +348,7 @@ class CartService
         $productSubtotals = [];
 
         foreach ($items as $item) {
-            $price = $item->variant ? $item->variant->sale_price : $item->product->sale_price;
+            $price = $item->unit_price;
             $lineTotal = $price * $item->quantity;
             $subtotal += $lineTotal;
             $productSubtotals[$item->product_id] = ($productSubtotals[$item->product_id] ?? 0) + $lineTotal;
@@ -326,23 +359,26 @@ class CartService
         $coupon = $this->getAppliedCoupon();
         if ($coupon) {
             $eligibleSubtotal = 0.00;
+            $targetType = strtolower(trim($coupon->target_type ?? 'all'));
+            $targetIds = is_array($coupon->target_ids) ? array_map('strval', $coupon->target_ids) : [];
+
             foreach ($items as $item) {
                 $isEligible = false;
-                if ($coupon->target_type === 'all') {
+                if ($targetType === 'all' || empty($targetType)) {
                     $isEligible = true;
-                } elseif ($coupon->target_type === 'products') {
-                    $isEligible = in_array($item->product_id, $coupon->target_ids ?? []);
-                } elseif ($coupon->target_type === 'categories') {
-                    $isEligible = in_array($item->product->category_id, $coupon->target_ids ?? []);
+                } elseif ($targetType === 'products') {
+                    $isEligible = in_array((string)$item->product_id, $targetIds, true);
+                } elseif ($targetType === 'categories') {
+                    $isEligible = $item->product && in_array((string)$item->product->category_id, $targetIds, true);
                 }
 
                 if ($isEligible) {
-                    $price = $item->variant ? $item->variant->sale_price : $item->product->sale_price;
+                    $price = $item->unit_price;
                     $eligibleSubtotal += $price * $item->quantity;
                 }
             }
 
-            if ($eligibleSubtotal > 0 && $eligibleSubtotal >= $coupon->min_amount) {
+            if ($eligibleSubtotal > 0 && $eligibleSubtotal >= (float)$coupon->min_amount) {
                 $discount = $coupon->calculateDiscount($eligibleSubtotal);
             } else {
                 Session::forget('applied_coupon'); // clean invalid coupon
@@ -398,10 +434,14 @@ class CartService
 
         if (!$freeShipping) {
             $deliveryCharge = DeliveryCharge::where('is_active', true)->first();
-            if ($deliveryCharge && $taxableAmount > 0) {
-                if ($taxableAmount < $deliveryCharge->min_order_amount) {
-                    $shipping = (float) $deliveryCharge->charge_amount;
-                }
+            $configuredCharge = \App\Models\Setting::get('default_delivery_charge');
+            $configuredMinOrder = \App\Models\Setting::get('free_shipping_threshold');
+
+            $chargeAmount = ($configuredCharge !== null && $configuredCharge !== '') ? (float) $configuredCharge : ($deliveryCharge ? (float) $deliveryCharge->charge_amount : 100.00);
+            $minOrderAmount = ($configuredMinOrder !== null && $configuredMinOrder !== '') ? (float) $configuredMinOrder : ($deliveryCharge ? (float) $deliveryCharge->min_order_amount : 999.00);
+
+            if ($taxableAmount > 0 && $taxableAmount < $minOrderAmount) {
+                $shipping = $chargeAmount;
             }
         }
 
@@ -455,8 +495,7 @@ class CartService
         $subtotal = 0.00;
 
         foreach ($items as $item) {
-            $price = $item->variant ? $item->variant->sale_price : $item->product->sale_price;
-            $subtotal += $price * $item->quantity;
+            $subtotal += $item->unit_price * $item->quantity;
         }
 
         return ['subtotal' => $subtotal];

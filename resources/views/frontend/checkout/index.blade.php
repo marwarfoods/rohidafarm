@@ -19,6 +19,7 @@
 
         <form action="{{ route('checkout.store') }}" method="POST" id="checkoutForm">
             @csrf
+            <input type="hidden" name="coupon_code" id="hiddenCheckoutCoupon" value="{{ $totals['coupon']?->code }}">
             
             <div class="row g-4">
                 <!-- Shipping Address Form -->
@@ -246,6 +247,11 @@
                             <span class="fs-4 fw-bold text-success font-heading" id="summaryTotal">₹{{ number_format($totals['total'], 2) }}</span>
                         </div>
 
+                        <div id="freeOrderNotice" class="alert alert-success d-flex align-items-center gap-2 mb-4 py-2 px-3 rounded-3" style="{{ $totals['total'] <= 0 ? '' : 'display:none !important;' }}; font-size:0.85rem;">
+                            <i class="bi bi-gift-fill text-success fs-5"></i>
+                            <div><strong>100% Free Order!</strong> No payment required. Click below to complete your order.</div>
+                        </div>
+
                         <div id="codAdvanceBlock" class="p-3 mb-4 rounded-3 border" style="background-color: #fff9e6; {{ (isset($totals['cod_advance']) && $totals['cod_advance'] > 0) ? '' : 'display:none !important;' }}">
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="fw-bold text-dark" style="font-size: 0.9rem;"><i class="bi bi-wallet2 me-1"></i> Advance to Pay Now</span>
@@ -306,6 +312,16 @@
             } else {
                 codAdvanceBlock.style.setProperty('display', 'none', 'important');
             }
+
+            const freeNotice = document.getElementById('freeOrderNotice');
+            const placeOrderBtn = document.getElementById('placeOrderBtn');
+            if (totals.total <= 0) {
+                if (freeNotice) freeNotice.style.setProperty('display', 'flex', 'important');
+                if (placeOrderBtn) placeOrderBtn.textContent = 'Place Free Order Now';
+            } else {
+                if (freeNotice) freeNotice.style.setProperty('display', 'none', 'important');
+                if (placeOrderBtn) placeOrderBtn.textContent = 'Place Order Now';
+            }
         }
 
         // Fetch Dynamic Totals
@@ -354,6 +370,8 @@
                         document.getElementById('couponApplyGroup').style.setProperty('display', 'none', 'important');
                         document.getElementById('couponAppliedGroup').style.setProperty('display', 'flex', 'important');
                         document.getElementById('appliedCouponCode').textContent = 'Code: ' + code.toUpperCase();
+                        const hiddenCoupon = document.getElementById('hiddenCheckoutCoupon');
+                        if (hiddenCoupon) hiddenCoupon.value = code.toUpperCase();
                         updateSummary(data.totals);
                     } else {
                         alert(data.message);
@@ -382,6 +400,8 @@
                         document.getElementById('couponApplyGroup').style.setProperty('display', 'flex', 'important');
                         document.getElementById('couponAppliedGroup').style.setProperty('display', 'none', 'important');
                         document.getElementById('couponInput').value = '';
+                        const hiddenCoupon = document.getElementById('hiddenCheckoutCoupon');
+                        if (hiddenCoupon) hiddenCoupon.value = '';
                         updateSummary(data.totals);
                     }
                 });

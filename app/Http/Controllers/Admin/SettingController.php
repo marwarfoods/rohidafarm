@@ -105,6 +105,21 @@ class SettingController extends Controller
             Setting::set($key, $value, $type, $group, $description);
         }
 
+        // Synchronize delivery charge model if configured
+        if (isset($settings['default_delivery_charge']) || isset($settings['free_shipping_threshold'])) {
+            $dc = \App\Models\DeliveryCharge::first();
+            if ($dc) {
+                $dcUpdate = [];
+                if (isset($settings['default_delivery_charge'])) {
+                    $dcUpdate['charge_amount'] = (float) $settings['default_delivery_charge'];
+                }
+                if (isset($settings['free_shipping_threshold'])) {
+                    $dcUpdate['min_order_amount'] = (float) $settings['free_shipping_threshold'];
+                }
+                $dc->update($dcUpdate);
+            }
+        }
+
         // Handle Global FAQs synchronization
         if ($request->has('global_faqs_submitted')) {
             \App\Models\Faq::truncate();

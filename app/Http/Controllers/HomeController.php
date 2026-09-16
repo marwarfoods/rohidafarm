@@ -36,21 +36,21 @@ class HomeController extends Controller
 
         // ── Categories ────────────────────────────────────────────────
         $categories = Category::with(['products' => function ($q) {
-            $q->where('is_active', true)->where('show_on_home', true)->with(['category:id,name,slug', 'images', 'primaryImage', 'gallery', 'variants'])->limit(8);
+            $q->where('is_active', true)->where('show_on_home', true)->with(['category:id,name,slug', 'images', 'primaryImage', 'gallery', 'variants'])->orderBy('sort_order', 'asc')->orderBy('id', 'desc')->limit(8);
         }])->where('is_active', true)->get();
 
         // ── Tabbed Products ───────────────────────────────────────────
         $featuredProducts = Product::with(['category:id,name,slug', 'images', 'primaryImage', 'gallery', 'variants'])
-            ->where('is_active', true)->where('show_on_home', true)->where('is_featured', true)->limit(8)->get();
+            ->where('is_active', true)->where('show_on_home', true)->where('is_featured', true)->orderBy('sort_order', 'asc')->orderBy('id', 'desc')->limit(8)->get();
 
         $trendingProducts = Product::with(['category:id,name,slug', 'images', 'primaryImage', 'gallery', 'variants'])
-            ->where('is_active', true)->where('show_on_home', true)->where('is_trending', true)->limit(8)->get();
+            ->where('is_active', true)->where('show_on_home', true)->where('is_trending', true)->orderBy('sort_order', 'asc')->orderBy('id', 'desc')->limit(8)->get();
 
         $bestSellers = Product::with(['category:id,name,slug', 'images', 'primaryImage', 'gallery', 'variants'])
-            ->where('is_active', true)->where('show_on_home', true)->where('is_best_seller', true)->limit(8)->get();
+            ->where('is_active', true)->where('show_on_home', true)->where('is_best_seller', true)->orderBy('sort_order', 'asc')->orderBy('id', 'desc')->limit(8)->get();
 
         $newArrivals = Product::with(['category:id,name,slug', 'images', 'primaryImage', 'gallery', 'variants'])
-            ->where('is_active', true)->where('show_on_home', true)->where('is_new_arrival', true)->limit(8)->get();
+            ->where('is_active', true)->where('show_on_home', true)->where('is_new_arrival', true)->orderBy('sort_order', 'asc')->orderBy('id', 'desc')->limit(8)->get();
 
         // ── Blogs ─────────────────────────────────────────────────────
         $blogs = Blog::with('category:id,name,slug')
@@ -77,11 +77,13 @@ class HomeController extends Controller
         $bilonaSteps = \App\Models\BilonaStep::where('is_active', true)
             ->orderBy('sort_order')->get();
 
-        // ── All Products Grid ─────────────────────────────────────────
+        // ── Buy More & Save More Products Grid ────────────────────────
         $allProducts = Product::with(['category:id,name,slug', 'images', 'primaryImage', 'gallery', 'variants'])
             ->where('is_active', true)
             ->where('show_on_home', true)
-            ->orderBy('created_at', 'desc')
+            ->where('show_in_save_more', true)
+            ->orderBy('sort_order', 'asc')
+            ->orderBy('id', 'desc')
             ->get();
 
         // ── Certifications & Trust Marks ──────────────────────────────

@@ -22,6 +22,8 @@
         <option value="show_on_shop:0">Disable: Show on Shop</option>
         <option value="show_on_category:1">Enable: Show on Category</option>
         <option value="show_on_category:0">Disable: Show on Category</option>
+        <option value="show_in_save_more:1">Enable: Buy More &amp; Save More</option>
+        <option value="show_in_save_more:0">Disable: Buy More &amp; Save More</option>
         <option value="is_featured:1">Mark Selling Fast Badge</option>
         <option value="is_featured:0">Unmark Selling Fast Badge</option>
         <option value="is_best_seller:1">Mark Best Seller Badge</option>
@@ -42,9 +44,25 @@
 </div>
 @endif
 
+@php
+    $tableHeaders = [
+        auth()->user()->hasPermission('products-edit') ? '<div class="d-flex align-items-center gap-2"><span class="text-muted opacity-75" title="Drag &amp; drop rows to reorder" style="cursor: default;"><i class="bi bi-arrow-down-up"></i></span><input type="checkbox" id="selectAllProducts" class="form-check-input m-0"></div>' : '',
+        'ID',
+        'Product Name & Image',
+        'Category',
+        'SKU',
+        'Original / Off Price',
+        'Stock',
+        'Order',
+        'Status & Placement',
+        'Actions'
+    ];
+@endphp
+
 <x-admin-table
-    :headers="[auth()->user()->hasPermission('products-edit') ? '<input type=\'checkbox\' id=\'selectAllProducts\'>' : '', 'ID', 'Product Name & Image', 'Category', 'SKU', 'Original / Off Price', 'Stock', 'Status & Placement', 'Actions']"
+    :headers="$tableHeaders"
     :items="$products"
+    tbodyId="sortableProducts"
     title="Products Catalog"
     description="Manage your store products, modify pricing, stock levels, and assign categories.">
 
@@ -55,10 +73,17 @@
     </x-slot>
 
     @forelse($products as $prod)
-        <tr style="font-size: 0.85rem;" id="productRow_{{ $prod->id }}">
+        <tr style="font-size: 0.85rem;" id="productRow_{{ $prod->id }}" data-id="{{ $prod->id }}" class="product-row align-middle">
             @if(auth()->user()->hasPermission('products-edit'))
             <td class="px-4 py-3">
-                <input type="checkbox" class="form-check-input product-row-checkbox" value="{{ $prod->id }}">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="drag-handle text-secondary d-inline-flex align-items-center justify-content-center"
+                          style="cursor: grab; width: 22px; height: 26px; border-radius: 4px;"
+                          title="Drag up or down to reorder position">
+                        <i class="bi bi-grip-vertical fs-5"></i>
+                    </span>
+                    <input type="checkbox" class="form-check-input product-row-checkbox m-0" value="{{ $prod->id }}">
+                </div>
             </td>
             @endif
             <td class="fw-semibold px-4 py-3">#{{ $prod->id }}</td>
@@ -84,6 +109,16 @@
                 <span class="fw-bold">{{ $prod->stock }}</span>
                 @endif
             </td>
+            <td class="px-4 py-3" style="min-width: 115px;">
+                @if(auth()->user()->hasPermission('products-edit'))
+                <div class="input-group input-group-sm" style="width: 100px;">
+                    <input type="number" class="form-control text-center order-inp bg-light border fw-bold" data-id="{{ $prod->id }}" value="{{ $prod->sort_order ?? 0 }}" min="0" placeholder="0" title="Display Order Position (Lower appears first)">
+                    <button type="button" class="btn btn-outline-success btn-update-order" data-id="{{ $prod->id }}" title="Save Sort Order"><i class="bi bi-check-lg"></i></button>
+                </div>
+                @else
+                <span class="badge bg-light text-dark border fw-bold">{{ $prod->sort_order ?? 0 }}</span>
+                @endif
+            </td>
             <td class="px-4 py-3">
                 <span class="badge product-status-active-badge {{ $prod->is_active ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-secondary border' }} d-block mb-1" style="width: fit-content;">
                     {{ $prod->is_active ? 'Active' : 'Inactive' }}
@@ -97,6 +132,9 @@
                     @endif
                     @if($prod->show_on_category)
                         <span class="badge bg-light text-secondary border" style="font-size:0.68rem;" title="Visible on Category Page">Cat</span>
+                    @endif
+                    @if($prod->show_in_save_more)
+                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle" style="font-size:0.68rem;" title="Visible in Buy More &amp; Save More Section">SaveMore</span>
                     @endif
                     @if($prod->is_featured)
                         <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size:0.68rem;" title="Selling Fast Badge">Selling Fast</span>
@@ -126,7 +164,7 @@
         </tr>
     @empty
         <tr>
-            <td colspan="9" class="text-center py-4 text-muted">No products available in database catalog.</td>
+            <td colspan="10" class="text-center py-4 text-muted">No products available in database catalog.</td>
         </tr>
     @endforelse
 </x-admin-table>
@@ -136,23 +174,112 @@
 <style>
 /* Remove number spinner up/down arrows */
 input.stock-inp::-webkit-outer-spin-button,
-input.stock-inp::-webkit-inner-spin-button {
+input.stock-inp::-webkit-inner-spin-button,
+input.order-inp::-webkit-outer-spin-button,
+input.order-inp::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
-input.stock-inp[type=number] {
+input.stock-inp[type=number],
+input.order-inp[type=number] {
     -moz-appearance: textfield;
 }
-.stock-inp {
+.stock-inp,
+.order-inp {
     font-size: 0.9rem !important;
     letter-spacing: 0.5px;
+}
+
+/* Drag & Drop Reordering Styles */
+.drag-handle {
+    cursor: grab;
+    color: #6c757d;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+.drag-handle:hover {
+    color: #198754 !important;
+    background-color: #e8f5e9;
+}
+.drag-handle:active {
+    cursor: grabbing;
+}
+tr.sortable-ghost {
+    background-color: #e8f5e9 !important;
+    opacity: 0.55;
+    outline: 2px dashed #198754;
+}
+tr.sortable-chosen {
+    background-color: #f4fbf7 !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
 }
 </style>
 @endpush
 
 @push('admin_scripts')
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // ── Drag & Drop Table Row Reordering (SortableJS) ──
+        const sortableTbody = document.getElementById('sortableProducts');
+        if (sortableTbody && typeof Sortable !== 'undefined') {
+            Sortable.create(sortableTbody, {
+                handle: '.drag-handle',
+                animation: 180,
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                onEnd: function (evt) {
+                    if (evt.oldIndex === evt.newIndex) return;
+
+                    const rows = sortableTbody.querySelectorAll('tr[data-id]');
+                    const orders = [];
+
+                    rows.forEach((row, index) => {
+                        const id = row.getAttribute('data-id');
+                        const newOrder = index + 1;
+                        const inp = row.querySelector('.order-inp');
+                        if (inp) {
+                            inp.value = newOrder;
+                        }
+                        orders.push({
+                            id: parseInt(id),
+                            sort_order: newOrder
+                        });
+                    });
+
+                    fetch("{{ route('admin.products.reorder') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({ orders: orders })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            rows.forEach(row => {
+                                const inp = row.querySelector('.order-inp');
+                                if (inp) {
+                                    inp.classList.add('is-valid');
+                                    setTimeout(() => inp.classList.remove('is-valid'), 1200);
+                                }
+                            });
+                            if (window.AdminToast) {
+                                window.AdminToast('success', 'Products display order saved successfully');
+                            }
+                        } else {
+                            alert('Failed to save reordered products: ' + (data.message || 'Error'));
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error reordering products:', err);
+                        alert('Network error while saving product order.');
+                    });
+                }
+            });
+        }
+
         // Stock Quick Update AJAX
         const stockButtons = document.querySelectorAll('.btn-update-stock');
         stockButtons.forEach(btn => {
@@ -188,6 +315,63 @@ input.stock-inp[type=number] {
                     this.disabled = false;
                     this.innerHTML = origHtml;
                     alert('Network error while updating stock.');
+                });
+            });
+        });
+
+        // Press Enter in Order input to save
+        document.querySelectorAll('.order-inp').forEach(inp => {
+            inp.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const id = this.getAttribute('data-id');
+                    const btn = document.querySelector(`.btn-update-order[data-id="${id}"]`);
+                    if (btn) btn.click();
+                }
+            });
+        });
+
+        // Sort Order Quick Update AJAX (Manual Button)
+        const orderButtons = document.querySelectorAll('.btn-update-order');
+        orderButtons.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const id = this.getAttribute('data-id');
+                const inp = document.querySelector(`.order-inp[data-id="${id}"]`);
+                const orderVal = inp.value;
+
+                const origHtml = this.innerHTML;
+                this.disabled = true;
+                this.innerHTML = '<span class="spinner-border spinner-border-sm" style="width: 12px; height: 12px;"></span>';
+
+                fetch(`/admin/products/${id}/sort-order`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ sort_order: orderVal })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    this.disabled = false;
+                    this.innerHTML = origHtml;
+                    if (data.status === 'success') {
+                        inp.classList.add('is-valid');
+                        if (window.AdminToast) {
+                            window.AdminToast('success', 'Sort order updated successfully');
+                        }
+                        setTimeout(() => {
+                            inp.classList.remove('is-valid');
+                            window.location.reload();
+                        }, 400);
+                    } else {
+                        alert('Failed to update sort order: ' + (data.message || 'Error'));
+                    }
+                })
+                .catch(err => {
+                    this.disabled = false;
+                    this.innerHTML = origHtml;
+                    alert('Network error while updating sort order.');
                 });
             });
         });

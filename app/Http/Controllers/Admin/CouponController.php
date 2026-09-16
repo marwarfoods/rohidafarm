@@ -41,6 +41,11 @@ class CouponController extends Controller
 
         $validated['is_active'] = $request->has('is_active');
         if (!isset($validated['min_amount'])) $validated['min_amount'] = 0;
+        if ($validated['target_type'] === 'all') {
+            $validated['target_ids'] = null;
+        } else {
+            $validated['target_ids'] = array_values(array_filter((array)($validated['target_ids'] ?? [])));
+        }
 
         Coupon::create($validated);
 
@@ -75,8 +80,10 @@ class CouponController extends Controller
 
         $validated['is_active'] = $request->has('is_active');
         if (!isset($validated['min_amount'])) $validated['min_amount'] = 0;
-        if ($validated['target_type'] == 'all') {
+        if ($validated['target_type'] === 'all') {
             $validated['target_ids'] = null;
+        } else {
+            $validated['target_ids'] = array_values(array_filter((array)($validated['target_ids'] ?? [])));
         }
 
         $coupon->update($validated);

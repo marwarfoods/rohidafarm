@@ -12,6 +12,7 @@ use App\Models\SubCategory;
 use App\Models\Coupon;
 use App\Traits\LogsActivity;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
@@ -23,7 +24,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::with(['category', 'subCategory', 'brand'])->orderBy('created_at', 'desc')->paginate(15);
+        $products = Product::with(['category', 'subCategory', 'brand'])->orderBy('sort_order', 'asc')->orderBy('created_at', 'desc')->paginate(50);
         return view('admin.products.index', compact('products'));
     }
 
@@ -55,6 +56,7 @@ class ProductController extends Controller
             'stock' => 'required|integer|min:0',
             'mrp' => 'required|numeric|min:0',
             'sale_price' => 'required|numeric|min:0|lte:mrp',
+            'sort_order' => 'nullable|integer|min:0',
             'short_description' => 'required|string',
             'description' => 'nullable|string',
             'benefits' => 'nullable|string',
@@ -107,6 +109,8 @@ class ProductController extends Controller
             'show_on_home' => $request->has('show_on_home'),
             'show_on_shop' => $request->has('show_on_shop'),
             'show_on_category' => $request->has('show_on_category'),
+            'sort_order' => (int) ($request->input('sort_order') ?: 0),
+            'show_in_save_more' => $request->has('show_in_save_more'),
             'use_global_faqs' => $request->has('use_global_faqs'),
             'free_shipping_threshold' => $request->input('free_shipping_threshold'),
             'display_coupons' => $request->input('display_coupons'),
@@ -176,6 +180,7 @@ class ProductController extends Controller
             'stock' => 'required|integer|min:0',
             'mrp' => 'required|numeric|min:0',
             'sale_price' => 'required|numeric|min:0|lte:mrp',
+            'sort_order' => 'nullable|integer|min:0',
             'short_description' => 'required|string',
             'free_shipping_threshold' => 'nullable|numeric|min:0',
             'display_coupons' => 'nullable|array',
@@ -197,6 +202,8 @@ class ProductController extends Controller
             'show_on_home' => $request->has('show_on_home'),
             'show_on_shop' => $request->has('show_on_shop'),
             'show_on_category' => $request->has('show_on_category'),
+            'sort_order' => (int) ($request->input('sort_order') ?: 0),
+            'show_in_save_more' => $request->has('show_in_save_more'),
             'use_global_faqs' => $request->has('use_global_faqs'),
             'free_shipping_threshold' => $request->input('free_shipping_threshold'),
             'display_coupons' => $request->input('display_coupons'),
@@ -246,14 +253,13 @@ class ProductController extends Controller
             'sort_order' => 0
         ]);
 
-        // Delete old variants and FAQs
-        ProductVariant::where('product_id', $product->id)->delete();
+        // Delete old FAQs (custom FAQs will be recreated below)
         \App\Models\ProductFaq::where('product_id', $product->id)->delete();
 
         // Save new gallery items
         $this->saveGalleryItems($request, $product);
 
-        // Save new variants with individual images & galleries
+        // Save variants (updates existing ones to preserve active carts, syncs pricing)
         $this->saveVariants($request, $product);
 
         // Save new FAQs (question/answer pairs, in submitted order) if custom FAQs are active
@@ -299,6 +305,53 @@ class ProductController extends Controller
     }
 
     /**
+     * Quick sort order update from admin table.
+     */
+    public function updateSortOrder(Request $request, $id)
+    {
+        $request->validate([
+            'sort_order' => 'required|integer|min:0'
+        ]);
+
+        $product = Product::findOrFail($id);
+        $product->update(['sort_order' => $request->input('sort_order')]);
+
+        self::logActivity('product_reorder', "Updated sort order of {$product->name} to {$request->input('sort_order')}", ['product_id' => $id]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Sort order updated successfully.'
+        ]);
+    }
+
+    /**
+     * Bulk reorder products via drag-and-drop.
+     */
+    public function reorder(Request $request)
+    {
+        $request->validate([
+            'orders' => 'required|array',
+            'orders.*.id' => 'required|integer|exists:products,id',
+            'orders.*.sort_order' => 'required|integer|min:0',
+        ]);
+
+        DB::transaction(function () use ($request) {
+            foreach ($request->input('orders') as $item) {
+                Product::where('id', $item['id'])->update([
+                    'sort_order' => (int) $item['sort_order']
+                ]);
+            }
+        });
+
+        self::logActivity('product_reorder', 'Bulk reordered products via drag and drop');
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Product order saved successfully.'
+        ]);
+    }
+
+    /**
      * Update a single product's active/featured status. Used both for the
      * per-row toggle and, called once per selected product, by the bulk
      * status action on the products list (so the UI can show real,
@@ -307,7 +360,7 @@ class ProductController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'field' => 'required|string|in:is_active,is_featured,is_best_seller,is_trending,is_new_arrival,is_organic,is_bilona,show_on_home,show_on_shop,show_on_category',
+            'field' => 'required|string|in:is_active,is_featured,is_best_seller,is_trending,is_new_arrival,is_organic,is_bilona,show_on_home,show_on_shop,show_on_category,show_in_save_more',
             'value' => 'required|boolean',
         ]);
 
@@ -654,14 +707,29 @@ class ProductController extends Controller
 
     /**
      * Save weight-option variants (each with its own image/gallery) for a product.
+     * Updates in-place to preserve IDs for active carts and synchronize pricing.
      */
     private function saveVariants(Request $request, Product $product): void
     {
         if (!$request->has('variants')) {
+            // If product has variants and base price was updated, sync existing variants if single
+            if ($product->variants()->count() === 1) {
+                $product->variants()->first()->update([
+                    'mrp' => $product->mrp,
+                    'sale_price' => $product->sale_price,
+                ]);
+            }
             return;
         }
 
-        foreach ($request->input('variants') as $v) {
+        $submittedVariants = $request->input('variants');
+        $keptVariantIds = [];
+        $wasSalePriceChanged = $product->wasChanged('sale_price');
+        $oldSalePrice = (float) $product->getOriginal('sale_price');
+        $wasMrpChanged = $product->wasChanged('mrp');
+        $oldMrp = (float) $product->getOriginal('mrp');
+
+        foreach ($submittedVariants as $index => $v) {
             if (empty($v['weight'])) {
                 continue;
             }
@@ -673,18 +741,48 @@ class ProductController extends Controller
                     : array_values(array_filter(explode(',', $v['gallery_images'])));
             }
 
-            ProductVariant::create([
-                'product_id' => $product->id,
+            $vMrp = (isset($v['mrp']) && $v['mrp'] !== '') ? (float)$v['mrp'] : (float)$product->mrp;
+            $vSalePrice = (isset($v['sale_price']) && $v['sale_price'] !== '') ? (float)$v['sale_price'] : (float)$product->sale_price;
+
+            // If base product price/mrp was updated in sidebar, keep base/first variant in sync
+            if ($wasSalePriceChanged && ($index === 0 || $vSalePrice === $oldSalePrice || count($submittedVariants) === 1)) {
+                $vSalePrice = (float) $product->sale_price;
+            }
+            if ($wasMrpChanged && ($index === 0 || $vMrp === $oldMrp || count($submittedVariants) === 1)) {
+                $vMrp = (float) $product->mrp;
+            }
+
+            $variantData = [
                 'name' => $product->name . ' - ' . $v['weight'],
                 'sku' => $product->sku . '-' . Str::slug($v['weight']),
                 'weight' => $v['weight'],
                 'image_path' => !empty($v['image_path']) ? $v['image_path'] : null,
                 'gallery_images' => !empty($galleryImages) ? $galleryImages : null,
-                'mrp' => $v['mrp'] ?? $product->mrp,
-                'sale_price' => $v['sale_price'] ?? $product->sale_price,
-                'stock' => $v['stock'] ?? $product->stock,
-                'max_cart_qty' => $v['max_cart_qty'] ?? null,
-            ]);
+                'mrp' => $vMrp,
+                'sale_price' => $vSalePrice,
+                'stock' => isset($v['stock']) && $v['stock'] !== '' ? $v['stock'] : $product->stock,
+                'max_cart_qty' => !empty($v['max_cart_qty']) ? $v['max_cart_qty'] : null,
+            ];
+
+            $existingVariant = null;
+            if (!empty($v['id'])) {
+                $existingVariant = ProductVariant::where('product_id', $product->id)->find($v['id']);
+            }
+            if (!$existingVariant) {
+                $existingVariant = ProductVariant::where('product_id', $product->id)->where('weight', $v['weight'])->first();
+            }
+
+            if ($existingVariant) {
+                $existingVariant->update($variantData);
+                $keptVariantIds[] = $existingVariant->id;
+            } else {
+                $newVariant = ProductVariant::create($variantData + ['product_id' => $product->id]);
+                $keptVariantIds[] = $newVariant->id;
+            }
+        }
+
+        if (!empty($keptVariantIds)) {
+            ProductVariant::where('product_id', $product->id)->whereNotIn('id', $keptVariantIds)->delete();
         }
     }
 

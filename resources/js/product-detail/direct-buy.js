@@ -39,6 +39,12 @@ export function initDirectBuy() {
                 throw new Error(result.message || 'Something went wrong while initializing payment.');
             }
 
+            // If order was placed for free (0 amount), redirect immediately
+            if (result.status === 'free_success' || result.redirect_url) {
+                window.location.href = result.redirect_url;
+                return;
+            }
+
             // Initialize Razorpay
             var options = {
                 "key": result.key,

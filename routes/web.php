@@ -163,6 +163,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/products/{id}/update', [AdminProductController::class, 'update'])->name('products.update');
         Route::delete('/products/{id}/delete', [AdminProductController::class, 'destroy'])->name('products.delete');
         Route::post('/products/{id}/stock', [AdminProductController::class, 'updateStock'])->name('products.stock');
+        Route::post('/products/{id}/sort-order', [AdminProductController::class, 'updateSortOrder'])->name('products.sort-order');
+        Route::post('/products/reorder', [AdminProductController::class, 'reorder'])->name('products.reorder');
         Route::post('/products/{id}/status', [AdminProductController::class, 'updateStatus'])->name('products.status');
     });
 

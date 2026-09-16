@@ -31,10 +31,12 @@
         @include('frontend.home.banners')
     </div>
 
-    {{-- -- 6. All Products Grid -- --}}
-    <div class="lazy-section">
-        @include('frontend.home.all-products-grid')
-    </div>
+    {{-- -- 6. All Products Grid (Buy More & Save More) -- --}}
+    @if(isset($allProducts) && $allProducts->isNotEmpty())
+        <div class="lazy-section">
+            @include('frontend.home.all-products-grid')
+        </div>
+    @endif
 
     {{-- -- 7. Native Ingredients -- --}}
     <div class="lazy-section">

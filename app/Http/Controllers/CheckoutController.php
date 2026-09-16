@@ -87,6 +87,12 @@ class CheckoutController extends Controller
         }
 
         try {
+            // Preserve coupon code from request or session
+            $couponCode = $request->input('coupon_code') ?: session('applied_coupon');
+            if ($couponCode) {
+                session(['applied_coupon' => $couponCode]);
+            }
+
             // 0. Auto-register or Auto-login Guest Account if not authenticated
             if (!Auth::check()) {
                 $existingUser = \App\Models\User::withTrashed()->where('email', $request->input('email'))->first();
@@ -95,6 +101,9 @@ class CheckoutController extends Controller
                         $existingUser->restore();
                     }
                     Auth::login($existingUser);
+                    if ($couponCode) {
+                        session(['applied_coupon' => $couponCode]);
+                    }
                     $this->cartService->syncSessionToDb();
                 } else {
                     $rawPassword = \Illuminate\Support\Str::random(12);
@@ -107,6 +116,9 @@ class CheckoutController extends Controller
                         'wallet_balance' => 0.00
                     ]);
                     Auth::login($user);
+                    if ($couponCode) {
+                        session(['applied_coupon' => $couponCode]);
+                    }
                     
                     // Send welcome email with password
                     try {
@@ -118,6 +130,10 @@ class CheckoutController extends Controller
                     // Sync guest session items to newly created database account
                     $this->cartService->syncSessionToDb();
                 }
+            }
+
+            if ($couponCode) {
+                session(['applied_coupon' => $couponCode]);
             }
 
             // 1. Gather address details
@@ -153,25 +169,63 @@ class CheckoutController extends Controller
                 );
             }
 
-            // Handle Razorpay Payment Flow (or COD advance flow)
+            // Handle Payment Flow
             $totals = $this->cartService->getTotals($shippingData['state'] ?? null, $request->input('payment_method'));
             
-            if ($request->input('payment_method') === 'razorpay' || ($request->input('payment_method') === 'cod' && ($totals['cod_advance'] ?? 0) > 0)) {
-                // Pre-validate stock availability before initiating gateway
-                foreach ($items as $item) {
-                    if ($item->variant_id) {
-                        $variant = \App\Models\ProductVariant::find($item->variant_id);
-                        if (!$variant || $variant->stock < $item->quantity) {
-                            return back()->with('error', "Product variant {$item->variant?->name} is out of stock.")->withInput();
-                        }
-                    } else {
-                        $product = \App\Models\Product::find($item->product_id);
-                        if (!$product || $product->stock < $item->quantity) {
-                            return back()->with('error', "Product {$item->product?->name} is out of stock.")->withInput();
-                        }
+            // Pre-validate stock availability before proceeding
+            foreach ($items as $item) {
+                if ($item->variant_id) {
+                    $variant = \App\Models\ProductVariant::find($item->variant_id);
+                    if (!$variant || $variant->stock < $item->quantity) {
+                        return back()->with('error', "Product variant {$item->variant?->name} is out of stock.")->withInput();
+                    }
+                } else {
+                    $product = \App\Models\Product::find($item->product_id);
+                    if (!$product || $product->stock < $item->quantity) {
+                        return back()->with('error', "Product {$item->product?->name} is out of stock.")->withInput();
                     }
                 }
+            }
 
+            // If total amount is 0 or less (e.g. 100% coupon discount), place order directly without Razorpay!
+            if ($totals['total'] <= 0) {
+                $order = $this->orderService->createFromCart(
+                    $shippingData,
+                    'free'
+                );
+
+                $order->update(['payment_status' => 'paid']);
+
+                // Clear cart for completed free order
+                $this->cartService->clear();
+
+                // Send Order Confirmation Mail
+                try {
+                    \Illuminate\Support\Facades\Mail::to($order->user->email ?? $request->input('email'))->send(new \App\Mail\OrderPlacedMail($order));
+                } catch (\Exception $e) {
+                    logger()->error('Failed to send OrderPlacedMail: ' . $e->getMessage());
+                }
+
+                // Send Admin Notification Mail
+                try {
+                    $adminEmails = \App\Models\User::where('role', 'admin')->pluck('email')->toArray();
+                    $primarySettingEmail = \App\Models\Setting::get('contact_email_1') ?: \App\Models\Setting::get('contact_email');
+                    if ($primarySettingEmail && !in_array($primarySettingEmail, $adminEmails)) {
+                        $adminEmails[] = $primarySettingEmail;
+                    }
+
+                    if (!empty($adminEmails)) {
+                        \Illuminate\Support\Facades\Mail::to($adminEmails)->send(new \App\Mail\AdminNewOrderMail($order));
+                    }
+                } catch (\Exception $e) {
+                    logger()->error('Failed to send AdminNewOrderMail: ' . $e->getMessage());
+                }
+
+                return redirect()->route('checkout.success', $order->uuid)->with('success', 'Order placed successfully!');
+            }
+
+            // Handle Razorpay Payment Flow (or COD advance flow)
+            if ($request->input('payment_method') === 'razorpay' || ($request->input('payment_method') === 'cod' && ($totals['cod_advance'] ?? 0) > 0)) {
                 try {
                     $keyId = \App\Models\Setting::get('razorpay_key_id') ?: env('RAZORPAY_KEY', 'rzp_test_dummy');
                     $keySecret = \App\Models\Setting::get('razorpay_secret_key') ?: env('RAZORPAY_SECRET', 'dummy_secret');
@@ -346,13 +400,59 @@ class CheckoutController extends Controller
             }
 
             // Calculate amount
-            $price = $variant ? $variant->sale_price : $product->sale_price;
+            $price = ($variant && (float)$variant->sale_price > 0) ? (float)$variant->sale_price : (float)$product->sale_price;
             $subtotal = $price * $quantity;
             $shippingThreshold = $product->free_shipping_threshold ?? \App\Models\Setting::get('free_shipping_threshold', 499);
             $shippingChargeSetting = \App\Models\Setting::get('shipping_charges', 50);
             $shippingCharges = ($subtotal >= $shippingThreshold) ? 0 : $shippingChargeSetting;
             $tax = 0;
-            $total = $subtotal + $shippingCharges + $tax;
+
+            $discount = 0.00;
+            $couponCode = $request->input('coupon_code');
+            if ($couponCode) {
+                $coupon = \App\Models\Coupon::where('code', $couponCode)->where('is_active', true)->first();
+                if ($coupon && $coupon->isValid($subtotal)) {
+                    $discount = $coupon->calculateDiscount($subtotal);
+                }
+            }
+
+            $total = max(0, $subtotal - $discount) + $shippingCharges + $tax;
+
+            // If direct buy total is 0 or less (e.g. 100% coupon), process directly without Razorpay
+            if ($total <= 0) {
+                $order = $this->orderService->createDirectOrder(
+                    $product,
+                    $variant,
+                    $quantity,
+                    $shippingData,
+                    'free'
+                );
+                $order->update(['payment_status' => 'paid']);
+
+                try {
+                    \Illuminate\Support\Facades\Mail::to($order->user->email ?? $request->input('email'))->send(new \App\Mail\OrderPlacedMail($order));
+                } catch (\Exception $e) {
+                    logger()->error('Failed to send OrderPlacedMail: ' . $e->getMessage());
+                }
+
+                try {
+                    $adminEmails = \App\Models\User::where('role', 'admin')->pluck('email')->toArray();
+                    $primarySettingEmail = \App\Models\Setting::get('contact_email_1') ?: \App\Models\Setting::get('contact_email');
+                    if ($primarySettingEmail && !in_array($primarySettingEmail, $adminEmails)) {
+                        $adminEmails[] = $primarySettingEmail;
+                    }
+                    if (!empty($adminEmails)) {
+                        \Illuminate\Support\Facades\Mail::to($adminEmails)->send(new \App\Mail\AdminNewOrderMail($order));
+                    }
+                } catch (\Exception $e) {
+                    logger()->error('Failed to send AdminNewOrderMail: ' . $e->getMessage());
+                }
+
+                return response()->json([
+                    'status' => 'free_success',
+                    'redirect_url' => route('checkout.success', $order->uuid)
+                ]);
+            }
 
             $tempToken = (string) \Illuminate\Support\Str::uuid();
 

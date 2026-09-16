@@ -126,19 +126,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const categoryWrapper = document.getElementById('categorySelectWrapper');
     const label = document.getElementById('targetIdsLabel');
 
+    const targetProducts = document.getElementById('targetProducts');
+    const targetCategories = document.getElementById('targetCategories');
+
     function toggleFields() {
         productWrapper.style.display = 'none';
         categoryWrapper.style.display = 'none';
 
         if (targetType.value === 'all') {
             container.style.display = 'none';
+            if (targetProducts) targetProducts.disabled = true;
+            if (targetCategories) targetCategories.disabled = true;
         } else if (targetType.value === 'products') {
             container.style.display = 'block';
             productWrapper.style.display = 'block';
+            if (targetProducts) targetProducts.disabled = false;
+            if (targetCategories) targetCategories.disabled = true;
             label.textContent = 'Select Specific Products';
         } else if (targetType.value === 'categories') {
             container.style.display = 'block';
             categoryWrapper.style.display = 'block';
+            if (targetProducts) targetProducts.disabled = true;
+            if (targetCategories) targetCategories.disabled = false;
             label.textContent = 'Select Specific Categories';
         }
     }

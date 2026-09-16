@@ -44,6 +44,8 @@ class ProductRepository implements ProductRepositoryInterface
                 ->where('is_active', true)
                 ->where('show_on_home', true)
                 ->where('is_featured', true)
+                ->orderBy('sort_order', 'asc')
+                ->orderBy('id', 'desc')
                 ->limit($limit)
                 ->get();
         });
@@ -56,6 +58,8 @@ class ProductRepository implements ProductRepositoryInterface
                 ->where('is_active', true)
                 ->where('show_on_home', true)
                 ->where('is_trending', true)
+                ->orderBy('sort_order', 'asc')
+                ->orderBy('id', 'desc')
                 ->limit($limit)
                 ->get();
         });
@@ -68,6 +72,8 @@ class ProductRepository implements ProductRepositoryInterface
                 ->where('is_active', true)
                 ->where('show_on_home', true)
                 ->where('is_best_seller', true)
+                ->orderBy('sort_order', 'asc')
+                ->orderBy('id', 'desc')
                 ->limit($limit)
                 ->get();
         });
@@ -80,6 +86,8 @@ class ProductRepository implements ProductRepositoryInterface
                 ->where('is_active', true)
                 ->where('show_on_home', true)
                 ->where('is_new_arrival', true)
+                ->orderBy('sort_order', 'asc')
+                ->orderBy('id', 'desc')
                 ->limit($limit)
                 ->get();
         });
@@ -176,7 +184,7 @@ class ProductRepository implements ProductRepositoryInterface
                 break;
             case 'featured':
             default:
-                $query->orderBy('is_featured', 'desc')->orderBy('created_at', 'desc');
+                $query->orderBy('sort_order', 'asc')->orderBy('is_featured', 'desc')->orderBy('created_at', 'desc');
                 break;
         }
 

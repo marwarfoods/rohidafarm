@@ -2,7 +2,8 @@
     'headers' => [],
     'items' => [],
     'title' => '',
-    'description' => ''
+    'description' => '',
+    'tbodyId' => ''
 ])
 
 <div class="card border-0 rounded-4 shadow-sm bg-white overflow-hidden">
@@ -35,7 +36,7 @@
                     @endforeach
                 </tr>
             </thead>
-            <tbody style="font-size: 0.9rem;">
+            <tbody @if($tbodyId) id="{{ $tbodyId }}" @endif style="font-size: 0.9rem;">
                 {{ $slot }}
             </tbody>
         </table>
