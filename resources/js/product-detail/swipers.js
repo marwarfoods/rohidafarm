@@ -19,6 +19,13 @@ export function initSwipers() {
             // "change" (and the price update that depends on it) never fired on
             // mobile even though it worked fine with a mouse on desktop.
             noSwipingSelector: 'select',
+            // Swiper's defaults (preventClicks/preventClicksPropagation: true)
+            // suppress the click that follows any detected touch-move, so a tap
+            // that starts as a tiny swipe can silently swallow the "Add to Cart"
+            // click on a related-product card.
+            preventClicks: false,
+            preventClicksPropagation: false,
+            touchStartPreventDefault: false,
             navigation: {
                 nextEl: relatedWrapper ? relatedWrapper.querySelector('.swiper-button-next') : null,
                 prevEl: relatedWrapper ? relatedWrapper.querySelector('.swiper-button-prev') : null,

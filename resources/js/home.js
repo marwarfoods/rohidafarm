@@ -83,6 +83,15 @@ document.addEventListener('DOMContentLoaded', function () {
             slidesPerGroup: 1,
             spaceBetween: 10,
             grabCursor: true,
+            // Swiper's defaults (preventClicks/preventClicksPropagation: true)
+            // suppress the click that follows any detected touch-move — with
+            // autoplay constantly nudging the slide, an ordinary tap can get
+            // misread as a micro-swipe, silently swallowing the "Add to Cart"
+            // click on that card. This is the same fix already applied to
+            // .promo-three-slider below.
+            preventClicks: false,
+            preventClicksPropagation: false,
+            touchStartPreventDefault: false,
             // Let taps on the variant <select> inside a slide open the native
             // picker normally on touch devices instead of Swiper's own touch/drag
             // handling swallowing the tap — this is why the weight dropdown's

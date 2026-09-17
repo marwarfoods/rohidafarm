@@ -105,6 +105,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     disableOnInteraction: false,
                     pauseOnMouseEnter: true,
                 },
+                // Without these, Swiper's default click-suppression-after-touch-move
+                // can silently swallow a tap on the add-on's checkbox/button while
+                // autoplay is running, making it look like the tap did nothing.
+                preventClicks: false,
+                preventClicksPropagation: false,
+                touchStartPreventDefault: false,
                 pagination: {
                     el: el.querySelector('.swiper-pagination'),
                     clickable: true,
@@ -324,16 +330,29 @@ document.addEventListener('DOMContentLoaded', function () {
             restoreBtn();
             reloadCartDrawer(function () { hideCartSkeleton(); });
 
-            // Trigger Top Add-Ons Modal ("✔ Added to Cart!")
-            const addonsModalEl = document.getElementById('addToCartAddonsModal');
-            if (addonsModalEl) {
-                bootstrap.Modal.getOrCreateInstance(addonsModalEl).show();
-            } else {
+            // Trigger Top Add-Ons Modal ("✔ Added to Cart!"). The item is
+            // already in the cart at this point (the request above succeeded),
+            // so a failure here (e.g. Bootstrap not ready) must never fall
+            // through to the network-failure catch below — that fallback
+            // re-submits the form natively, which would add the item a
+            // second time.
+            try {
+                const addonsModalEl = document.getElementById('addToCartAddonsModal');
+                if (addonsModalEl && window.bootstrap) {
+                    bootstrap.Modal.getOrCreateInstance(addonsModalEl).show();
+                } else {
+                    sessionStorage.setItem('open_cart_drawer', '1');
+                    window.location.reload();
+                }
+            } catch (uiErr) {
                 sessionStorage.setItem('open_cart_drawer', '1');
                 window.location.reload();
             }
         })
         .catch(() => {
+            // Only a genuine network/fetch failure reaches here (the success
+            // path above has its own try/catch), so it's safe to fall back
+            // to a native form submission.
             restoreBtn();
             hideCartSkeleton();
             form.submit();

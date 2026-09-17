@@ -18,7 +18,7 @@
                             <p class="text-muted mb-3" style="font-size: 0.8rem; line-height: 1.3;">Made the Traditional Bilona Way</p>
                             <a href="{{ route('shop.index') }}" class="btn btn-premium btn-sm px-4 py-2 rounded-pill text-uppercase font-heading" style="font-size: 0.7rem; letter-spacing: 0.5px;">Shop Now <i class="bi bi-arrow-right ms-1"></i></a>
                         </div>
-                        <img src="{{ url('uploads/products/1784099286_cow-ghee-1.png') }}" alt="Cow Ghee Product" width="150" height="150" loading="lazy" decoding="async" class="position-absolute end-0 bottom-0" style="height: 150px; object-fit: contain; transform: translateY(10px) translateX(10px); z-index: 1; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">
+                        <img src="{{ asset('images/Pure-Cow-Ghee.PNG') }}" alt="Pure Cow Ghee" width="150" height="150" loading="lazy" decoding="async" class="position-absolute end-0 bottom-0" style="height: 150px; object-fit: contain; transform: translateY(10px) translateX(10px); z-index: 1; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">
                     </div>
                 </div>
 
