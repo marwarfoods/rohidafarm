@@ -18,12 +18,10 @@ class OrderService
     use LogsActivity;
 
     protected $cartService;
-    protected $delhiveryService;
 
-    public function __construct(CartService $cartService, DelhiveryService $delhiveryService)
+    public function __construct(CartService $cartService)
     {
         $this->cartService = $cartService;
-        $this->delhiveryService = $delhiveryService;
     }
 
     /**
@@ -139,20 +137,13 @@ class OrderService
                 'location' => 'System'
             ]);
 
-            // 7. Trigger courier shipment creation — Shiprocket if enabled, else Delhivery
+            // 7. Trigger courier shipment creation via Shiprocket
             $shiprocket = app(\App\Services\ShiprocketService::class);
             if ($shiprocket->isConfigured()) {
                 try {
                     $shiprocket->createShipment($order);
                 } catch (\Exception $e) {
                     logger()->error('Shiprocket order creation failed: ' . $e->getMessage());
-                    $order->update(['shipment_status' => 'Shipment Failed - Needs Manual Booking']);
-                }
-            } else {
-                try {
-                    $this->delhiveryService->createShipment($order);
-                } catch (\Exception $e) {
-                    logger()->error('Delhivery shipment creation failed: ' . $e->getMessage());
                     $order->update(['shipment_status' => 'Shipment Failed - Needs Manual Booking']);
                 }
             }
@@ -355,7 +346,7 @@ class OrderService
             // Save tracking details if provided
             if ($trackingNumber) {
                 $updateData['tracking_number'] = $trackingNumber;
-                $updateData['tracking_url'] = "https://www.delhivery.com/track/package/{$trackingNumber}";
+                $updateData['tracking_url'] = "https://shiprocket.co/tracking/{$trackingNumber}";
                 $updateData['tracking_carrier'] = $trackingCarrier ?: $order->tracking_carrier;
             } elseif ($trackingCarrier) {
                 $updateData['tracking_carrier'] = $trackingCarrier;

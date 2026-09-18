@@ -99,7 +99,7 @@ class ShiprocketService
 
         $pickupLocation = Setting::get('shiprocket_pickup_location', 'Primary');
         $channelId = Setting::get('shiprocket_channel_id') ?: null;
-        $defaultWeight = (float) Setting::get('shiprocket_default_weight', 0.5);
+        $defaultWeight = (float) Setting::get('shiprocket_default_weight', 0.5) ?: 0.5;
         $dimL = (float) Setting::get('shiprocket_pkg_length', 15);
         $dimB = (float) Setting::get('shiprocket_pkg_breadth', 12);
         $dimH = (float) Setting::get('shiprocket_pkg_height', 8);
@@ -146,7 +146,7 @@ class ShiprocketService
             'length' => $dimL,
             'breadth' => $dimB,
             'height' => $dimH,
-            'weight' => $totalWeight > 0 ? round($totalWeight, 2) : $defaultWeight,
+            'weight' => $totalWeight > 0 ? round($totalWeight, 2) : max($defaultWeight, 0.5),
         ];
 
         if ($channelId) {

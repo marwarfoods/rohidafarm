@@ -4,23 +4,15 @@
 <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom flex-wrap gap-2">
     <h1 class="display-6 font-heading fw-bold m-0"><i class="bi bi-cart text-success me-2"></i>Order #{{ $order->order_number }}</h1>
     <div class="d-flex gap-2 align-items-center flex-wrap">
-        {{-- Push to courier buttons --}}
+        {{-- Push to courier --}}
         @if(!in_array($order->status, ['cancelled', 'delivered']))
             @if(auth()->user()->hasPermission('orders-edit'))
-                <form action="{{ route('admin.orders.sync-delhivery', $order->id) }}" method="POST" onsubmit="this.querySelector('button').disabled=true; this.querySelector('button').innerHTML='<span class=\'spinner-border spinner-border-sm me-1\'></span>Sending...'">
+                <form action="{{ route('admin.orders.sync-shiprocket', $order->id) }}" method="POST" onsubmit="this.querySelector('button').disabled=true; this.querySelector('button').innerHTML='<span class=\'spinner-border spinner-border-sm me-1\'></span>Sending...'">
                     @csrf
-                    <button type="submit" class="btn px-4 py-2 rounded-pill text-uppercase font-heading text-white fw-bold" style="font-size: 0.8rem; background: linear-gradient(135deg, #7c3aed, #4f46e5);">
-                        <i class="bi bi-send-fill me-1"></i> Push to Delhivery
+                    <button type="submit" class="btn px-4 py-2 rounded-pill text-uppercase font-heading text-white fw-bold" style="font-size: 0.8rem; background: linear-gradient(135deg, #0ea5e9, #2563eb);">
+                        <i class="bi bi-truck me-1"></i> Push to Shiprocket
                     </button>
                 </form>
-                @if(filter_var(\App\Models\Setting::get('shiprocket_enabled', 'false'), FILTER_VALIDATE_BOOLEAN))
-                    <form action="{{ route('admin.orders.sync-shiprocket', $order->id) }}" method="POST" onsubmit="this.querySelector('button').disabled=true; this.querySelector('button').innerHTML='<span class=\'spinner-border spinner-border-sm me-1\'></span>Sending...'">
-                        @csrf
-                        <button type="submit" class="btn px-4 py-2 rounded-pill text-uppercase font-heading text-white fw-bold" style="font-size: 0.8rem; background: linear-gradient(135deg, #0ea5e9, #2563eb);">
-                            <i class="bi bi-truck me-1"></i> Push to Shiprocket
-                        </button>
-                    </form>
-                @endif
             @endif
         @endif
         <a href="{{ route('admin.orders.index') }}" class="btn btn-outline-secondary px-4 py-2 rounded-pill text-uppercase font-heading" style="font-size: 0.8rem;"><i class="bi-arrow-left me-1"></i> Back to List</a>
@@ -223,7 +215,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Courier / Carrier Name</label>
-                    <input type="text" name="tracking_carrier" class="form-control bg-light border p-2" value="{{ $order->tracking_carrier }}" placeholder="e.g. Delhivery">
+                    <input type="text" name="tracking_carrier" class="form-control bg-light border p-2" value="{{ $order->tracking_carrier }}" placeholder="e.g. Shiprocket">
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Tracking Comment / Location</label>
@@ -234,13 +226,13 @@
         </div>
         @endif
 
-        {{-- Delhivery Sync Status Card --}}
-        <div class="card border-0 rounded-4 shadow-sm p-4 bg-white mb-4" style="background: linear-gradient(135deg, #f5f3ff, #ede9fe) !important; border: 1px solid #c4b5fd !important;">
-            <h5 class="font-heading fw-bold mb-3" style="color: #4f46e5;"><i class="bi bi-truck me-2"></i>Delhivery Sync</h5>
+        {{-- Shiprocket Sync Status Card --}}
+        <div class="card border-0 rounded-4 shadow-sm p-4 bg-white mb-4" style="background: linear-gradient(135deg, #eff6ff, #dbeafe) !important; border: 1px solid #93c5fd !important;">
+            <h5 class="font-heading fw-bold mb-3" style="color: #2563eb;"><i class="bi bi-truck me-2"></i>Shiprocket Sync</h5>
 
             @if($order->shipment)
                 <div class="mb-2" style="font-size: 0.82rem;">
-                    <span class="badge bg-success mb-2"><i class="bi bi-check-circle me-1"></i>Synced to Delhivery</span>
+                    <span class="badge bg-success mb-2"><i class="bi bi-check-circle me-1"></i>Synced to Shiprocket</span>
                     <div class="text-muted">Order ID: <strong class="text-dark">{{ $order->shipment->delhivery_order_id }}</strong></div>
                     <div class="text-muted">Shipment ID: <strong class="text-dark">{{ $order->shipment->delhivery_shipment_id }}</strong></div>
                     <div class="text-muted">AWB (Waybill): <strong class="text-dark">{{ $order->shipment->awb_code ?: 'Not assigned yet' }}</strong></div>
@@ -248,29 +240,29 @@
                     <div class="text-muted">Status: <strong class="text-dark">{{ $order->shipment->status }}</strong></div>
                 </div>
                 @if($order->tracking_number)
-                    <a href="https://www.delhivery.com/track/package/{{ $order->tracking_number }}" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-3 mt-1" style="font-size: 0.78rem;">
-                        <i class="bi bi-box-arrow-up-right me-1"></i>Track on Delhivery
+                    <a href="{{ $order->tracking_url ?: 'https://shiprocket.co/tracking/' . $order->tracking_number }}" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-3 mt-1" style="font-size: 0.78rem;">
+                        <i class="bi bi-box-arrow-up-right me-1"></i>Track on Shiprocket
                     </a>
                 @endif
                 {{-- Re-sync button --}}
                 @if(!in_array($order->status, ['cancelled', 'delivered']))
                     @if(auth()->user()->hasPermission('orders-edit'))
-                        <form action="{{ route('admin.orders.sync-delhivery', $order->id) }}" method="POST" class="mt-2" onsubmit="this.querySelector('button').disabled=true;">
+                        <form action="{{ route('admin.orders.sync-shiprocket', $order->id) }}" method="POST" class="mt-2" onsubmit="this.querySelector('button').disabled=true;">
                             @csrf
-                            <button type="submit" class="btn btn-sm rounded-pill px-3 text-white" style="font-size: 0.78rem; background:#7c3aed;">
-                                <i class="bi bi-arrow-repeat me-1"></i>Re-sync to Delhivery
+                            <button type="submit" class="btn btn-sm rounded-pill px-3 text-white" style="font-size: 0.78rem; background:#2563eb;">
+                                <i class="bi bi-arrow-repeat me-1"></i>Re-sync to Shiprocket
                             </button>
                         </form>
                     @endif
                 @endif
             @else
-                <p class="text-muted mb-3" style="font-size: 0.85rem;">This order has not been pushed to Delhivery yet.</p>
+                <p class="text-muted mb-3" style="font-size: 0.85rem;">This order has not been pushed to Shiprocket yet.</p>
                 @if(!in_array($order->status, ['cancelled', 'delivered']))
                     @if(auth()->user()->hasPermission('orders-edit'))
-                        <form action="{{ route('admin.orders.sync-delhivery', $order->id) }}" method="POST" onsubmit="this.querySelector('button').disabled=true; this.querySelector('button').innerHTML='<span class=\'spinner-border spinner-border-sm me-1\'></span>Sending...'">
+                        <form action="{{ route('admin.orders.sync-shiprocket', $order->id) }}" method="POST" onsubmit="this.querySelector('button').disabled=true; this.querySelector('button').innerHTML='<span class=\'spinner-border spinner-border-sm me-1\'></span>Sending...'">
                             @csrf
-                            <button type="submit" class="btn w-100 rounded-3 py-2 text-white fw-bold text-uppercase font-heading" style="font-size: 0.8rem; background: linear-gradient(135deg, #7c3aed, #4f46e5);">
-                                <i class="bi bi-send-fill me-1"></i> Push Order to Delhivery
+                            <button type="submit" class="btn w-100 rounded-3 py-2 text-white fw-bold text-uppercase font-heading" style="font-size: 0.8rem; background: linear-gradient(135deg, #0ea5e9, #2563eb);">
+                                <i class="bi bi-send-fill me-1"></i> Push Order to Shiprocket
                             </button>
                         </form>
                     @endif

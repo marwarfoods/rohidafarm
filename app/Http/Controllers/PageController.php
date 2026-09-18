@@ -7,7 +7,7 @@ use App\Models\Faq;
 use App\Models\Order;
 use App\Models\Page;
 use App\Services\SeoService;
-use App\Services\DelhiveryService;
+use App\Services\ShippingService;
 use App\Traits\LogsActivity;
 use Illuminate\Http\Request;
 
@@ -15,12 +15,12 @@ class PageController extends Controller
 {
     use LogsActivity;
 
-    protected $delhiveryService;
+    protected $shippingService;
     protected $seoService;
 
-    public function __construct(DelhiveryService $delhiveryService, SeoService $seoService)
+    public function __construct(ShippingService $shippingService, SeoService $seoService)
     {
-        $this->delhiveryService = $delhiveryService;
+        $this->shippingService = $shippingService;
         $this->seoService = $seoService;
     }
 
@@ -173,7 +173,7 @@ class PageController extends Controller
                         $timeline[0]['is_latest'] = true;
                     }
                 } else {
-                    $timeline = $this->delhiveryService->getTrackingTimeline($order);
+                    $timeline = $this->shippingService->getTrackingTimeline($order);
                 }
             } else {
                 session()->now('error', 'No orders found matching this order number.');

@@ -2,36 +2,6 @@
 <div class="tab-pane settings-tab-pane fade" id="integrations" role="tabpanel" aria-labelledby="integrations-tab">
     <h4 class="font-heading fw-bold text-success border-bottom pb-2 mb-3">Third-Party Integrations</h4>
     
-    <!-- Delhivery Section -->
-    <div class="mb-4">
-        <h6 class="fw-bold text-dark d-flex align-items-center mb-3">
-            <i class="bi bi-truck text-danger me-2" style="font-size: 1.3rem;"></i> Delhivery Logistics
-            <i class="bi bi-question-circle text-primary ms-2 cursor-pointer" data-bs-toggle="modal" data-bs-target="#delhiveryHelpModal" style="font-size: 1.1rem;" title="How to get Delhivery API details?"></i>
-        </h6>
-        <div class="row g-3">
-            <div class="col-md-6">
-                <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Delhivery API Token</label>
-                <div class="input-group">
-                    <input type="password" name="settings[delhivery_api_token]" class="form-control bg-light border p-2" value="{{ App\Models\Setting::get('delhivery_api_token') }}">
-                    <button class="btn bg-white border border-start-0 toggle-password text-muted" type="button" style="border-color: #dee2e6 !important;">
-                        <i class="bi bi-eye"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Pickup Location Name</label>
-                <input type="text" name="settings[delhivery_pickup_location]" class="form-control bg-light border p-2" placeholder="e.g. RohidaFarm Warehouse" value="{{ App\Models\Setting::get('delhivery_pickup_location') }}">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Client Name (Registered on Delhivery)</label>
-                <input type="text" name="settings[delhivery_client_name]" class="form-control bg-light border p-2" placeholder="Defaults to Pickup Location Name if blank" value="{{ App\Models\Setting::get('delhivery_client_name') }}">
-            </div>
-        </div>
-        <small class="text-muted d-block mt-2">Connecting your account allows automatic syncing of real orders to Delhivery for fulfillment.</small>
-    </div>
-    
-    <hr class="my-4">
-    
     <!-- Google Analytics Section -->
     <div>
         <h6 class="fw-bold text-dark d-flex align-items-center mb-3">

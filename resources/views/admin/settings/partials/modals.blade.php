@@ -1,28 +1,3 @@
-<!-- Delhivery Help Modal -->
-<div class="modal fade" id="delhiveryHelpModal" tabindex="-1" aria-labelledby="delhiveryHelpModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow">
-            <div class="modal-header border-bottom py-3">
-                <h5 class="modal-title font-heading fw-bold text-dark" id="delhiveryHelpModalLabel">
-                    <i class="bi bi-box-seam text-primary me-2"></i>How to connect Delhivery?
-                </h5>
-                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4">
-                <ol class="text-muted" style="font-size: 0.9rem; line-height: 1.8;">
-                    <li>Log in to your <strong>Delhivery One / Partner Portal</strong> account.</li>
-                    <li>Go to <strong>Settings &gt; API Center</strong> (or contact your Delhivery account manager to enable API access).</li>
-                    <li>Generate/copy your <strong>API Token</strong> (a long alphanumeric key).</li>
-                    <li>Note the <strong>Pickup Location Name</strong> you registered with Delhivery for your warehouse.</li>
-                    <li>Note your registered <strong>Client Name</strong> (used to generate waybills); leave blank to reuse the Pickup Location Name.</li>
-                    <li>Paste the Token, Pickup Location Name and Client Name into the settings fields here.</li>
-                    <li>Click <strong>Save Configurations</strong>. Future orders will automatically sync!</li>
-                </ol>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Google Analytics Help Modal -->
 <div class="modal fade" id="gaHelpModal" tabindex="-1" aria-labelledby="gaHelpModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">

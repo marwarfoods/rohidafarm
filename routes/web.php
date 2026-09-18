@@ -245,7 +245,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('orders.show');
         Route::post('/orders/{id}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.status');
         Route::post('/orders/{id}/cancel', [AdminOrderController::class, 'cancel'])->name('orders.cancel');
-        Route::post('/orders/{id}/sync-delhivery', [AdminOrderController::class, 'syncDelhivery'])->name('orders.sync-delhivery');
         Route::post('/orders/{id}/sync-shiprocket', [AdminOrderController::class, 'syncShiprocket'])->name('orders.sync-shiprocket');
         Route::delete('/orders/{id}/delete', [AdminOrderController::class, 'destroy'])->name('orders.delete');
         Route::post('/orders/{id}/restore', [AdminOrderController::class, 'restore'])->name('orders.restore');

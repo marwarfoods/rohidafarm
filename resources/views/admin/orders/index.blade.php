@@ -19,7 +19,7 @@
 <form id="bulkDeleteForm" action="{{ route('admin.orders.bulk-delete') }}" method="POST">
     @csrf
     <x-admin-table 
-        :headers="['<input type=\'checkbox\' id=\'selectAll\'>', 'Order Number', 'Customer Name', 'Total Amount', 'Payment Mode', 'Payment Status', 'Order Status', 'Delhivery', 'Actions']"
+        :headers="['<input type=\'checkbox\' id=\'selectAll\'>', 'Order Number', 'Customer Name', 'Total Amount', 'Payment Mode', 'Payment Status', 'Order Status', 'Shiprocket', 'Actions']"
         :items="$orders" 
         title="Customer Sales Orders" 
         description="Track customer purchases, update fulfillment status, and review payments.">
@@ -95,8 +95,8 @@
                     @elseif(!in_array($ord->status, ['cancelled', 'delivered']))
                         @if(auth()->user()->hasPermission('orders-edit'))
                         <button type="button" form="syncForm{{ $ord->id }}" class="btn btn-sm text-white px-2 py-1 rounded-2 fw-bold"
-                                style="font-size: 0.72rem; background: linear-gradient(135deg,#7c3aed,#4f46e5);" 
-                                title="Push to Delhivery">
+                                style="font-size: 0.72rem; background: linear-gradient(135deg,#0ea5e9,#2563eb);"
+                                title="Push to Shiprocket">
                             <i class="bi bi-send-fill me-1"></i>Sync
                         </button>
                         @else
@@ -131,7 +131,7 @@
 
 @foreach($orders as $ord)
     @if(!in_array($ord->status, ['cancelled', 'delivered']) && !$ord->shipment)
-    <form id="syncForm{{ $ord->id }}" action="{{ route('admin.orders.sync-delhivery', $ord->id) }}" method="POST" class="d-none" onsubmit="this.querySelector('button').disabled=true;">
+    <form id="syncForm{{ $ord->id }}" action="{{ route('admin.orders.sync-shiprocket', $ord->id) }}" method="POST" class="d-none" onsubmit="this.querySelector('button').disabled=true;">
         @csrf
     </form>
     @endif

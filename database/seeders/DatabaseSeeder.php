@@ -457,10 +457,6 @@ class DatabaseSeeder extends Seeder
             ['key' => 'stripe_secret', 'value' => 'sk_test_stripeMockSecret123', 'type' => 'string', 'group' => 'payment', 'description' => 'Stripe SDK API credentials.'],
             ['key' => 'paypal_client_id', 'value' => 'paypal_client_mockId123', 'type' => 'string', 'group' => 'payment', 'description' => 'PayPal API client.'],
             
-            // Delhivery Settings
-            ['key' => 'delhivery_api_token', 'value' => '', 'type' => 'string', 'group' => 'delhivery', 'description' => 'Delhivery API token.'],
-            ['key' => 'delhivery_pickup_location', 'value' => '', 'type' => 'string', 'group' => 'delhivery', 'description' => 'Delhivery registered pickup location name.'],
-            ['key' => 'delhivery_client_name', 'value' => '', 'type' => 'string', 'group' => 'delhivery', 'description' => 'Delhivery registered client name (for waybill generation).'],
             
             // General Company Meta
             ['key' => 'contact_phone', 'value' => '+91 98765 43210', 'type' => 'string', 'group' => 'general', 'description' => 'Support phone line.'],

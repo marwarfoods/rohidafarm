@@ -65,9 +65,9 @@
 <!-- Integrations Panel -->
 <div class="card border-0 rounded-4 shadow-sm p-4 bg-white dynamic-sidebar-card" id="sidebar-integrations">
     <h5 class="font-heading fw-bold text-dark border-bottom pb-2 mb-3"><i class="bi bi-boxes text-success me-2"></i>Integration Status</h5>
-    <p class="text-muted" style="font-size: 0.85rem; line-height:1.6;">Manage your third-party connections. If Delhivery credentials are blank, the system will use simulated sandbox mode.</p>
+    <p class="text-muted" style="font-size: 0.85rem; line-height:1.6;">Manage your third-party connections.</p>
     <div class="bg-light p-3 rounded-3 border mt-3 text-center">
-        <span class="badge bg-{{ App\Models\Setting::get('delhivery_api_token') ? 'success' : 'warning text-dark' }} w-100 p-2 mb-2">Delhivery: {{ App\Models\Setting::get('delhivery_api_token') ? 'Connected' : 'Sandbox Mode' }}</span>
+        <span class="badge bg-{{ filter_var(App\Models\Setting::get('shiprocket_enabled', 'false'), FILTER_VALIDATE_BOOLEAN) ? 'success' : 'secondary' }} w-100 p-2 mb-2">Shiprocket: {{ filter_var(App\Models\Setting::get('shiprocket_enabled', 'false'), FILTER_VALIDATE_BOOLEAN) ? 'Enabled' : 'Disabled' }}</span>
         <span class="badge bg-{{ App\Models\Setting::get('google_analytics_id') ? 'success' : 'secondary' }} w-100 p-2 mb-2">Google Analytics: {{ App\Models\Setting::get('google_analytics_id') ? 'Active' : 'Inactive' }}</span>
         <span class="badge bg-{{ App\Models\Setting::get('meta_pixel_enabled') && (App\Models\Setting::get('meta_pixel_id') || App\Models\Setting::get('meta_pixel_code')) ? 'success' : 'secondary' }} w-100 p-2 mb-2">Meta Pixel: {{ App\Models\Setting::get('meta_pixel_enabled') && (App\Models\Setting::get('meta_pixel_id') || App\Models\Setting::get('meta_pixel_code')) ? 'Active & Tracking' : 'Disabled' }}</span>
         <span class="badge bg-{{ App\Models\Setting::get('turnstile_enabled') && App\Models\Setting::get('turnstile_site_key') ? 'success' : 'secondary' }} w-100 p-2">Cloudflare Turnstile: {{ App\Models\Setting::get('turnstile_enabled') && App\Models\Setting::get('turnstile_site_key') ? 'Active & Protecting' : 'Disabled' }}</span>

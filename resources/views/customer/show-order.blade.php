@@ -42,7 +42,7 @@
                             <i class="bi bi-file-earmark-text me-1"></i> View Invoice
                         </a>
                         @if($order->tracking_number)
-                            <a href="{{ $order->tracking_url ?: 'https://www.delhivery.com/track/package/' . $order->tracking_number }}" target="_blank" class="btn btn-sm btn-info text-white px-3 rounded-pill">
+                            <a href="{{ $order->tracking_url ?: 'https://shiprocket.co/tracking/' . $order->tracking_number }}" target="_blank" class="btn btn-sm btn-info text-white px-3 rounded-pill">
                                 <i class="bi bi-truck me-1"></i> Track Shipment
                             </a>
                         @endif

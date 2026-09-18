@@ -5,18 +5,15 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\OrderService;
-use App\Services\DelhiveryService;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
     protected $orderService;
-    protected $delhiveryService;
 
-    public function __construct(OrderService $orderService, DelhiveryService $delhiveryService)
+    public function __construct(OrderService $orderService)
     {
         $this->orderService = $orderService;
-        $this->delhiveryService = $delhiveryService;
     }
 
     /**
@@ -93,32 +90,6 @@ class OrderController extends Controller
             return back()->with('success', 'Order cancelled and stock restored successfully.');
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
-        }
-    }
-
-    /**
-     * Manually push order to Delhivery.
-     */
-    public function syncDelhivery($id)
-    {
-        $order = Order::with(['items.product', 'items.variant', 'user'])->findOrFail($id);
-
-        try {
-            $shipment = $this->delhiveryService->createShipment($order);
-
-            // Update tracking on order if AWB was returned
-            if ($shipment->awb_code) {
-                $order->update([
-                    'tracking_number' => $shipment->awb_code,
-                    'tracking_url'    => "https://www.delhivery.com/track/package/{$shipment->awb_code}",
-                    'tracking_carrier' => $shipment->courier_name,
-                ]);
-            }
-
-            return back()->with('success', '✅ Order successfully pushed to Delhivery! Shipment ID: ' . $shipment->delhivery_shipment_id);
-        } catch (\Exception $e) {
-            \Log::error('Manual Delhivery Sync Failed', ['order_id' => $id, 'error' => $e->getMessage()]);
-            return back()->with('error', '❌ Delhivery sync failed: ' . $e->getMessage());
         }
     }
 

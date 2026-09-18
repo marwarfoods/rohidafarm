@@ -44,7 +44,7 @@
                                                 <a href="{{ route('order.receipt', $ord->uuid) }}" target="_blank" class="btn btn-sm btn-premium-outline px-3 py-1 rounded-3">Invoice</a>
                                                 
                                                 @if($ord->tracking_number)
-                                                    <a href="{{ $ord->tracking_url ?: 'https://www.delhivery.com/track/package/' . $ord->tracking_number }}" target="_blank" class="btn btn-sm btn-info text-white px-3 py-1 rounded-3"><i class="bi bi-truck me-1"></i> Track</a>
+                                                    <a href="{{ $ord->tracking_url ?: 'https://shiprocket.co/tracking/' . $ord->tracking_number }}" target="_blank" class="btn btn-sm btn-info text-white px-3 py-1 rounded-3"><i class="bi bi-truck me-1"></i> Track</a>
                                                 @endif
                                                 
                                                 @if(!in_array($ord->status, ['shipped', 'delivered', 'cancelled', 'cancellation_requested']))

@@ -38,7 +38,7 @@
 
                 <div class="timeline-item">
                     <h6 class="fw-bold m-0 text-muted" style="font-size: 0.95rem;">Packed & Dispatched</h6>
-                    <p class="text-muted m-0" style="font-size: 0.85rem;">Package seal verification and manifest creation via Delhivery/BlueDart shipping hubs.</p>
+                    <p class="text-muted m-0" style="font-size: 0.85rem;">Package seal verification and manifest creation via Shiprocket shipping hubs.</p>
                     <span class="text-muted d-block mt-1" style="font-size: 0.7rem;">Pending warehouse verification</span>
                 </div>
 
@@ -51,7 +51,7 @@
             @if($order->tracking_number)
                 <div class="p-3 bg-light rounded-3 d-flex align-items-center justify-content-between mt-3 border">
                     <div>
-                        <span class="text-muted d-block" style="font-size: 0.75rem;">Delhivery Waybill AWB</span>
+                        <span class="text-muted d-block" style="font-size: 0.75rem;">Shipment Waybill AWB</span>
                         <strong class="text-dark" style="font-size: 0.85rem;">{{ $order->tracking_number }} ({{ $order->tracking_carrier }})</strong>
                     </div>
                     <a href="{{ $order->tracking_url }}" target="_blank" class="btn btn-sm btn-premium px-3 py-1 rounded-pill text-uppercase font-heading" style="font-size: 0.7rem;"><i class="bi bi-box-seam me-1"></i> Track Live</a>

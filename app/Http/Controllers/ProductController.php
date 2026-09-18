@@ -5,25 +5,25 @@ namespace App\Http\Controllers;
 use App\Repositories\Contracts\CategoryRepositoryInterface;
 use App\Repositories\Contracts\ProductRepositoryInterface;
 use App\Services\SeoService;
-use App\Services\DelhiveryService;
+use App\Services\ShippingService;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
     protected $productRepo;
     protected $categoryRepo;
-    protected $delhiveryService;
+    protected $shippingService;
     protected $seoService;
 
     public function __construct(
         ProductRepositoryInterface $productRepo,
         CategoryRepositoryInterface $categoryRepo,
-        DelhiveryService $delhiveryService,
+        ShippingService $shippingService,
         SeoService $seoService
     ) {
         $this->productRepo = $productRepo;
         $this->categoryRepo = $categoryRepo;
-        $this->delhiveryService = $delhiveryService;
+        $this->shippingService = $shippingService;
         $this->seoService = $seoService;
     }
 
@@ -152,7 +152,7 @@ class ProductController extends Controller
     public function checkDelivery(Request $request)
     {
         $pincode = $request->input('pincode');
-        $response = $this->delhiveryService->estimateDelivery($pincode);
+        $response = $this->shippingService->estimateDelivery($pincode);
         return response()->json($response);
     }
 
