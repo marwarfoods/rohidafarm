@@ -40,9 +40,11 @@
                     </select>
                 </div>
 
-                <button type="submit" class="btn btn-success w-100 py-2.5 rounded-3 fw-bold text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px; background-color: var(--primary-green) !important; border-color: var(--primary-green) !important;">
-                    <i class="bi bi-plus-circle me-1"></i> Add Ticker Point
-                </button>
+                <div class="pt-2">
+                    <button type="submit" class="btn btn-success w-100 py-2.5 rounded-3 fw-bold text-uppercase text-white shadow-sm d-flex align-items-center justify-content-center gap-2" style="font-size: 0.85rem; letter-spacing: 0.5px; background-color: #1a4d2e !important; border-color: #1a4d2e !important; color: #ffffff !important; min-height: 44px;">
+                        <i class="bi bi-plus-circle-fill fs-6"></i> Add Ticker Point
+                    </button>
+                </div>
             </form>
         </div>
     </div>

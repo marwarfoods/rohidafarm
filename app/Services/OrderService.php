@@ -232,6 +232,17 @@ class OrderService
                 'location' => 'System'
             ]);
 
+            // 7. Trigger courier shipment creation via Shiprocket
+            $shiprocket = app(\App\Services\ShiprocketService::class);
+            if ($shiprocket->isConfigured()) {
+                try {
+                    $shiprocket->createShipment($order);
+                } catch (\Exception $e) {
+                    logger()->error('Shiprocket direct order creation failed: ' . $e->getMessage());
+                    $order->update(['shipment_status' => 'Shipment Failed - Needs Manual Booking']);
+                }
+            }
+
             // 8. Log activity
             self::logActivity('checkout_direct', "Placed direct order {$orderNumber} with total ₹{$total}", ['order_id' => $order->id]);
 
