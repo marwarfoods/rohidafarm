@@ -165,11 +165,19 @@ h6,
     animation-play-state: paused !important;
 }
 
+// Two identical groups; shifting by -50% lands exactly on the second group, so the loop is seamless
 .announcement-ticker-container {
-    display: inline-block;
+    display: flex;
+    width: max-content;
     white-space: nowrap;
-    animation: marquee 25s linear infinite;
-    padding-left: 10%;
+    animation: marquee 30s linear infinite;
+}
+
+.announcement-ticker-group {
+    display: flex;
+    flex-shrink: 0;
+    justify-content: space-around;
+    min-width: 100vw;
 }
 
 @keyframes marquee {

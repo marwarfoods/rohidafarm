@@ -236,13 +236,20 @@
     @endphp
     @if($topTickers->isNotEmpty())
         <div class="announcement-bar py-2 text-white" role="marquee" aria-label="Announcements" style="background-color: var(--dark-green); font-size: 0.82rem; font-family: 'DM Sans', sans-serif; overflow: hidden; white-space: nowrap;">
-            <div class="announcement-ticker-container d-inline-block" aria-hidden="true">
-                @foreach($topTickers as $ticker)
-                    <span class="mx-4 fw-semibold"><i class="{{ $ticker->icon_class }} me-2 text-white" aria-hidden="true"></i> {{ $ticker->text }}</span>
-                @endforeach
-                @foreach($topTickers as $ticker)
-                    <span class="mx-4 fw-semibold"><i class="{{ $ticker->icon_class }} me-2 text-white" aria-hidden="true"></i> {{ $ticker->text }}</span>
-                @endforeach
+            @php
+                // Repeat items so each group is wider than the screen, even with a single ticker
+                $tickerRepeat = (int) ceil(6 / $topTickers->count());
+            @endphp
+            <div class="announcement-ticker-container" aria-hidden="true">
+                @for($group = 0; $group < 2; $group++)
+                    <div class="announcement-ticker-group">
+                        @for($r = 0; $r < $tickerRepeat; $r++)
+                            @foreach($topTickers as $ticker)
+                                <span class="mx-4 fw-semibold"><i class="{{ $ticker->icon_class }} me-2 text-white" aria-hidden="true"></i> {{ $ticker->text }}</span>
+                            @endforeach
+                        @endfor
+                    </div>
+                @endfor
             </div>
         </div>
     @endif
