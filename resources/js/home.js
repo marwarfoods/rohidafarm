@@ -459,9 +459,18 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize Home Blog Slider (PC: 4 items, Mobile: 1.5 items, scroll 1-by-1)
     const blogSlider = document.querySelector('.blogs-slider');
     if (blogSlider) {
-        const slidesCount = blogSlider.querySelectorAll('.swiper-slide').length;
+        // Swiper loop needs ~2x the visible slides (max 4) to cycle smoothly,
+        // so duplicate the cards until there are enough.
+        const blogWrapper = blogSlider.querySelector('.swiper-wrapper');
+        const originalBlogSlides = Array.from(blogWrapper.querySelectorAll('.swiper-slide'));
+        const slidesCount = originalBlogSlides.length;
+        if (slidesCount > 1) {
+            while (blogWrapper.children.length < 10) {
+                originalBlogSlides.forEach(slide => blogWrapper.appendChild(slide.cloneNode(true)));
+            }
+        }
         new Swiper(blogSlider, {
-            loop: slidesCount > 4,
+            loop: slidesCount > 1,
             autoplay: {
                 delay: 4000,
                 disableOnInteraction: false,

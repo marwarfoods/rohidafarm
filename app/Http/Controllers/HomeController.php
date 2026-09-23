@@ -56,7 +56,7 @@ class HomeController extends Controller
         $blogs = Blog::with('category:id,name,slug')
             ->where('is_published', true)
             ->orderBy('published_at', 'desc')
-            ->limit(3)->get();
+            ->limit(8)->get();
 
         // ── Reviews ───────────────────────────────────────────────────
         $reviews = ProductReview::with(['product:id,name,slug', 'user:id,name'])
