@@ -23,7 +23,8 @@
             };
             const selectors = [];
             if (cfg.buyNow) selectors.push('#btnBuyNowDirect', '#mobileBtnBuyNowDirect');
-            if (cfg.cart) selectors.push('[data-shiprocket-checkout="cart"]');
+            // Cart page / cart drawer buttons + the checkout page's "Place Order Now".
+            if (cfg.cart) selectors.push('[data-shiprocket-checkout="cart"]', '#placeOrderBtn');
             if (!selectors.length) return;
 
             let busy = false;
@@ -52,8 +53,14 @@
             async function onClick(e) {
                 const el = e.target.closest(selectors.join(','));
                 if (!el || el.disabled) return;
+                if (el.dataset.srBypass === '1') { // fallback re-click → let the native handler run
+                    delete el.dataset.srBypass;
+                    return;
+                }
+                // Free (₹0) orders stay on the native checkout.
+                if (el.id === 'placeOrderBtn' && /free/i.test(el.textContent)) return;
 
-                const isCart = el.matches('[data-shiprocket-checkout="cart"]');
+                const isCart = el.matches('[data-shiprocket-checkout="cart"], #placeOrderBtn');
                 const payload = isCart ? { source: 'cart' } : buyNowPayload();
                 if (!isCart && !payload.product_id) return; // not a product page → native flow
 
@@ -66,8 +73,9 @@
                 el.setAttribute('aria-busy', 'true');
                 el.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Checkout...';
 
-                const nativeFallback = isCart ? (el.getAttribute('href') || cfg.nativeCheckout) : null;
-                let fallbackUrl = nativeFallback;
+                // Links fall back to their own URL; buttons (Buy Now, Place Order) to their native handler.
+                const isLink = el.hasAttribute('href');
+                let fallbackUrl = isLink ? el.getAttribute('href') : null;
 
                 try {
                     const res = await fetch(cfg.tokenUrl, {
@@ -76,13 +84,13 @@
                         body: JSON.stringify(payload),
                     });
                     const data = await res.json().catch(() => ({}));
-                    fallbackUrl = data.fallback_url || fallbackUrl;
+                    if (isLink || !isCart) fallbackUrl = data.fallback_url || fallbackUrl;
 
                     if (!res.ok || !data.ok || !data.token || typeof window.HeadlessCheckout === 'undefined') {
                         throw new Error(data.message || 'Shiprocket Checkout unavailable');
                     }
 
-                    window.HeadlessCheckout.addToCart(e, data.token, { fallbackUrl: fallbackUrl || cfg.nativeCheckout });
+                    window.HeadlessCheckout.addToCart(e, data.token, { fallbackUrl: data.fallback_url || cfg.nativeCheckout });
                     el.innerHTML = originalHtml;
                     el.removeAttribute('aria-busy');
                     busy = false;
@@ -92,11 +100,11 @@
                         window.location.href = fallbackUrl;
                         return;
                     }
-                    // Buy Now with no server fallback URL: hand back to the native handler.
+                    // No fallback URL (e.g. Place Order on the checkout page): run the native handler.
                     el.innerHTML = originalHtml;
                     el.removeAttribute('aria-busy');
                     busy = false;
-                    document.removeEventListener('click', onClick, true);
+                    el.dataset.srBypass = '1';
                     el.click();
                 }
             }
