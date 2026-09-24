@@ -22,9 +22,11 @@ class ShiprocketCheckoutCatalogController extends Controller
     public function products(Request $request)
     {
         [$page, $limit] = $this->paging($request);
+        $payload = $this->catalog->products($page, $limit);
+        // Only mark the catalog as configured once a fetch has actually succeeded.
         $this->checkout->touch('shiprocket_checkout_last_catalog_fetch_at');
 
-        return response()->json($this->catalog->products($page, $limit));
+        return response()->json($payload);
     }
 
     public function collectionProducts(Request $request)
