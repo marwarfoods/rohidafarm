@@ -41,6 +41,8 @@
                         @if ($srcEnabled && !$srcHasCreds) <small class="text-danger ms-1">Enabled, but API Key/Secret missing — native checkout is used.</small> @endif</td></tr>
                 <tr><th class="bg-light">Catalog Status</th>
                     <td>{!! $srcCatalogAt ? '<span class="text-success fw-bold">Configured</span> <small class="text-muted">— last fetched by Shiprocket ' . e($srcCatalogAt) . '</small>' : '<span class="text-muted fw-bold">Not Configured</span> <small class="text-muted">— Shiprocket has not called the catalog API yet</small>' !!}</td></tr>
+                <tr><th class="bg-light">Catalog Pushed</th>
+                    <td>{{ \App\Models\Setting::get('shiprocket_checkout_last_catalog_push_at') ?: 'Never' }} <small class="text-muted">— via "Sync catalog to Shiprocket now"</small></td></tr>
                 <tr><th class="bg-light">Webhook Status</th>
                     <td>{!! $srcWebhookAt ? '<span class="text-success fw-bold">Configured</span> <small class="text-muted">— last order webhook ' . e($srcWebhookAt) . '</small>' : '<span class="text-muted fw-bold">Not Configured</span> <small class="text-muted">— no order webhook received yet</small>' !!}</td></tr>
                 <tr><th class="bg-light">Environment</th><td>{{ ucfirst($srcEnv) }} — <code>{{ $src->baseUrl() }}</code></td></tr>
@@ -157,6 +159,9 @@
             </div>
         @endforeach
     </div>
+    <button type="submit" form="srcSyncCatalogForm" class="btn btn-sm btn-success me-2" onclick="this.innerHTML='<span class=&quot;spinner-border spinner-border-sm me-1&quot;></span> Syncing...';">
+        <i class="bi bi-cloud-upload me-1"></i> Sync catalog to Shiprocket now
+    </button>
     <button type="submit" form="srcRegenerateWebhookForm" class="btn btn-sm btn-outline-danger" onclick="return confirm('Generate a new webhook URL? The old URL stops working immediately — you must update it with Shiprocket.');">
         <i class="bi bi-arrow-repeat me-1"></i> Regenerate webhook URL
     </button>

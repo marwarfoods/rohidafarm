@@ -396,4 +396,33 @@ class ShiprocketCheckoutTest extends TestCase
         $page = $this->actingAs($admin)->get(route('admin.settings.index'));
         $page->assertOk()->assertSee('Shiprocket Checkout')->assertDontSee(self::SECRET)->assertDontSee(self::API_KEY);
     }
+
+    // ── Catalog push ─────────────────────────────────────────────────────
+
+    public function test_sync_catalog_pushes_signed_product_and_collection_webhooks(): void
+    {
+        $this->configure();
+        Http::fake(['*' => Http::response(['ok' => true, 'errorCode' => null, 'result' => true])]);
+
+        $this->artisan('shiprocket-checkout:sync-catalog')->assertSuccessful();
+
+        $vid = ShiprocketCheckoutVariant::idFor($this->withVariants->id, $this->variant->id);
+        Http::assertSent(fn (HttpRequest $r) => $r->url() === 'https://checkout-api.shiprocket.com/wh/v1/custom/product'
+            && $r['id'] === $this->withVariants->id
+            && $r['variants'][0]['id'] === $vid
+            && $r->header('X-Api-HMAC-SHA256')[0] === base64_encode(hash_hmac('sha256', $r->body(), self::SECRET, true)));
+        Http::assertSent(fn (HttpRequest $r) => $r->url() === 'https://checkout-api.shiprocket.com/wh/v1/custom/collection'
+            && $r['id'] === $this->category->id);
+    }
+
+    public function test_admin_sync_catalog_button_reports_failures(): void
+    {
+        $this->configure();
+        Http::fake(['*' => Http::response(['ok' => false, 'error' => 'bad'], 511)]);
+        $admin = User::create(['name' => 'Admin', 'email' => 'admin' . Str::random(5) . '@example.com', 'password' => bcrypt('x'), 'role' => 'admin']);
+
+        $this->actingAs($admin)->post(route('admin.settings.shiprocket-checkout.catalog.sync'))
+            ->assertRedirect()
+            ->assertSessionHas('error');
+    }
 }

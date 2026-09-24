@@ -297,6 +297,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/settings/shiprocket/test', [AdminSettingController::class, 'testShiprocket'])->name('settings.shiprocket.test');
         Route::post('/settings/shiprocket-engage/test', [AdminShiprocketEngageController::class, 'testConnection'])->name('settings.shiprocket-engage.test');
         Route::post('/settings/shiprocket-checkout/test', [\App\Http\Controllers\Admin\ShiprocketCheckoutController::class, 'testConnection'])->name('settings.shiprocket-checkout.test');
+        Route::post('/settings/shiprocket-checkout/catalog/sync', [\App\Http\Controllers\Admin\ShiprocketCheckoutController::class, 'syncCatalog'])->name('settings.shiprocket-checkout.catalog.sync');
         Route::post('/settings/shiprocket-checkout/webhook/regenerate', [\App\Http\Controllers\Admin\ShiprocketCheckoutController::class, 'regenerateWebhook'])->name('settings.shiprocket-checkout.webhook.regenerate');
     });
 

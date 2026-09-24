@@ -57,6 +57,31 @@ class ShiprocketCheckoutCatalog
         ]];
     }
 
+    /**
+     * Push the whole catalog to Shiprocket Checkout with the documented Collection and
+     * Product webhooks (same payloads as the catalog APIs).
+     *
+     * @return array{collections: int, products: int, failed: array<int, string>}
+     */
+    public function pushAll(ShiprocketCheckoutService $checkout): array
+    {
+        $result = ['collections' => 0, 'products' => 0, 'failed' => []];
+
+        foreach (Category::where('is_active', true)->orderBy('id')->get() as $category) {
+            $res = $checkout->sendCollectionWebhook($this->formatCollection($category));
+            $res['ok'] ? $result['collections']++ : $result['failed'][] = "Collection #{$category->id} {$category->name}: {$res['error']}";
+        }
+
+        $this->productQuery()->orderBy('id')->chunk(50, function ($products) use ($checkout, &$result) {
+            foreach ($products as $product) {
+                $res = $checkout->sendProductWebhook($this->formatProduct($product));
+                $res['ok'] ? $result['products']++ : $result['failed'][] = "Product #{$product->id} {$product->name}: {$res['error']}";
+            }
+        });
+
+        return $result;
+    }
+
     public function productQuery(): Builder
     {
         // Soft-deleted products are excluded automatically.

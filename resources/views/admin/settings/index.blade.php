@@ -115,6 +115,7 @@
 </div>
 
 <!-- Standalone form (cannot be nested in the settings form) -->
+<form id="srcSyncCatalogForm" action="{{ route('admin.settings.shiprocket-checkout.catalog.sync') }}" method="POST" class="d-none">@csrf</form>
 <form id="srcRegenerateWebhookForm" action="{{ route('admin.settings.shiprocket-checkout.webhook.regenerate') }}" method="POST" class="d-none">@csrf</form>
 
 <!-- Settings Helper Modals -->

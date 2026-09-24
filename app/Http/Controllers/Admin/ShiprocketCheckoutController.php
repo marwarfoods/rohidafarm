@@ -46,6 +46,31 @@ class ShiprocketCheckoutController extends Controller
     }
 
     /**
+     * Push the whole catalog to Shiprocket Checkout now.
+     */
+    public function syncCatalog(ShiprocketCheckoutService $checkout, \App\Services\ShiprocketCheckoutCatalog $catalog)
+    {
+        $back = redirect()->to(route('admin.settings.index') . '#shiprocket-checkout');
+        if (!$checkout->hasCredentials()) {
+            return $back->with('error', 'Save the Shiprocket Checkout API Key and Secret Key first.');
+        }
+
+        @set_time_limit(300);
+        $result = $catalog->pushAll($checkout);
+        self::logActivity('shiprocket_checkout_catalog_sync', "Pushed {$result['products']} products / {$result['collections']} collections to Shiprocket Checkout.");
+
+        if ($result['failed']) {
+            $checkout->recordError('Catalog sync: ' . implode(' | ', array_slice($result['failed'], 0, 3)));
+
+            return $back->with('error', "Synced {$result['products']} product(s); " . count($result['failed']) . ' failed: ' . implode(' | ', array_slice($result['failed'], 0, 3)));
+        }
+
+        \App\Models\Setting::set('shiprocket_checkout_last_catalog_push_at', now()->toDateTimeString(), 'string', 'shiprocket_checkout', 'Last catalog push to Shiprocket Checkout');
+
+        return $back->with('success', "Catalog sent to Shiprocket Checkout: {$result['products']} product(s), {$result['collections']} collection(s).");
+    }
+
+    /**
      * Rotate the secret token in the order webhook URL.
      */
     public function regenerateWebhook(ShiprocketCheckoutService $checkout)
