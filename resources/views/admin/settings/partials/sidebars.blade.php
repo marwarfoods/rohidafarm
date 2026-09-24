@@ -62,6 +62,38 @@
     </ul>
 </div>
 
+<!-- Shiprocket Checkout Panel -->
+@php $srcSidebar = app(\App\Services\ShiprocketCheckoutService::class); @endphp
+<div class="card border-0 rounded-4 shadow-sm p-4 bg-white dynamic-sidebar-card" id="sidebar-shiprocket-checkout">
+    <h5 class="font-heading fw-bold text-dark border-bottom pb-2 mb-3"><i class="bi bi-lightning-charge text-success me-2"></i>Shiprocket Checkout</h5>
+    <p class="text-muted" style="font-size: 0.85rem; line-height:1.6;">Fastrr one-click checkout with address autofill, UPI/COD and RTO protection.</p>
+    <div class="bg-light p-3 rounded-3 border text-center">
+        <span class="badge bg-{{ $srcSidebar->isActive() ? 'success' : 'secondary' }} w-100 p-2 mb-2">Checkout: {{ $srcSidebar->isActive() ? 'ON' : 'OFF (native checkout)' }}</span>
+        <span class="badge bg-{{ filter_var(App\Models\Setting::get('shiprocket_enabled', 'false'), FILTER_VALIDATE_BOOLEAN) ? 'success' : 'warning text-dark' }} w-100 p-2">Shiprocket Shipping: {{ filter_var(App\Models\Setting::get('shiprocket_enabled', 'false'), FILTER_VALIDATE_BOOLEAN) ? 'On' : 'Off' }}</span>
+    </div>
+    <ul class="text-muted ps-3 mt-3" style="font-size: 0.8rem; line-height:1.8;">
+        <li>Keys are server-side only and encrypted.</li>
+        <li>Catalog/webhook URLs need a public HTTPS <code>APP_URL</code>.</li>
+        <li>Clear page cache after turning ON.</li>
+    </ul>
+</div>
+
+<!-- Shiprocket Engage Panel -->
+@php $engageSidebar = app(\App\Services\ShiprocketEngageService::class); @endphp
+<div class="card border-0 rounded-4 shadow-sm p-4 bg-white dynamic-sidebar-card" id="sidebar-shiprocket-engage">
+    <h5 class="font-heading fw-bold text-dark border-bottom pb-2 mb-3"><i class="bi bi-whatsapp text-success me-2"></i>Shiprocket Engage</h5>
+    <p class="text-muted" style="font-size: 0.85rem; line-height:1.6;">WhatsApp order confirmation, COD confirmation and address verification — run by Shiprocket on orders pushed from this site.</p>
+    <div class="bg-light p-3 rounded-3 border text-center">
+        <span class="badge bg-{{ $engageSidebar->isConfigured() ? 'success' : 'secondary' }} w-100 p-2 mb-2">Engage: {{ $engageSidebar->isConfigured() ? 'Enabled & Configured' : 'Disabled / Incomplete' }}</span>
+        <span class="badge bg-{{ filter_var(App\Models\Setting::get('shiprocket_enabled', 'false'), FILTER_VALIDATE_BOOLEAN) ? 'success' : 'warning text-dark' }} w-100 p-2">Order push to Shiprocket: {{ filter_var(App\Models\Setting::get('shiprocket_enabled', 'false'), FILTER_VALIDATE_BOOLEAN) ? 'On' : 'Off (required)' }}</span>
+    </div>
+    <ul class="text-muted ps-3 mt-3" style="font-size: 0.8rem; line-height:1.8;">
+        <li>Engage only sees orders that reach Shiprocket — keep the Shipping tab integration on.</li>
+        <li>Credentials priority: <strong>.env</strong> → this tab → Shipping tab.</li>
+        <li>Follow the <strong>Setup Guide</strong> below the form.</li>
+    </ul>
+</div>
+
 <!-- Integrations Panel -->
 <div class="card border-0 rounded-4 shadow-sm p-4 bg-white dynamic-sidebar-card" id="sidebar-integrations">
     <h5 class="font-heading fw-bold text-dark border-bottom pb-2 mb-3"><i class="bi bi-boxes text-success me-2"></i>Integration Status</h5>

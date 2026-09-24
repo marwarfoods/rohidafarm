@@ -250,7 +250,7 @@
                     </div>
 
                     <!-- Right: Continue Button -->
-                    <a href="{{ route('checkout.index') }}" class="btn btn-lg rounded-pill px-4 py-2.5 text-white fw-bold font-heading shadow-sm" style="background-color: #174C38; border-color: #174C38; font-size: 0.92rem; min-width: 140px; color: #ffffff !important;">
+                    <a data-shiprocket-checkout="cart" href="{{ route('checkout.index') }}" class="btn btn-lg rounded-pill px-4 py-2.5 text-white fw-bold font-heading shadow-sm" style="background-color: #174C38; border-color: #174C38; font-size: 0.92rem; min-width: 140px; color: #ffffff !important;">
                         Continue
                     </a>
                 </div>

@@ -38,6 +38,11 @@ class SettingController extends Controller
             'settings' => 'nullable|array',
             'settings.*' => 'nullable|string',
             'global_faqs' => 'nullable|array',
+            'settings.shiprocket_checkout_environment' => 'nullable|in:production,staging',
+            'settings.shiprocket_checkout_base_url' => 'nullable|url:https|max:255',
+            'settings.shiprocket_checkout_api_key' => 'nullable|string|max:255',
+            'settings.shiprocket_checkout_secret_key' => 'nullable|string|max:255',
+            'clear_secrets' => 'nullable|array',
         ];
         
         $request->validate($rules);
@@ -59,6 +64,26 @@ class SettingController extends Controller
                         Setting::set($key, $path, 'file', 'branding', ucfirst(str_replace('_', ' ', $key)));
                     }
                 }
+            }
+        }
+
+        // Secrets: stored encrypted, never echoed back; blank keeps the saved value.
+        $encryptedKeys = [
+            'shiprocket_engage_password' => ['shiprocket_engage', 'Shiprocket Engage API user password (encrypted)'],
+            'shiprocket_checkout_api_key' => ['shiprocket_checkout', 'Shiprocket Checkout API Key (encrypted)'],
+            'shiprocket_checkout_secret_key' => ['shiprocket_checkout', 'Shiprocket Checkout Secret Key (encrypted)'],
+        ];
+        $clearSecrets = (array) $request->input('clear_secrets', []);
+        foreach ($encryptedKeys as $key => [$group, $description]) {
+            if (array_key_exists($key, $settings)) {
+                $secret = trim((string) $settings[$key]);
+                unset($settings[$key]);
+                if ($secret !== '') {
+                    Setting::set($key, \Illuminate\Support\Facades\Crypt::encryptString($secret), 'encrypted', $group, $description);
+                }
+            }
+            if (filter_var($clearSecrets[$key] ?? false, FILTER_VALIDATE_BOOLEAN)) {
+                Setting::set($key, null, 'encrypted', $group, $description);
             }
         }
 
@@ -86,6 +111,12 @@ class SettingController extends Controller
                     $value = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
                 } elseif (str_starts_with($key, 'meta_pixel_')) {
                     $group = 'integrations';
+                }
+                if (str_starts_with($key, 'shiprocket_engage_')) {
+                    $group = 'shiprocket_engage';
+                }
+                if (str_starts_with($key, 'shiprocket_checkout_')) {
+                    $group = 'shiprocket_checkout';
                 }
                 // If it's the state-wise JSON, force it to be JSON type
                 if ($key === 'tax_state_wise') {

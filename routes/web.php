@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
+use App\Http\Controllers\Admin\ShiprocketEngageController as AdminShiprocketEngageController;
 use App\Http\Controllers\Admin\ActivityLogController as AdminActivityLogController;
 use App\Http\Controllers\Admin\VideoReviewController;
 use App\Http\Controllers\Admin\CustomerReviewController;
@@ -116,6 +117,11 @@ Route::post('/checkout/direct-buy', [CheckoutController::class, 'directBuy'])->m
 Route::post('/checkout/razorpay-callback', [CheckoutController::class, 'razorpayCallback'])->name('checkout.razorpay.callback');
 Route::post('/checkout/razorpay-cancel/{uuid}', [CheckoutController::class, 'razorpayCancel'])->name('checkout.razorpay.cancel');
 Route::get('/checkout/success/{uuid}', [CheckoutController::class, 'success'])->name('checkout.success');
+
+// Shiprocket Checkout (Fastrr one-click checkout) — falls back to the native checkout above
+Route::post('/shiprocket-checkout/token', [\App\Http\Controllers\ShiprocketCheckoutController::class, 'token'])->middleware('throttle:20,1')->name('shiprocket-checkout.token');
+Route::get('/shiprocket-checkout/return', [\App\Http\Controllers\ShiprocketCheckoutController::class, 'return'])->name('shiprocket-checkout.return');
+Route::get('/shiprocket-checkout/fallback', [\App\Http\Controllers\ShiprocketCheckoutController::class, 'fallback'])->middleware('signed')->name('shiprocket-checkout.fallback');
 Route::get('/order/receipt/{uuid}', [CheckoutController::class, 'receipt'])->name('order.receipt');
 
 Route::middleware(['auth'])->group(function () {
@@ -289,6 +295,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/settings/google-oauth/test', [AdminSettingController::class, 'testGoogleOAuth'])->name('settings.google.test');
         Route::post('/settings/turnstile/test', [AdminSettingController::class, 'testTurnstile'])->name('settings.turnstile.test');
         Route::post('/settings/shiprocket/test', [AdminSettingController::class, 'testShiprocket'])->name('settings.shiprocket.test');
+        Route::post('/settings/shiprocket-engage/test', [AdminShiprocketEngageController::class, 'testConnection'])->name('settings.shiprocket-engage.test');
+        Route::post('/settings/shiprocket-checkout/test', [\App\Http\Controllers\Admin\ShiprocketCheckoutController::class, 'testConnection'])->name('settings.shiprocket-checkout.test');
+        Route::post('/settings/shiprocket-checkout/webhook/regenerate', [\App\Http\Controllers\Admin\ShiprocketCheckoutController::class, 'regenerateWebhook'])->name('settings.shiprocket-checkout.webhook.regenerate');
     });
 
     // Audit Logs

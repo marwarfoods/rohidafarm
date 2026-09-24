@@ -47,6 +47,16 @@
                     </a>
                 </li>
                 <li class="nav-item" role="presentation">
+                    <a class="nav-link settings-tab-link" id="shiprocket-checkout-tab" data-bs-toggle="pill" href="#shiprocket-checkout" role="tab" aria-controls="shiprocket-checkout" aria-selected="false">
+                        <i class="bi bi-lightning-charge me-2"></i>Shiprocket Checkout
+                    </a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link settings-tab-link" id="shiprocket-engage-tab" data-bs-toggle="pill" href="#shiprocket-engage" role="tab" aria-controls="shiprocket-engage" aria-selected="false">
+                        <i class="bi bi-whatsapp me-2"></i>Shiprocket Engage
+                    </a>
+                </li>
+                <li class="nav-item" role="presentation">
                     <a class="nav-link settings-tab-link" id="integrations-tab" data-bs-toggle="pill" href="#integrations" role="tab" aria-controls="integrations" aria-selected="false">
                         <i class="bi bi-boxes me-2"></i>Integrations
                     </a>
@@ -80,6 +90,8 @@
                     @include('admin.settings.partials.seo')
                     @include('admin.settings.partials.payments')
                     @include('admin.settings.partials.shipping')
+                    @include('admin.settings.partials.shiprocket-engage')
+                    @include('admin.settings.partials.shiprocket-checkout')
                     @include('admin.settings.partials.integrations')
                     @include('admin.settings.partials.faqs')
                     @include('admin.settings.partials.auth')
@@ -101,6 +113,9 @@
         </div>
     </div>
 </div>
+
+<!-- Standalone form (cannot be nested in the settings form) -->
+<form id="srcRegenerateWebhookForm" action="{{ route('admin.settings.shiprocket-checkout.webhook.regenerate') }}" method="POST" class="d-none">@csrf</form>
 
 <!-- Settings Helper Modals -->
 @include('admin.settings.partials.modals')
@@ -363,6 +378,106 @@
                         resultDiv.className = 'mt-3 alert alert-danger fw-bold';
                         resultDiv.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i> Connection test failed.';
                     });
+                });
+            }
+
+            // Shiprocket Engage Connection Test
+            const btnTestEngage = document.getElementById('btnTestShiprocketEngage');
+            if (btnTestEngage) {
+                const engageBtnHtml = btnTestEngage.innerHTML;
+                const engageIcons = { pass: 'bi-check-circle-fill text-success', fail: 'bi-x-circle-fill text-danger', warn: 'bi-exclamation-triangle-fill text-warning', info: 'bi-info-circle-fill text-primary' };
+
+                btnTestEngage.addEventListener('click', function () {
+                    const resultDiv = document.getElementById('shiprocketEngageTestResult');
+                    btnTestEngage.disabled = true;
+                    btnTestEngage.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Testing with Shiprocket...';
+                    resultDiv.className = 'mt-3 alert alert-info';
+                    resultDiv.textContent = 'Connecting to Shiprocket API...';
+
+                    fetch('{{ route("admin.settings.shiprocket-engage.test") }}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                        body: JSON.stringify({
+                            email: (document.getElementById('shiprocketEngageEmail')?.value || '').trim(),
+                            password: document.getElementById('shiprocketEngagePassword')?.value || ''
+                        })
+                    })
+                    .then(res => res.json().then(data => ({ status: res.status, body: data })))
+                    .then(res => {
+                        const ok = res.status === 200 && res.body.status === 'success';
+                        resultDiv.className = 'mt-3 alert ' + (ok ? 'alert-success' : 'alert-danger');
+                        resultDiv.replaceChildren();
+
+                        const head = document.createElement('div');
+                        head.className = 'fw-bold fs-6 mb-2';
+                        head.textContent = (ok ? '✓ ' : '✗ ') + (res.body.message || (res.body.errors ? Object.values(res.body.errors).flat().join(' ') : 'Connection Failed'));
+                        resultDiv.appendChild(head);
+
+                        const list = document.createElement('ul');
+                        list.className = 'list-unstyled mb-0 small';
+                        (res.body.checks || []).forEach(c => {
+                            const li = document.createElement('li');
+                            li.className = 'mb-1';
+                            const icon = document.createElement('i');
+                            icon.className = 'bi me-1 ' + (engageIcons[c.status] || engageIcons.info);
+                            const label = document.createElement('strong');
+                            label.textContent = c.label + ': ';
+                            li.append(icon, label, document.createTextNode(c.detail));
+                            list.appendChild(li);
+                        });
+                        resultDiv.appendChild(list);
+                    })
+                    .catch(() => {
+                        resultDiv.className = 'mt-3 alert alert-danger fw-bold';
+                        resultDiv.textContent = '✗ Connection Failed — could not reach this server.';
+                    })
+                    .finally(() => {
+                        btnTestEngage.disabled = false;
+                        btnTestEngage.innerHTML = engageBtnHtml;
+                    });
+                });
+            }
+
+            // Shiprocket Checkout Connection Test
+            const btnTestSrc = document.getElementById('btnTestShiprocketCheckout');
+            if (btnTestSrc) {
+                const srcBtnHtml = btnTestSrc.innerHTML;
+                btnTestSrc.addEventListener('click', function () {
+                    const resultDiv = document.getElementById('shiprocketCheckoutTestResult');
+                    btnTestSrc.disabled = true;
+                    btnTestSrc.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Testing...';
+                    resultDiv.className = 'mt-3 alert alert-info';
+                    resultDiv.textContent = 'Sending a signed request to Shiprocket Checkout...';
+
+                    fetch('{{ route("admin.settings.shiprocket-checkout.test") }}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                        body: JSON.stringify({
+                            api_key: (document.getElementById('srcApiKey')?.value || '').trim(),
+                            secret_key: document.getElementById('srcSecretKey')?.value || ''
+                        })
+                    })
+                    .then(res => res.json().then(data => ({ status: res.status, body: data })))
+                    .then(res => {
+                        const ok = res.status === 200 && res.body.status === 'success';
+                        resultDiv.className = 'mt-3 alert ' + (ok ? 'alert-success' : 'alert-danger');
+                        resultDiv.replaceChildren();
+                        const head = document.createElement('div');
+                        head.className = 'fw-bold';
+                        head.textContent = res.body.message || (res.body.errors ? Object.values(res.body.errors).flat().join(' ') : '✗ Connection failed.');
+                        resultDiv.appendChild(head);
+                        if ((res.body.details || []).length) {
+                            const list = document.createElement('ul');
+                            list.className = 'small mb-0 mt-2';
+                            res.body.details.forEach(d => { const li = document.createElement('li'); li.textContent = d; list.appendChild(li); });
+                            resultDiv.appendChild(list);
+                        }
+                    })
+                    .catch(() => {
+                        resultDiv.className = 'mt-3 alert alert-danger fw-bold';
+                        resultDiv.textContent = '✗ Connection failed. Could not reach this server.';
+                    })
+                    .finally(() => { btnTestSrc.disabled = false; btnTestSrc.innerHTML = srcBtnHtml; });
                 });
             }
 

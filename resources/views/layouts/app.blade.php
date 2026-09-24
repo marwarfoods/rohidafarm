@@ -416,6 +416,7 @@
     </script>
     @endif
 
+    @include('frontend.partials.shiprocket-checkout')
     @stack('scripts')
     @stack('page-scripts')
 

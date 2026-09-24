@@ -36,6 +36,16 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useBootstrapFive();
 
+        // Shiprocket Checkout real-time catalog sync (no-op unless the integration is active)
+        \App\Models\Product::saved(fn ($p) => \App\Services\ShiprocketCheckoutCatalogSync::product($p->id));
+        \App\Models\Product::deleted(fn ($p) => \App\Services\ShiprocketCheckoutCatalogSync::product($p->id));
+        \App\Models\ProductVariant::saved(fn ($v) => \App\Services\ShiprocketCheckoutCatalogSync::product($v->product_id));
+        // decrement()/increment() (stock changes) fire "updated" but not "saved"
+        \App\Models\Product::updated(fn ($p) => \App\Services\ShiprocketCheckoutCatalogSync::product($p->id));
+        \App\Models\ProductVariant::updated(fn ($v) => \App\Services\ShiprocketCheckoutCatalogSync::product($v->product_id));
+        \App\Models\ProductVariant::deleted(fn ($v) => \App\Services\ShiprocketCheckoutCatalogSync::product($v->product_id));
+        \App\Models\Category::saved(fn ($c) => \App\Services\ShiprocketCheckoutCatalogSync::collection($c->id));
+
         // Implicitly grant admin all permissions
         \Illuminate\Support\Facades\Gate::before(function ($user, $ability) {
             return $user->isAdmin() ? true : null;

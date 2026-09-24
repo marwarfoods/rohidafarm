@@ -111,7 +111,7 @@
                         </div>
 
                         <!-- Checkout CTA -->
-                        <a href="{{ route('checkout.index') }}" class="btn btn-premium w-100 py-3 rounded-pill text-uppercase font-heading d-flex justify-content-between align-items-center px-4" style="font-size: 0.9rem; letter-spacing: 0.5px;">
+                        <a data-shiprocket-checkout="cart" href="{{ route('checkout.index') }}" class="btn btn-premium w-100 py-3 rounded-pill text-uppercase font-heading d-flex justify-content-between align-items-center px-4" style="font-size: 0.9rem; letter-spacing: 0.5px;">
                             <span>Checkout Now</span>
                             <i class="bi bi-arrow-right fs-5"></i>
                         </a>
