@@ -235,62 +235,51 @@ class SettingController extends Controller
     }
 
     /**
-     * Test Cloudflare Turnstile credentials.
+     * Test Google reCAPTCHA v3 credentials.
      */
-    public function testTurnstile(Request $request)
+    public function testRecaptcha(Request $request)
     {
-        $siteKey = trim($request->input('turnstile_site_key') ?: Setting::get('turnstile_site_key', ''));
-        $secretKey = trim($request->input('turnstile_secret_key') ?: Setting::get('turnstile_secret_key', ''));
+        $siteKey = trim($request->input('recaptcha_site_key') ?: Setting::get('recaptcha_site_key', ''));
+        $secretKey = trim($request->input('recaptcha_secret_key') ?: Setting::get('recaptcha_secret_key', ''));
 
         if (empty($siteKey) || empty($secretKey)) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Please provide both Turnstile Site Key and Secret Key before testing.'
+                'message' => 'Please provide both reCAPTCHA Site Key and Secret Key before testing.'
             ], 400);
         }
 
-        if (strlen($siteKey) < 10) {
+        if (strlen($siteKey) < 20 || strlen($secretKey) < 20) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Invalid Turnstile Site Key format. Standard Cloudflare keys usually start with 0x4AAAA...'
-            ], 400);
-        }
-
-        if (strlen($secretKey) < 10) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Invalid Turnstile Secret Key format. Standard Cloudflare secrets usually start with 0x4AAAA...'
+                'message' => 'Invalid reCAPTCHA key format. Google keys are 40 characters long and usually start with 6L...'
             ], 400);
         }
 
         try {
-            // Verify against Cloudflare Turnstile verification API
-            $response = \Illuminate\Support\Facades\Http::asForm()->timeout(8)->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+            // A dummy token: Google answers "invalid-input-secret" only when the secret itself is wrong.
+            $response = \Illuminate\Support\Facades\Http::asForm()->timeout(8)->post(\App\Services\RecaptchaService::VERIFY_URL, [
                 'secret' => $secretKey,
                 'response' => 'test_dummy_verification_token',
-                'remoteip' => $request->ip(),
             ]);
 
-            $result = $response->json();
-            $errorCodes = $result['error-codes'] ?? [];
+            $errorCodes = $response->json()['error-codes'] ?? [];
 
-            // If Cloudflare returns 'invalid-input-secret', the secret key is wrong
             if (in_array('invalid-input-secret', $errorCodes)) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Cloudflare rejected this Secret Key (invalid-input-secret). Please check the Secret Key from your Cloudflare Dashboard.'
+                    'message' => 'Google rejected this Secret Key (invalid-input-secret). Please check the Secret Key in your reCAPTCHA Admin Console.'
                 ], 422);
             }
 
-            // If secret is accepted by Cloudflare
             return response()->json([
                 'status' => 'success',
-                'message' => 'Cloudflare Turnstile credentials successfully verified! Secret Key is valid and recognized by Cloudflare.'
+                'message' => 'Google reCAPTCHA Secret Key verified! Make sure the Site Key is a v3 (score based) key for this domain.'
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Could not connect to Cloudflare Turnstile API: ' . $e->getMessage()
+                'message' => 'Could not connect to Google reCAPTCHA API: ' . $e->getMessage()
             ], 500);
         }
     }

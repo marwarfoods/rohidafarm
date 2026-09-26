@@ -293,7 +293,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/settings/save', [AdminSettingController::class, 'store'])->name('settings.save');
         Route::post('/settings/smtp/test', [AdminSettingController::class, 'testSmtp'])->name('settings.smtp.test');
         Route::post('/settings/google-oauth/test', [AdminSettingController::class, 'testGoogleOAuth'])->name('settings.google.test');
-        Route::post('/settings/turnstile/test', [AdminSettingController::class, 'testTurnstile'])->name('settings.turnstile.test');
+        Route::post('/settings/recaptcha/test', [AdminSettingController::class, 'testRecaptcha'])->name('settings.recaptcha.test');
         Route::post('/settings/shiprocket/test', [AdminSettingController::class, 'testShiprocket'])->name('settings.shiprocket.test');
         Route::post('/settings/shiprocket-engage/test', [AdminShiprocketEngageController::class, 'testConnection'])->name('settings.shiprocket-engage.test');
         Route::post('/settings/shiprocket-checkout/test', [\App\Http\Controllers\Admin\ShiprocketCheckoutController::class, 'testConnection'])->name('settings.shiprocket-checkout.test');

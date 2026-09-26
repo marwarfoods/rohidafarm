@@ -102,7 +102,7 @@
         <span class="badge bg-{{ filter_var(App\Models\Setting::get('shiprocket_enabled', 'false'), FILTER_VALIDATE_BOOLEAN) ? 'success' : 'secondary' }} w-100 p-2 mb-2">Shiprocket: {{ filter_var(App\Models\Setting::get('shiprocket_enabled', 'false'), FILTER_VALIDATE_BOOLEAN) ? 'Enabled' : 'Disabled' }}</span>
         <span class="badge bg-{{ App\Models\Setting::get('google_analytics_id') ? 'success' : 'secondary' }} w-100 p-2 mb-2">Google Analytics: {{ App\Models\Setting::get('google_analytics_id') ? 'Active' : 'Inactive' }}</span>
         <span class="badge bg-{{ App\Models\Setting::get('meta_pixel_enabled') && (App\Models\Setting::get('meta_pixel_id') || App\Models\Setting::get('meta_pixel_code')) ? 'success' : 'secondary' }} w-100 p-2 mb-2">Meta Pixel: {{ App\Models\Setting::get('meta_pixel_enabled') && (App\Models\Setting::get('meta_pixel_id') || App\Models\Setting::get('meta_pixel_code')) ? 'Active & Tracking' : 'Disabled' }}</span>
-        <span class="badge bg-{{ App\Models\Setting::get('turnstile_enabled') && App\Models\Setting::get('turnstile_site_key') ? 'success' : 'secondary' }} w-100 p-2">Cloudflare Turnstile: {{ App\Models\Setting::get('turnstile_enabled') && App\Models\Setting::get('turnstile_site_key') ? 'Active & Protecting' : 'Disabled' }}</span>
+        <span class="badge bg-{{ App\Models\Setting::get('recaptcha_enabled') && App\Models\Setting::get('recaptcha_site_key') ? 'success' : 'secondary' }} w-100 p-2">Google reCAPTCHA: {{ App\Models\Setting::get('recaptcha_enabled') && App\Models\Setting::get('recaptcha_site_key') ? 'Active & Protecting' : 'Disabled' }}</span>
     </div>
 </div>
 

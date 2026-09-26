@@ -133,7 +133,7 @@
 
                         {{-- Preview grid --}}
                         <div id="reviewImagePreviews" class="d-flex flex-wrap gap-2 mt-3"></div>
-                    <x-turnstile />
+                    <x-recaptcha />
 
                     <div class="d-flex gap-3">
                         <button type="submit" class="btn btn-premium px-5 py-2 rounded-pill">Submit Review</button>

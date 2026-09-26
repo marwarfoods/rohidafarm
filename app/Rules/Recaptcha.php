@@ -2,23 +2,23 @@
 
 namespace App\Rules;
 
-use App\Services\TurnstileService;
+use App\Services\RecaptchaService;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 
-class Turnstile implements ValidationRule
+class Recaptcha implements ValidationRule
 {
     /**
      * Run the validation rule.
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (!TurnstileService::isEnabled()) {
+        if (!RecaptchaService::isEnabled()) {
             return;
         }
 
-        if (!TurnstileService::verify($value)) {
-            $fail('Security verification failed (Cloudflare Turnstile). Please try submitting again.');
+        if (!RecaptchaService::verify($value)) {
+            $fail('Security verification failed (Google reCAPTCHA). Please try submitting again.');
         }
     }
 }

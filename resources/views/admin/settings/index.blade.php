@@ -293,35 +293,35 @@
                 });
             }
 
-            // Cloudflare Turnstile Connection Test
-            const btnTestTurnstile = document.getElementById('btnTestTurnstile');
-            if (btnTestTurnstile) {
-                btnTestTurnstile.addEventListener('click', function () {
-                    const siteKey = document.getElementById('inputTurnstileSiteKey').value.trim();
-                    const secretKey = document.getElementById('inputTurnstileSecretKey').value.trim();
-                    const resultDiv = document.getElementById('turnstileTestResult');
+            // Google reCAPTCHA Connection Test
+            const btnTestRecaptcha = document.getElementById('btnTestRecaptcha');
+            if (btnTestRecaptcha) {
+                btnTestRecaptcha.addEventListener('click', function () {
+                    const siteKey = document.getElementById('inputRecaptchaSiteKey').value.trim();
+                    const secretKey = document.getElementById('inputRecaptchaSecretKey').value.trim();
+                    const resultDiv = document.getElementById('recaptchaTestResult');
 
-                    btnTestTurnstile.disabled = true;
-                    btnTestTurnstile.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Verifying with Cloudflare...';
+                    btnTestRecaptcha.disabled = true;
+                    btnTestRecaptcha.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Verifying with Google...';
                     resultDiv.className = 'mt-3 alert alert-info';
                     resultDiv.classList.remove('d-none');
-                    resultDiv.textContent = 'Contacting Cloudflare Turnstile API...';
+                    resultDiv.textContent = 'Contacting Google reCAPTCHA API...';
 
-                    fetch('{{ route("admin.settings.turnstile.test") }}', {
+                    fetch('{{ route("admin.settings.recaptcha.test") }}', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                         },
                         body: JSON.stringify({
-                            turnstile_site_key: siteKey,
-                            turnstile_secret_key: secretKey
+                            recaptcha_site_key: siteKey,
+                            recaptcha_secret_key: secretKey
                         })
                     })
                     .then(res => res.json().then(data => ({ status: res.status, body: data })))
                     .then(res => {
-                        btnTestTurnstile.disabled = false;
-                        btnTestTurnstile.innerHTML = '<i class="bi bi-shield-check me-1"></i> Test Connection';
+                        btnTestRecaptcha.disabled = false;
+                        btnTestRecaptcha.innerHTML = '<i class="bi bi-shield-check me-1"></i> Test Connection';
                         if (res.status === 200 && res.body.status === 'success') {
                             resultDiv.className = 'mt-3 alert alert-success fw-bold';
                             resultDiv.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>' + res.body.message;
@@ -331,8 +331,8 @@
                         }
                     })
                     .catch(err => {
-                        btnTestTurnstile.disabled = false;
-                        btnTestTurnstile.innerHTML = '<i class="bi bi-shield-check me-1"></i> Test Connection';
+                        btnTestRecaptcha.disabled = false;
+                        btnTestRecaptcha.innerHTML = '<i class="bi bi-shield-check me-1"></i> Test Connection';
                         resultDiv.className = 'mt-3 alert alert-danger fw-bold';
                         resultDiv.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i> Connection test failed.';
                     });

@@ -18,7 +18,7 @@ class RegisterRequest extends FormRequest
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'phone' => ['required', 'string', 'regex:/^[0-9]{10}$/', 'unique:users,phone'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'cf-turnstile-response' => [new \App\Rules\Turnstile()],
+            'g-recaptcha-response' => [new \App\Rules\Recaptcha()],
         ];
     }
 

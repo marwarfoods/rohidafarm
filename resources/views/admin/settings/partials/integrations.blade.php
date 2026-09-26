@@ -19,57 +19,65 @@
 
     <hr class="my-4">
 
-    <!-- Cloudflare Turnstile CAPTCHA Protection -->
+    <!-- Google reCAPTCHA v3 Protection -->
+    @php
+        $recaptchaOn = \App\Models\Setting::get('recaptcha_enabled') && \App\Models\Setting::get('recaptcha_site_key');
+    @endphp
     <div>
         <div class="d-flex align-items-center justify-content-between mb-3">
             <h6 class="fw-bold text-dark d-flex align-items-center m-0">
-                <i class="bi bi-shield-lock-fill text-warning fs-5 me-2"></i> Cloudflare Turnstile (Bot & Spam Protection)
+                <i class="bi bi-shield-lock-fill text-warning fs-5 me-2"></i> Google reCAPTCHA v3 (Bot & Spam Protection)
             </h6>
-            <span class="badge bg-{{ \App\Models\Setting::get('turnstile_enabled') && \App\Models\Setting::get('turnstile_site_key') ? 'success' : 'secondary' }}">
-                {{ \App\Models\Setting::get('turnstile_enabled') && \App\Models\Setting::get('turnstile_site_key') ? 'Enabled' : 'Disabled' }}
+            <span class="badge bg-{{ $recaptchaOn ? 'success' : 'secondary' }}">
+                {{ $recaptchaOn ? 'Enabled' : 'Disabled' }}
             </span>
         </div>
 
         <div class="card border rounded-3 p-3 bg-light mb-3">
             <div class="form-check form-switch mb-1">
-                <input type="hidden" name="settings[turnstile_enabled]" value="0">
-                <input class="form-check-input" type="checkbox" name="settings[turnstile_enabled]" value="1" id="turnstileSwitch" {{ \App\Models\Setting::get('turnstile_enabled') ? 'checked' : '' }}>
-                <label class="form-check-label fw-bold text-dark fs-6" for="turnstileSwitch">Enable Cloudflare Turnstile on Public Forms</label>
+                <input type="hidden" name="settings[recaptcha_enabled]" value="0">
+                <input class="form-check-input" type="checkbox" name="settings[recaptcha_enabled]" value="1" id="recaptchaSwitch" {{ \App\Models\Setting::get('recaptcha_enabled') ? 'checked' : '' }}>
+                <label class="form-check-label fw-bold text-dark fs-6" for="recaptchaSwitch">Enable Google reCAPTCHA v3 on Public Forms</label>
             </div>
-            <small class="text-muted d-block">Invisible and frictionless bot security protecting Login, Registration, Contact Form, Reviews, and Password Reset.</small>
+            <small class="text-muted d-block">Invisible background check (no checkbox) protecting Login, Registration, Contact Form, Reviews, and Password Reset. Only the small reCAPTCHA badge shows at the bottom-left.</small>
         </div>
 
         <div class="row g-3">
             <div class="col-md-6">
-                <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Turnstile Site Key</label>
-                <input type="text" name="settings[turnstile_site_key]" id="inputTurnstileSiteKey" class="form-control bg-light border p-2 font-monospace" placeholder="e.g. 0x4AAAAAA..." value="{{ \App\Models\Setting::get('turnstile_site_key') }}">
-                <small class="text-muted">Public Site Key from Cloudflare Turnstile Dashboard</small>
+                <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">reCAPTCHA Site Key</label>
+                <input type="text" name="settings[recaptcha_site_key]" id="inputRecaptchaSiteKey" class="form-control bg-light border p-2 font-monospace" placeholder="e.g. 6Lc..." value="{{ \App\Models\Setting::get('recaptcha_site_key') }}">
+                <small class="text-muted">Public Site Key (reCAPTCHA v3) from the Google reCAPTCHA Admin Console</small>
             </div>
             <div class="col-md-6">
-                <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Turnstile Secret Key</label>
+                <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">reCAPTCHA Secret Key</label>
                 <div class="input-group">
-                    <input type="password" name="settings[turnstile_secret_key]" id="inputTurnstileSecretKey" class="form-control bg-light border p-2 font-monospace" placeholder="e.g. 0x4AAAAAA..." value="{{ \App\Models\Setting::get('turnstile_secret_key') }}">
+                    <input type="password" name="settings[recaptcha_secret_key]" id="inputRecaptchaSecretKey" class="form-control bg-light border p-2 font-monospace" placeholder="e.g. 6Lc..." value="{{ \App\Models\Setting::get('recaptcha_secret_key') }}">
                     <button class="btn btn-outline-secondary toggle-password" type="button"><i class="bi bi-eye"></i></button>
                 </div>
                 <small class="text-muted">Server-side Secret Key used for verification API</small>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Minimum Score</label>
+                <input type="number" name="settings[recaptcha_min_score]" class="form-control bg-light border p-2" min="0.1" max="1" step="0.1" value="{{ \App\Models\Setting::get('recaptcha_min_score', '0.5') }}">
+                <small class="text-muted">0.1 (lenient) – 1.0 (strict). Submissions scoring below this are blocked. Google recommends 0.5.</small>
             </div>
         </div>
 
         <div class="alert alert-info border-0 rounded-3 py-2 px-3 mt-3 d-flex align-items-center gap-2" style="font-size:0.85rem;">
             <i class="bi bi-info-circle-fill text-primary fs-5"></i>
-            <span><strong>Auto-Mode:</strong> Turnstile automatically syncs with Cloudflare. If you configured <em>Managed (Visible Checkbox)</em> or <em>Invisible</em> in your Cloudflare dashboard, it will render accordingly on all login, registration, contact, and submission forms.</span>
+            <span>Create the keys as <strong>Score based (v3)</strong> in the Google console and add your domain there. v2 checkbox keys will not work.</span>
         </div>
 
         <div class="mt-3 d-flex align-items-center gap-3">
-            <button type="button" class="btn btn-outline-success fw-bold rounded-pill px-4" id="btnTestTurnstile">
+            <button type="button" class="btn btn-outline-success fw-bold rounded-pill px-4" id="btnTestRecaptcha">
                 <i class="bi bi-shield-check me-1"></i> Test Connection
             </button>
-            <a href="https://dash.cloudflare.com/?to=/:account/turnstile" target="_blank" class="btn btn-link text-decoration-none text-muted p-0" style="font-size: 0.85rem;">
-                <i class="bi bi-box-arrow-up-right me-1"></i> Open Cloudflare Dashboard
+            <a href="https://www.google.com/recaptcha/admin" target="_blank" class="btn btn-link text-decoration-none text-muted p-0" style="font-size: 0.85rem;">
+                <i class="bi bi-box-arrow-up-right me-1"></i> Open reCAPTCHA Admin Console
             </a>
         </div>
 
-        <div id="turnstileTestResult" class="mt-3 d-none"></div>
+        <div id="recaptchaTestResult" class="mt-3 d-none"></div>
     </div>
 
     <hr class="my-4">
