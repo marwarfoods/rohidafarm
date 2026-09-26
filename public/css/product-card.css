@@ -4,10 +4,6 @@
     border: 1px solid rgba(236, 231, 221, 0.7) !important;
     transition: all 0.25s ease-in-out;
 }
-.product-card:hover {
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06) !important;
-    transform: translateY(-2px);
-}
 
 /* Image hover transition */
 .product-card .product-card-img-primary {
@@ -25,15 +21,34 @@
     height: 100%;
     object-fit: cover;
 }
-.product-card:hover .product-card-img-primary {
-    transform: scale(1.03);
+/* Hover effects only on real hover devices (mouse). On touch screens a :hover
+   that reveals content (the alternate image fading in) makes iOS/Android treat
+   the first tap as "hover" and swallow it, so tapping a card did nothing. */
+@media (hover: hover) and (pointer: fine) {
+    .product-card:hover {
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06) !important;
+        transform: translateY(-2px);
+    }
+    .product-card:hover .product-card-img-primary {
+        transform: scale(1.03);
+    }
+    .product-card:hover .product-card-img-hover {
+        opacity: 1 !important;
+        transform: scale(1.03);
+    }
+    .product-card:hover .product-actions {
+        transform: translateY(0) !important;
+    }
 }
-.product-card:hover .product-card-img-hover {
-    opacity: 1 !important;
-    transform: scale(1.03);
-}
-.product-card:hover .product-actions {
-    transform: translateY(0) !important;
+
+/* Touch devices: never render the hover-only image, and remove tap delay. */
+@media (hover: none), (pointer: coarse) {
+    .product-card .product-card-img-hover {
+        display: none;
+    }
+    .product-card a {
+        touch-action: manipulation;
+    }
 }
 
 .product-card .card-body {

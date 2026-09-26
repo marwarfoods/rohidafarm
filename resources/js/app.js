@@ -289,8 +289,13 @@ document.addEventListener('DOMContentLoaded', function () {
         const csrfToken = (csrfMeta && csrfMeta.getAttribute('content')) || (csrfField && csrfField.value) || '';
 
         const submitBtn = form.querySelector('[type="submit"]');
-        const submitBtnHtml = submitBtn ? submitBtn.innerHTML : null;
-        if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '...'; }
+        // A tap held by the layout's early guard already swapped the label for a spinner.
+        const submitBtnHtml = submitBtn ? (submitBtn.dataset.origHtml || submitBtn.innerHTML) : null;
+        if (submitBtn) {
+            delete submitBtn.dataset.origHtml;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>';
+        }
 
         const restoreBtn = function () {
             if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = submitBtnHtml; }
@@ -328,6 +333,15 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             restoreBtn();
+
+            // Bump the header badges right away instead of waiting for the drawer HTML.
+            if (data && data.cart_count !== undefined) {
+                document.querySelectorAll('.cart-badge-count').forEach(badge => {
+                    badge.innerText = data.cart_count;
+                    badge.classList.toggle('d-none', !data.cart_count);
+                });
+            }
+            showCartSkeleton();
             reloadCartDrawer(function () { hideCartSkeleton(); });
 
             // Trigger Top Add-Ons Modal ("✔ Added to Cart!"). The item is
@@ -358,6 +372,15 @@ document.addEventListener('DOMContentLoaded', function () {
             form.submit();
         });
     });
+
+    // Replay an "Add to Cart" tap the layout's early guard held while scripts were loading.
+    window.__cartReady = true;
+    if (window.__pendingCartForm) {
+        const pendingForm = window.__pendingCartForm;
+        window.__pendingCartForm = null;
+        if (pendingForm.requestSubmit) pendingForm.requestSubmit();
+        else pendingForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    }
 
     // "Added to Cart!" Add-Ons Modal — confirm button was previously wired to
     // nothing, so checking add-ons and clicking "Add to Cart" silently did
@@ -480,21 +503,24 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Auto-open drawers after page reload if flag is present
+    // Auto-open drawers after page reload if flag is present. Open as soon as the
+    // DOM is ready — waiting for window "load" (every image on the page) made the
+    // drawer pop open seconds later, long after the user had moved on.
+    function openDrawerNow(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (window.bootstrap) bootstrap.Offcanvas.getOrCreateInstance(el).show();
+        else window.addEventListener('load', () => bootstrap.Offcanvas.getOrCreateInstance(el).show());
+    }
+
     if (sessionStorage.getItem('open_cart_drawer') === '1') {
         sessionStorage.removeItem('open_cart_drawer');
-        window.addEventListener('load', function() {
-            const cartDrawer = new bootstrap.Offcanvas(document.getElementById('cartOffcanvas'));
-            cartDrawer.show();
-        });
+        openDrawerNow('cartOffcanvas');
     }
 
     if (sessionStorage.getItem('open_wishlist_drawer') === '1') {
         sessionStorage.removeItem('open_wishlist_drawer');
-        window.addEventListener('load', function() {
-            const wishlistDrawer = new bootstrap.Offcanvas(document.getElementById('wishlistOffcanvas'));
-            wishlistDrawer.show();
-        });
+        openDrawerNow('wishlistOffcanvas');
     }
 
     // Hide mobile sticky CTA and prevent background scroll when any offcanvas is opened

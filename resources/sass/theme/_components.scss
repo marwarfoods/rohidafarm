@@ -401,3 +401,26 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
+
+// Coupon "Apply" buttons (cart page, checkout, available coupons list): solid black, white text.
+.btn-coupon-black {
+    background-color: #000 !important;
+    border-color: #000 !important;
+    color: #fff !important;
+
+    &:hover,
+    &:focus,
+    &:active {
+        background-color: #262626 !important;
+        border-color: #262626 !important;
+        color: #fff !important;
+    }
+
+    &:disabled,
+    &.disabled {
+        background-color: #198754 !important;
+        border-color: #198754 !important;
+        color: #fff !important;
+        opacity: 1;
+    }
+}

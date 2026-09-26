@@ -95,7 +95,7 @@ class AppServiceProvider extends ServiceProvider
 
             // Share only currently valid, active coupons with the store coupons popup,
             // each resolved to the product/category page it should deep-link to.
-            view()->composer('frontend.partials.coupons-offcanvas', function ($view) {
+            view()->composer(['frontend.partials.coupons-offcanvas', 'frontend.partials.available-coupons'], function ($view) {
                 $now = now();
 
                 $coupons = \App\Models\Coupon::where('is_active', true)

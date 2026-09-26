@@ -37,7 +37,7 @@
                             </div>
 
                             <div class="col-md-6">
-                                <input type="text" name="phone" id="shippingPhone" class="form-control bg-light border p-2 @error('phone') is-invalid @enderror" value="{{ old('phone', $defaultAddress?->phone ?? Auth::user()?->phone) }}" placeholder="Mobile Number *" required>
+                                <input type="text" name="phone" id="shippingPhone" class="form-control bg-light border p-2 @error('phone') is-invalid @enderror" value="{{ old('phone', $defaultAddress?->phone ?? Auth::user()?->phone) }}" placeholder="Mobile Number *" required inputmode="tel" pattern="[0-9+\s\-]{10,15}">
                                 @error('phone')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -191,16 +191,16 @@
                         <div class="accordion mb-4 border rounded-3 overflow-hidden" id="couponAccordion" style="border-color: #ECE7DD !important;">
                             <div class="accordion-item border-0">
                                 <h2 class="accordion-header">
-                                    <button class="accordion-button collapsed py-2 px-3 bg-light shadow-none fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCoupon" aria-expanded="false" aria-controls="collapseCoupon" style="font-size: 0.85rem;">
+                                    <button class="accordion-button py-2 px-3 bg-light shadow-none fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCoupon" aria-expanded="true" aria-controls="collapseCoupon" style="font-size: 0.85rem;">
                                         <i class="bi bi-tag-fill text-success me-2"></i> Have a coupon code?
                                     </button>
                                 </h2>
-                                <div id="collapseCoupon" class="accordion-collapse collapse {{ $totals['coupon'] ? 'show' : '' }}" data-bs-parent="#couponAccordion">
+                                <div id="collapseCoupon" class="accordion-collapse collapse show" data-bs-parent="#couponAccordion">
                                     <div class="accordion-body p-3 bg-white">
                                         <!-- Apply Group -->
                                         <div class="input-group mb-0" id="couponApplyGroup" style="{{ $totals['coupon'] ? 'display:none !important;' : '' }}">
                                             <input type="text" id="couponInput" class="form-control border shadow-none" placeholder="Enter Code (e.g. PURE15)" style="font-size: 0.85rem; padding: 8px 12px;">
-                                            <button type="button" id="btnApplyCoupon" class="btn btn-dark fw-bold px-3" style="font-size: 0.8rem;">APPLY</button>
+                                            <button type="button" id="btnApplyCoupon" class="btn btn-coupon-black fw-bold px-3" style="font-size: 0.8rem;">APPLY</button>
                                         </div>
 
                                         <!-- Applied Group -->
@@ -211,6 +211,8 @@
                                             </div>
                                             <button type="button" id="btnRemoveCoupon" class="btn btn-sm text-danger p-0 border-0"><i class="bi bi-x-circle-fill fs-6"></i></button>
                                         </div>
+
+                                        @include('frontend.partials.available-coupons')
                                     </div>
                                 </div>
                             </div>
@@ -412,10 +414,63 @@
         const checkoutForm = document.getElementById('checkoutForm');
         const placeOrderBtn = document.getElementById('placeOrderBtn');
 
+        // Flags every empty/invalid required field, scrolls to the first one and focuses it.
+        // Exposed on window so the Shiprocket Checkout launcher can validate before it opens.
+        const fieldMessages = {
+            name: 'Please enter your full name.',
+            phone: 'Please enter a valid 10-digit mobile number.',
+            email: 'Please enter a valid email address.',
+            address_line1: 'Please enter your street address / house no.',
+            postal_code: 'Please enter a valid 6-digit pin code.',
+            city: 'Please enter your city.',
+            state: 'Please enter your state.',
+        };
+
+        function showFieldError(field) {
+            field.classList.add('is-invalid');
+            let fb = field.parentElement.querySelector('.invalid-feedback');
+            if (!fb) {
+                fb = document.createElement('div');
+                fb.className = 'invalid-feedback';
+                field.parentElement.appendChild(fb);
+            }
+            fb.textContent = fieldMessages[field.name] || field.validationMessage || 'This field is required.';
+            fb.style.display = 'block';
+        }
+
+        function clearFieldError(field) {
+            field.classList.remove('is-invalid');
+            const fb = field.parentElement.querySelector('.invalid-feedback');
+            if (fb) fb.style.display = 'none';
+        }
+
+        window.validateCheckoutForm = function () {
+            let firstInvalid = null;
+            checkoutForm.querySelectorAll('input[required], select[required], textarea[required]').forEach(field => {
+                field.value = field.value.trim();
+                if (field.checkValidity()) {
+                    clearFieldError(field);
+                } else {
+                    showFieldError(field);
+                    if (!firstInvalid) firstInvalid = field;
+                }
+            });
+            if (firstInvalid) {
+                const y = firstInvalid.getBoundingClientRect().top + window.scrollY - 140; // clear the sticky header
+                window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+                setTimeout(() => firstInvalid.focus({ preventScroll: true }), 350);
+                return false;
+            }
+            return true;
+        };
+
+        checkoutForm.querySelectorAll('input[required], select[required], textarea[required]').forEach(field => {
+            field.addEventListener('input', () => { if (field.checkValidity()) clearFieldError(field); });
+        });
+
         placeOrderBtn.addEventListener('click', function(e) {
             // Check form validity before submitting
-            if (!checkoutForm.checkValidity()) {
-                checkoutForm.reportValidity();
+            if (!window.validateCheckoutForm()) {
                 return;
             }
 

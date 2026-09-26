@@ -59,6 +59,12 @@
                 }
                 // Free (₹0) orders stay on the native checkout.
                 if (el.id === 'placeOrderBtn' && /free/i.test(el.textContent)) return;
+                // Checkout page: block until the shipping form is filled (shows errors + scrolls to the field).
+                if (el.id === 'placeOrderBtn' && typeof window.validateCheckoutForm === 'function' && !window.validateCheckoutForm()) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    return;
+                }
 
                 const isCart = el.matches('[data-shiprocket-checkout="cart"], #placeOrderBtn');
                 const payload = isCart ? { source: 'cart' } : buyNowPayload();

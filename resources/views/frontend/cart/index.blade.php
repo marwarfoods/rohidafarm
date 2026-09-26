@@ -124,7 +124,7 @@
                         <!-- Toggle Form / Applied view -->
                         <div class="input-group mb-0" id="couponApplyGroup" style="{{ $totals['coupon'] ? 'display:none !important;' : '' }}">
                             <input type="text" id="couponInput" class="form-control border bg-light shadow-none" placeholder="Enter Code (e.g. PURE15)" style="font-size: 0.9rem; padding: 10px 15px;">
-                            <button type="button" id="btnApplyCoupon" class="btn btn-dark font-heading px-4 text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px;">Apply</button>
+                            <button type="button" id="btnApplyCoupon" class="btn btn-coupon-black font-heading px-4 text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px;">Apply</button>
                         </div>
 
                         <div class="bg-success-subtle border border-success-subtle p-3 rounded-3 d-flex justify-content-between align-items-center" id="couponAppliedGroup" style="{{ $totals['coupon'] ? '' : 'display:none !important;' }}">
@@ -134,6 +134,8 @@
                             </div>
                             <button type="button" id="btnRemoveCoupon" class="btn btn-sm btn-outline-danger px-2 border-0"><i class="bi bi-x-circle-fill"></i></button>
                         </div>
+
+                        @include('frontend.partials.available-coupons')
                     </div>
                 </div>
             </div>

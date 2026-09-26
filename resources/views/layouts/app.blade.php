@@ -119,6 +119,23 @@
     {{-- -- Preload Primary Font -- --}}
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Inter:wght@400;600&display=swap">
 
+    {{-- -- Add to Cart early guard --
+         Until app.js is ready (first visit on a slow connection), an "Add to Cart"
+         tap would do a full-page form POST + redirect. Hold the tap instead, show a
+         spinner, and let app.js replay it through the AJAX flow once it loads. --}}
+    <script>
+        document.addEventListener('submit', function (e) {
+            if (window.__cartReady) return;
+            var f = e.target;
+            if (!f || !f.matches || !(f.matches('form.add-to-cart-form') || /\/cart\/add$/.test(f.action || ''))) return;
+            e.preventDefault();
+            if (window.__pendingCartForm) return;
+            window.__pendingCartForm = f;
+            var b = f.querySelector('[type="submit"]');
+            if (b) { b.dataset.origHtml = b.innerHTML; b.disabled = true; b.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>'; }
+        }, true);
+    </script>
+
     {{-- -- 3rd-party scripts - deferred -- --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
     <script src="https://unpkg.com/aos@2.3.4/dist/aos.js" defer></script>

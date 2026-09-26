@@ -156,6 +156,21 @@ document.addEventListener('DOMContentLoaded', function () {
             productSwiper.allowTouchMove = true;
             productSwiper.autoplay.start();
         });
+
+        // Hold autoplay while a finger is on the slider: an autoplay slide (and
+        // the loop's slide re-ordering) mid-tap moves the card out from under
+        // the finger, so the tap on its image/title never became a click.
+        let resumeTimer = null;
+        slider.addEventListener('touchstart', function () {
+            clearTimeout(resumeTimer);
+            productSwiper.autoplay.stop();
+        }, { passive: true });
+        slider.addEventListener('touchend', function () {
+            clearTimeout(resumeTimer);
+            resumeTimer = setTimeout(() => {
+                if (productSwiper.allowTouchMove) productSwiper.autoplay.start();
+            }, 4000);
+        }, { passive: true });
     });
 
     // Initialize Promo Three Slider on Mobile
